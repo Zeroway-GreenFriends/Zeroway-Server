@@ -1,10 +1,10 @@
 package com.zeroway.user.dto;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 @Getter
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class SignInReq {
     private String email;
     private String nickname;

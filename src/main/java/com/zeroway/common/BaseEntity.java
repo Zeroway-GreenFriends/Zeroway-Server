@@ -1,5 +1,6 @@
 package com.zeroway.common;
 
+import com.github.dozermapper.core.Mapping;
 import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 import org.springframework.boot.context.properties.bind.DefaultValue;
