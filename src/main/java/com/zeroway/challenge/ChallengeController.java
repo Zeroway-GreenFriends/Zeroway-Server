@@ -1,19 +1,14 @@
 package com.zeroway.challenge;
 
-import com.zeroway.challenge.entity.Challenge;
+import com.zeroway.challenge.dto.GetChallengeRes;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/challenge")
 public class ChallengeController {
 
@@ -24,9 +19,22 @@ public class ChallengeController {
         this.challengeService = challengeService;
     }
 
-    @GetMapping("/list")
-    public List<Challenge> challengeList(@RequestParam Long id) {
-        return challengeService.findList();
+//    @GetMapping("/list")
+//    public List<Challenge> challengeList(@RequestParam Long id) {
+//        return challengeService.findList();
+//    }
+
+    @ResponseBody
+    @GetMapping("/{user_id}")
+    public BaseResponse<List<GetChallengeRes>> getPosts(@PathVariable("user_id") int userId) {
+        try{
+            List<GetChallengeRes> GetChallengeRes = challengeService.getList(userId);
+            return new BaseResponse<>(GetChallengeRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
     }
+
+
 
 }
