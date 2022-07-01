@@ -1,10 +1,13 @@
 package com.zeroway.user.dto;
 
 import com.github.dozermapper.core.Mapping;
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @AllArgsConstructor
 public class SignUpReq {
 
