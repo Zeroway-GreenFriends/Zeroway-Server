@@ -1,10 +1,12 @@
 package com.zeroway.user.entity;
 
 import com.zeroway.common.BaseEntity;
+import lombok.Getter;
 
 import javax.persistence.*;
 
 @Entity
+@Getter
 public class User extends BaseEntity {
 
     @Id @GeneratedValue
