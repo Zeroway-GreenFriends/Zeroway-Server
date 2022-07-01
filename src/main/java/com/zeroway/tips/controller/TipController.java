@@ -17,12 +17,14 @@ public class TipController {
 
     private final TipService tipService;
 
+    /**
+     * 오늘의 팁, 환경 용어 전체 조회 API
+     */
     @GetMapping("/all")
     public ResponseEntity<?> getAllTips() {
 
         try {
             AllTipRes allTips = tipService.getAllTips();
-            System.out.println("new BaseResponse<>(allTips) = " + new BaseResponse<>(allTips));
             return ResponseEntity.ok().body(new BaseResponse<>(allTips));
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
