@@ -27,5 +27,5 @@ public class BaseEntity {
     @Column
     @Enumerated(EnumType.STRING)
     @ColumnDefault("'ACTIVE'")
-    private StatusType status;
+    private StatusType status = StatusType.ACTIVE;
 }

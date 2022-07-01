@@ -25,11 +25,11 @@ public class User extends BaseEntity {
 
     // 달성한 챌린지의 개수
     @ColumnDefault("0")
-    private Integer challengeCount;
+    private Integer challengeCount = 0;
 
     // 캐릭터 레벨
     @ColumnDefault("1")
-    private Integer level;
+    private Integer level = 1;
 
 
 }
