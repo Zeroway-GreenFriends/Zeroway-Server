@@ -13,14 +13,11 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    private ProviderType provider;
-
     @Column(unique = true)
     private String email;
 
     @Column(nullable = false)
-    private String name;
+    private String nickname;
 
     // 달성한 챌린지의 개수
     private int challengeCount;
