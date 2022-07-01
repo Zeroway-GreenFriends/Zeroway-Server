@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class GetChallengeRes {
+    private Long challenge_id;
     private boolean complete;
     private String content;
 }
