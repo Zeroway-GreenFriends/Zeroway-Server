@@ -1,12 +1,15 @@
 package com.zeroway.user.entity;
 
 import com.zeroway.common.BaseEntity;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
+@AllArgsConstructor
 public class User extends BaseEntity {
 
     @Id @GeneratedValue
@@ -24,9 +27,6 @@ public class User extends BaseEntity {
 
     // 캐릭터 레벨
     private int level;
-
-
-
 
 
 }
