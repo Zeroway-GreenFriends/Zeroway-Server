@@ -23,6 +23,7 @@ public enum BaseResponseStatus {
     POST_USER_EMPTY_EMAIL(false, 2003, "이메일 값을 넣어주세요."),
     POST_USER_INVALID_EMAIL(false, 2004, "이메일 형식을 확신해주세요."),
     LOGIN_FAILED(false, 2005, "존재하지 않는 회원입니다."),
+    POST_USERS_EXISTS_EMAIL(false, 2021, "이미 가입된 이메일입니다."),
 
     /**
      * 3000 : Response 오류

@@ -46,6 +46,7 @@ public class ChallengeController {
         try{
             challengeService.completeChallenge(userId,challengeId);
             String result = "챌린지 수행 완료";
+            checkLevelUpgrade(userId);
             return new BaseResponse<>(result);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
@@ -55,8 +56,15 @@ public class ChallengeController {
         }
     }
 
-
-
+    private void checkLevelUpgrade(Long userId) {
+        try {
+            if(challengeService.checkLevelUpgrade(userId)>=5){
+                challengeService.levelUpgrade(userId);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 
 }

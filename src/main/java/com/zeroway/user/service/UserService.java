@@ -3,6 +3,7 @@ package com.zeroway.user.service;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
 import com.zeroway.common.BaseResponseStatus;
+import com.zeroway.common.StatusType;
 import com.zeroway.user.dto.PostUserRes;
 import com.zeroway.user.dto.SignInReq;
 import com.zeroway.user.dto.SignUpReq;
@@ -31,6 +32,9 @@ public class UserService {
      * 회원가입
      */
     public PostUserRes join(SignUpReq signUpReq) throws BaseException {
+        if (userRepository.existsUserByEmailAndStatus(signUpReq.getEmail(), StatusType.ACTIVE)) {
+            throw new BaseException(POST_USERS_EXISTS_EMAIL);
+        }
         User mappedUser = mapper.map(signUpReq, User.class);
         User user = userRepository.save(mappedUser);
 
@@ -56,7 +60,7 @@ public class UserService {
             throw new BaseException(LOGIN_FAILED);
         }
         User user = userOptional.get();
-        if (user.getStatus().equals("inactive")) {
+        if (user.getStatus().equals(StatusType.INACTIVE)) {
             throw new BaseException(LOGIN_FAILED);
         }
         // jwt 생성
