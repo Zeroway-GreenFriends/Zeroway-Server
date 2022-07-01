@@ -2,8 +2,7 @@ package com.zeroway.user.entity;
 
 import com.zeroway.common.BaseEntity;
 import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
@@ -25,10 +24,12 @@ public class User extends BaseEntity {
     private String nickname;
 
     // 달성한 챌린지의 개수
-    private int challengeCount;
+    @ColumnDefault("0")
+    private Integer challengeCount;
 
     // 캐릭터 레벨
-    private int level;
+    @ColumnDefault("1")
+    private Integer level;
 
 
 }
