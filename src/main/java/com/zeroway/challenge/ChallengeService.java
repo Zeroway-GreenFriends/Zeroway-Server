@@ -1,5 +1,6 @@
 package com.zeroway.challenge;
 
+import com.zeroway.challenge.dto.GetChallengeListRes;
 import com.zeroway.challenge.dto.GetChallengeRes;
 import com.zeroway.common.BaseException;
 import lombok.extern.slf4j.Slf4j;
@@ -36,10 +37,13 @@ public class ChallengeService {
     public void completeChallenge(Long userId, Long challengeId) throws Exception{
         try{
             challengeRepository.addChallengeCount(userId);
-            int result = challengeRepository.completeChallenge(userId, challengeId);
+            int result = challengeRepository.updateChallengeCount(userId, challengeId);
             if(result==0) {
                 throw new BaseException(REQUEST_ERROR);
             }
+            int userLevel = challengeRepository.findUserLevel(userId);
+            challengeRepository.completeChallenge(userId, challengeId);
+
         }
         catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
@@ -48,6 +52,7 @@ public class ChallengeService {
 
     public int checkLevelUpgrade(Long userId) throws Exception{
         try{
+
             return challengeRepository.checkLevelUpgrade(userId);
         }
         catch (Exception exception) {

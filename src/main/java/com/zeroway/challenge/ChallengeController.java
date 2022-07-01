@@ -1,8 +1,10 @@
 package com.zeroway.challenge;
 
+import com.zeroway.challenge.dto.GetChallengeListRes;
 import com.zeroway.challenge.dto.GetChallengeRes;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
+import com.zeroway.utils.JwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,9 @@ public class ChallengeController {
     @Autowired
     private final ChallengeService challengeService;
 
+    @Autowired
+    private JwtService jwtService;
+
 
     public ChallengeController(ChallengeService challengeService) {
         this.challengeService = challengeService;
@@ -29,10 +34,10 @@ public class ChallengeController {
 //    }
 
     @ResponseBody
-    @GetMapping("/{user_id}")
-    public BaseResponse<List<GetChallengeRes>> getList(@PathVariable("user_id") Long userId) {
+    @GetMapping("")
+    public BaseResponse<List<GetChallengeRes>> getList() {
         try{
-            List<GetChallengeRes> GetChallengeRes = challengeService.getList(userId);
+            List<GetChallengeRes> GetChallengeRes = challengeService.getList(jwtService.getUserIdx());
             return new BaseResponse<>(GetChallengeRes);
         } catch(BaseException exception){
             log.error(exception.getMessage());
@@ -41,12 +46,12 @@ public class ChallengeController {
     }
 
     @ResponseBody
-    @PatchMapping("/{user_id}/{challenge_id}/complete")
-    public BaseResponse<String> completeChallenge(@PathVariable ("user_id") Long userId, @PathVariable ("challenge_id") Long challengeId) {
+    @PatchMapping("/{challenge_id}/complete")
+    public BaseResponse<String> completeChallenge( @PathVariable ("challenge_id") Long challengeId) {
         try{
-            challengeService.completeChallenge(userId,challengeId);
+            challengeService.completeChallenge(jwtService.getUserIdx(),challengeId);
             String result = "챌린지 수행 완료";
-            checkLevelUpgrade(userId);
+            checkLevelUpgrade(jwtService.getUserIdx());
             return new BaseResponse<>(result);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
