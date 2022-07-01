@@ -1,5 +1,6 @@
 package com.zeroway.common;
 
+import com.github.dozermapper.core.Mapping;
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
