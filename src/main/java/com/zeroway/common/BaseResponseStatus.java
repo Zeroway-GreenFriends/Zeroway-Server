@@ -19,6 +19,7 @@ public enum BaseResponseStatus {
     // Common
     REQUEST_ERROR(false, 2000, "입력값을 확인해주세요."),
 
+    INVALID_POST_ID(false, 2100, "유효하지 않은 게시글 식별자입니다."),
 
     /**
      * 3000 : Response 오류

@@ -1,4 +1,4 @@
-package com.zeroway.community;
+package com.zeroway.community.repository;
 
 import com.zeroway.community.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
