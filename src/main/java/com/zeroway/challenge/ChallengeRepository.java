@@ -1,6 +1,7 @@
 package com.zeroway.challenge;
 
 import com.zeroway.challenge.dto.GetChallengeRes;
+import com.zeroway.user.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -39,5 +40,26 @@ public class ChallengeRepository  {
         String completeChallengeQuery = "UPDATE user_challenge SET complete=true WHERE user_id=? and challenge_id=?;";
         Object []completeChallengeParams= new Object[] {userId, challengeId};
         return this.jdbcTemplate.update(completeChallengeQuery, completeChallengeParams);
+    }
+
+    public int checkLevelUpgrade(Long userId) {
+        String findChallengeCountQuery = "select challenge_count from user where user_id=?";
+
+        Long findChallengeCountParams = userId;
+        return this.jdbcTemplate.queryForObject(findChallengeCountQuery,
+                int.class,
+                findChallengeCountParams);
+    }
+
+    public void addUserLevel(Long userId) {
+        String completeChallengeQuery = "UPDATE user SET level=level+1 where user_id=?;";
+        Object []completeChallengeParams= new Object[] {userId};
+        this.jdbcTemplate.update(completeChallengeQuery, completeChallengeParams);
+    }
+
+    public void addChallengeCount(Long userId) {
+        String completeChallengeQuery = "UPDATE user SET challenge_count=challenge_count+1 where user_id=?;";
+        Object []completeChallengeParams= new Object[] {userId};
+        this.jdbcTemplate.update(completeChallengeQuery, completeChallengeParams);
     }
 }

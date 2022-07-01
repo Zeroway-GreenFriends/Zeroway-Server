@@ -35,6 +35,7 @@ public class ChallengeService {
 
     public void completeChallenge(Long userId, Long challengeId) throws Exception{
         try{
+            challengeRepository.addChallengeCount(userId);
             int result = challengeRepository.completeChallenge(userId, challengeId);
             if(result==0) {
                 throw new BaseException(REQUEST_ERROR);
@@ -43,6 +44,19 @@ public class ChallengeService {
         catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
+    }
+
+    public int checkLevelUpgrade(Long userId) throws Exception{
+        try{
+            return challengeRepository.checkLevelUpgrade(userId);
+        }
+        catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public void levelUpgrade(Long userId) {
+        challengeRepository.addUserLevel(userId);
     }
 
 //    public List<Challenge> findList() {
