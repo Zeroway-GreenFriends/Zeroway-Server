@@ -5,10 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.ToString;
 
 import static com.zeroway.common.BaseResponseStatus.SUCCESS;
 
 @Getter
+@ToString
 @AllArgsConstructor
 @JsonPropertyOrder({"isSuccess", "code", "message", "result"})
 public class BaseResponse<T> {

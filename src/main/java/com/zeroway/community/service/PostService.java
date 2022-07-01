@@ -30,7 +30,7 @@ public class PostService {
                         .title(post.getTitle())
                         .content(post.getContent())
                         .createdAt(post.getCreatedAt())
-                        .username(post.getUser().getName())
+                        .username(post.getUser().getNickname())
                         .build());
             }
             return result;
