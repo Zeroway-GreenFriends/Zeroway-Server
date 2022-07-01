@@ -18,11 +18,14 @@ public enum BaseResponseStatus {
      */
     // Common
     REQUEST_ERROR(false, 2000, "입력값을 확인해주세요."),
+    
     EMPTY_JWT(false, 2001, "JWT를 입력해주세요."),
     INVALID_JWT(false, 2002, "유효하지 않은 JWT입니다."),
     POST_USER_EMPTY_EMAIL(false, 2003, "이메일 값을 넣어주세요."),
     POST_USER_INVALID_EMAIL(false, 2004, "이메일 형식을 확신해주세요."),
     LOGIN_FAILED(false, 2005, "존재하지 않는 회원입니다."),
+    
+    INVALID_POST_ID(false, 2100, "유효하지 않은 게시글 식별자입니다."),
 
     /**
      * 3000 : Response 오류
