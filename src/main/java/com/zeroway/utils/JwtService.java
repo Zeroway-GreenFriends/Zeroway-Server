@@ -64,17 +64,18 @@ public class JwtService {
      */
     public Long getUserIdx() throws BaseException {
         // 1. JWT 추출
-        String accessToken = getJwt();
-        if (accessToken == null || accessToken.length() == 0) {
+        String token = getJwt();
+        if (token == null || token.length() == 0) {
             throw new BaseException(EMPTY_JWT);
         }
 
         // 2. JWT parsing
         Jws<Claims> claims;
         try {
-            claims = Jwts.parser()
-                    .setSigningKey(Secret.JWT_SECRET_KEY)
-                    .parseClaimsJws(accessToken);
+            claims = Jwts.parserBuilder()
+                    .setSigningKey(key.getEncoded())
+                    .build()
+                    .parseClaimsJws(token);
         } catch (Exception ignored) {
             throw new BaseException(INVALID_JWT);
         }
