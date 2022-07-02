@@ -9,6 +9,7 @@ https://productive-garage-a90.notion.site/API-1703813db61a44f0b15bc802dd0778a4
 <br><br>
 
 ## ERD
+![erd](image/Zeroway_erd.png)
 <br><br>
 
 ## 사용 기술
