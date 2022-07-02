@@ -1,8 +1,11 @@
 package com.zeroway.challenge;
 
+import com.zeroway.challenge.dto.GetChallengeListRes;
 import com.zeroway.challenge.dto.GetChallengeRes;
+import com.zeroway.challenge.dto.PatchChallengeCompleteRes;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
+import com.zeroway.utils.JwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +20,9 @@ public class ChallengeController {
     @Autowired
     private final ChallengeService challengeService;
 
+    @Autowired
+    private JwtService jwtService;
+
 
     public ChallengeController(ChallengeService challengeService) {
         this.challengeService = challengeService;
@@ -29,10 +35,10 @@ public class ChallengeController {
 //    }
 
     @ResponseBody
-    @GetMapping("/{user_id}")
-    public BaseResponse<List<GetChallengeRes>> getList(@PathVariable("user_id") Long userId) {
+    @GetMapping("")
+    public BaseResponse<List<GetChallengeRes>> getList() {
         try{
-            List<GetChallengeRes> GetChallengeRes = challengeService.getList(userId);
+            List<GetChallengeRes> GetChallengeRes = challengeService.getList(jwtService.getUserIdx());
             return new BaseResponse<>(GetChallengeRes);
         } catch(BaseException exception){
             log.error(exception.getMessage());
@@ -41,13 +47,13 @@ public class ChallengeController {
     }
 
     @ResponseBody
-    @PatchMapping("/{user_id}/{challenge_id}/complete")
-    public BaseResponse<String> completeChallenge(@PathVariable ("user_id") Long userId, @PathVariable ("challenge_id") Long challengeId) {
+    @PatchMapping("/{challenge_id}/complete")
+    public BaseResponse<List<PatchChallengeCompleteRes>> completeChallenge(@PathVariable ("challenge_id") Long challengeId) {
         try{
-            challengeService.completeChallenge(userId,challengeId);
-            String result = "챌린지 수행 완료";
-            checkLevelUpgrade(userId);
-            return new BaseResponse<>(result);
+            challengeService.completeChallenge(jwtService.getUserIdx(),challengeId);
+            checkLevelUpgrade(jwtService.getUserIdx());
+            List<PatchChallengeCompleteRes> PatchChallengeCompleteRes = challengeService.findUserExp(jwtService.getUserIdx());
+            return new BaseResponse<>(PatchChallengeCompleteRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         } catch (Exception e) {
@@ -58,7 +64,7 @@ public class ChallengeController {
 
     private void checkLevelUpgrade(Long userId) {
         try {
-            if(challengeService.checkLevelUpgrade(userId)>=5){
+            if(challengeService.checkLevelUpgrade(userId)>=6){
                 challengeService.levelUpgrade(userId);
             }
         } catch (Exception e) {

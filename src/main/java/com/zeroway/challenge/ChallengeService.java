@@ -1,6 +1,8 @@
 package com.zeroway.challenge;
 
+import com.zeroway.challenge.dto.GetChallengeListRes;
 import com.zeroway.challenge.dto.GetChallengeRes;
+import com.zeroway.challenge.dto.PatchChallengeCompleteRes;
 import com.zeroway.common.BaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ public class ChallengeService {
             return challengeRepository.getList(userId);
         }
         catch (Exception exception) {
+            log.error(exception.getMessage());
             throw new BaseException(DATABASE_ERROR);
         }
     }
@@ -36,18 +39,20 @@ public class ChallengeService {
     public void completeChallenge(Long userId, Long challengeId) throws Exception{
         try{
             challengeRepository.addChallengeCount(userId);
-            int result = challengeRepository.completeChallenge(userId, challengeId);
+            int result = challengeRepository.updateChallengeCount(userId, challengeId);
             if(result==0) {
                 throw new BaseException(REQUEST_ERROR);
             }
         }
         catch (Exception exception) {
+            System.out.println(exception);
             throw new BaseException(DATABASE_ERROR);
         }
     }
 
     public int checkLevelUpgrade(Long userId) throws Exception{
         try{
+
             return challengeRepository.checkLevelUpgrade(userId);
         }
         catch (Exception exception) {
@@ -57,6 +62,16 @@ public class ChallengeService {
 
     public void levelUpgrade(Long userId) {
         challengeRepository.addUserLevel(userId);
+    }
+
+    public List<PatchChallengeCompleteRes> findUserExp(Long userId) throws Exception{
+        try{
+            return challengeRepository.findUserExp(userId);
+        }
+        catch (Exception exception) {
+            log.error(exception.getMessage());
+            throw new BaseException(DATABASE_ERROR);
+        }
     }
 
 //    public List<Challenge> findList() {
