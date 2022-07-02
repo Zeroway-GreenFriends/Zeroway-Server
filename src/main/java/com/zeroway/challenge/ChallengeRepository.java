@@ -80,12 +80,12 @@ public class ChallengeRepository {
         this.jdbcTemplate.update(completeChallengeQuery, completeChallengeParams);
     }
 
-    public List<PatchChallengeCompleteRes> findUserExp(Long userId) {
+    public PatchChallengeCompleteRes findUserExp(Long userId) {
         String patchChallengeCompleteQuery = "select level, (challenge_count / (select count(c.challenge_id) from challenge as c " +
                 "where c.level= (select user.level from user where user_id=?)))*100 as exp from user where user_id=?;";
 
         Object[] patchChallengeCompleteParam = new Object[]{userId, userId};
-        return this.jdbcTemplate.query(patchChallengeCompleteQuery,
+        return this.jdbcTemplate.queryForObject(patchChallengeCompleteQuery,
                 (rs,rowNum) -> new PatchChallengeCompleteRes(
                         rs.getInt("level"),
                         rs.getDouble("exp")

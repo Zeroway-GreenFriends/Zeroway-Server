@@ -64,7 +64,7 @@ public class ChallengeService {
         challengeRepository.addUserLevel(userId);
     }
 
-    public List<PatchChallengeCompleteRes> findUserExp(Long userId) throws Exception{
+    public PatchChallengeCompleteRes findUserExp(Long userId) throws Exception{
         try{
             return challengeRepository.findUserExp(userId);
         }
