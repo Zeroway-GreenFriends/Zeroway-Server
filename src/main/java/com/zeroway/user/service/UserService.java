@@ -1,5 +1,6 @@
 package com.zeroway.user.service;
 
+import com.zeroway.challenge.ChallengeRepository;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
 import com.zeroway.common.BaseResponseStatus;
@@ -15,16 +16,18 @@ import com.github.dozermapper.core.Mapper;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 import static com.zeroway.common.BaseResponseStatus.*;
 
 @Service
-@Transactional(rollbackOn = BaseException.class)
+//@Transactional(rollbackOn = BaseException.class)
 @RequiredArgsConstructor
 public class UserService {
 
     private final UserRepository userRepository;
+    private final ChallengeRepository challengeRepository;
     private final JwtService jwtService;
     private final Mapper mapper;
 
@@ -52,6 +55,7 @@ public class UserService {
     /**
      * 소셜 로그인
      */
+    @Transactional
     public PostUserRes login(SignInReq signInReq) throws BaseException {
         String email = signInReq.getEmail();
         Optional<User> userOptional = userRepository.findByEmail(email);
@@ -64,6 +68,12 @@ public class UserService {
                         .email(signInReq.getEmail())
                         .nickname(signInReq.getNickname())
                         .build());
+                user.setLevel(2);
+                System.out.println("user = " + user.getId());
+                List<Long> challengeIds = challengeRepository.findUserChallengeId(user.getId());
+                for (Long challengeId : challengeIds) {
+                    challengeRepository.insertUserChallenge(challengeId, user.getId());
+                }
             }
             catch (Exception e) {
                 throw new BaseException(DATABASE_ERROR);

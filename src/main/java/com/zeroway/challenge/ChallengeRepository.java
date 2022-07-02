@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -32,14 +33,16 @@ public class ChallengeRepository {
                         rs.getLong("user_id"),
                         rs.getInt("level"),
                         rs.getDouble("exp"),
-                        getChallengeListRes = this.jdbcTemplate.query("select c.challenge_id, uc.complete, c.content from challenge as c " +
-                                        "join user_challenge uc on c.challenge_id = uc.challenge_id\n" +
-                                        "    where c.level=(select u.level from user as u where user_id=?);",
+                        getChallengeListRes = this.jdbcTemplate.query("select c.challenge_id, uc.complete, c.content\n" +
+                                        "    from user_challenge as uc\n" +
+                                        "    join challenge as c on c.challenge_id = uc.challenge_id\n" +
+                                        "    where c.level=(select u.level from user as u where user_id=?)\n" +
+                                        "and uc.user_id=?;",
                                 (rk, rownum) -> new GetChallengeListRes(
                                         rk.getLong("challenge_id"),
                                         rk.getBoolean("complete"),
                                         rk.getString("content")
-                                ),rs.getLong("user_id")
+                                ),getChallengeParam
                         )
                 ),getChallengeParam);
     }
@@ -80,16 +83,34 @@ public class ChallengeRepository {
         this.jdbcTemplate.update(completeChallengeQuery, completeChallengeParams);
     }
 
-    public List<PatchChallengeCompleteRes> findUserExp(Long userId) {
+    public PatchChallengeCompleteRes findUserExp(Long userId) {
         String patchChallengeCompleteQuery = "select level, (challenge_count / (select count(c.challenge_id) from challenge as c " +
                 "where c.level= (select user.level from user where user_id=?)))*100 as exp from user where user_id=?;";
 
         Object[] patchChallengeCompleteParam = new Object[]{userId, userId};
-        return this.jdbcTemplate.query(patchChallengeCompleteQuery,
+        return this.jdbcTemplate.queryForObject(patchChallengeCompleteQuery,
                 (rs,rowNum) -> new PatchChallengeCompleteRes(
                         rs.getInt("level"),
                         rs.getDouble("exp")
                 ),patchChallengeCompleteParam);
+    }
 
+    public void insertUserChallenge(long challengeId, long userId){
+        String insertUserChallengeQuery = "INSERT INTO user_challenge(challenge_id, user_id) VALUES (?,?)";
+
+        Object []insertUserChallengeParams= new Object[] {challengeId, userId};
+        this.jdbcTemplate.update(insertUserChallengeQuery, insertUserChallengeParams);
+    }
+
+    public void resetUserChallengeCount(Long userId) {
+        String completeChallengeQuery = "UPDATE user SET challenge_count=0 where user_id=?;";
+        Object[] completeChallengeParams = new Object[]{userId};
+        this.jdbcTemplate.update(completeChallengeQuery, completeChallengeParams);
+    }
+
+    public List<Long> findUserChallengeId(Long userId) {
+        String patchChallengeCompleteQuery = "select challenge_id from challenge where level=(select level from user where user_id=?);";
+        Long patchChallengeCompleteParam = userId;
+        return this.jdbcTemplate.queryForList(patchChallengeCompleteQuery, Long.class, patchChallengeCompleteParam);
     }
 }

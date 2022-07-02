@@ -7,6 +7,7 @@ import com.zeroway.common.BaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.zeroway.common.BaseResponseStatus.DATABASE_ERROR;
@@ -24,6 +25,7 @@ public class ChallengeService {
 
     public GetChallengeRes getList(Long userId) throws BaseException {
         try{
+
             GetChallengeRes result = challengeRepository.getList(userId);
             if(result==null) {
                 throw new BaseException(REQUEST_ERROR);
@@ -62,9 +64,16 @@ public class ChallengeService {
 
     public void levelUpgrade(Long userId) {
         challengeRepository.addUserLevel(userId);
+        //challenge_count 초기화
+        challengeRepository.resetUserChallengeCount(userId);
+        //챌린지아이디 찾아와서 하나씩 실행시키기!
+        List<Long> challengeIds = challengeRepository.findUserChallengeId(userId);
+        for (Long challengeId : challengeIds) {
+            challengeRepository.insertUserChallenge(challengeId, userId);
+        }
     }
 
-    public List<PatchChallengeCompleteRes> findUserExp(Long userId) throws Exception{
+    public PatchChallengeCompleteRes findUserExp(Long userId) throws Exception{
         try{
             return challengeRepository.findUserExp(userId);
         }
