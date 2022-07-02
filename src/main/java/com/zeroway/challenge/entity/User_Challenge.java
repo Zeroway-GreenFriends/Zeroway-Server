@@ -23,7 +23,7 @@ public class User_Challenge extends BaseEntity {
 
     //챌린지 달성 여부
     @ColumnDefault("false")
-    private boolean complete;
+    private boolean complete = false;
 
 
 

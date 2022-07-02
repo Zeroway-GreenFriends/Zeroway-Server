@@ -1,15 +1,16 @@
 package com.zeroway.user.entity;
 
 import com.zeroway.common.BaseEntity;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
 @AllArgsConstructor
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntity {
 
     @Id @GeneratedValue
@@ -23,10 +24,12 @@ public class User extends BaseEntity {
     private String nickname;
 
     // 달성한 챌린지의 개수
-    private int challengeCount;
+    @ColumnDefault("0")
+    private Integer challengeCount = 0;
 
     // 캐릭터 레벨
-    private int level;
+    @ColumnDefault("1")
+    private Integer level = 1;
 
 
 }

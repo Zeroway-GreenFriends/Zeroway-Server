@@ -8,5 +8,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class PatchChallengeCompleteRes {
+    private int level;
     private double exp;
 }

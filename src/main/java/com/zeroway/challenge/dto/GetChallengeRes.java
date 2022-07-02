@@ -10,12 +10,8 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class GetChallengeRes {
+    private Long user_id;
     private int level;
     private double exp;
     private List<GetChallengeListRes> challenges;
-
-    public GetChallengeRes(int level, List<GetChallengeListRes> getChallengeListRes) {
-        this.level = level;
-        this.challenges = getChallengeListRes;
-    }
 }

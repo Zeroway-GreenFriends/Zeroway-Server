@@ -23,22 +23,23 @@ public class ChallengeRepository {
     }
 
     public List<GetChallengeRes> getList(Long userId) {
-        String getChallengeQuery = "select level,\n" +
-                "       challenge_count / (select count(c.challenge_id) from challenge as c  where c.level= (select user.level from user where c.level=(select u.level from user u where user_id=?)))*100 as exp\n" +
-                "from user where user_id=?;";
+        String getChallengeQuery = "select user_id, level, (challenge_count / (select count(c.challenge_id) from challenge as c " +
+                "where c.level= (select user.level from user where user_id=?)))*100 as exp from user where user_id=?;";
 
-        Long getChallengeParam = userId;
+        Object[] getChallengeParam = new Object[]{userId, userId};
         return this.jdbcTemplate.query(getChallengeQuery,
                 (rs, rowNum) -> new GetChallengeRes(
+                        rs.getLong("user_id"),
                         rs.getInt("level"),
                         rs.getDouble("exp"),
-                        getChallengeListRes = this.jdbcTemplate.query("select c.challenge_id, uc.complete, c.content from challenge as c join user_challenge uc on c.challenge_id = uc.challenge_id" +
-                                                                            "where c.level=(select u.level from user as u where user_id=?);",
+                        getChallengeListRes = this.jdbcTemplate.query("select c.challenge_id, uc.complete, c.content from challenge as c " +
+                                        "join user_challenge uc on c.challenge_id = uc.challenge_id\n" +
+                                        "    where c.level=(select u.level from user as u where user_id=?);",
                                 (rk, rownum) -> new GetChallengeListRes(
                                         rk.getLong("challenge_id"),
                                         rk.getBoolean("complete"),
                                         rk.getString("content")
-                                ),rs.getInt("user_id")
+                                ),rs.getLong("user_id")
                         )
                 ),getChallengeParam);
     }
@@ -80,20 +81,15 @@ public class ChallengeRepository {
     }
 
     public List<PatchChallengeCompleteRes> findUserExp(Long userId) {
-        String patchChallengeCompleteQuery = "SELECT p.postIdx as postIdx, pi.imgUrl as postImgUrl\n" +
-                "                FROM Post as p\n" +
-                "                join PostImgUrl as pi on pi.postIdx = p.postIdx and pi.status = 'ACTIVE'\n" +
-                "                join User as u on u.userIdx = p.userIdx\n" +
-                "                WHERE p.status  = 'ACTIVE' and u.userIdx = ?\n" +
-                "                group by p.postIdx\n" +
-                "                HAVING min(pi.postImgUrlIdx)\n" +
-                "                order by p.postIdx;";
+        String patchChallengeCompleteQuery = "select level, (challenge_count / (select count(c.challenge_id) from challenge as c " +
+                "where c.level= (select user.level from user where user_id=?)))*100 as exp from user where user_id=?;";
 
-        Long selectUserPostsParam = userId;
+        Object[] patchChallengeCompleteParam = new Object[]{userId, userId};
         return this.jdbcTemplate.query(patchChallengeCompleteQuery,
                 (rs,rowNum) -> new PatchChallengeCompleteRes(
+                        rs.getInt("level"),
                         rs.getDouble("exp")
-                ),selectUserPostsParam);
+                ),patchChallengeCompleteParam);
 
     }
 }

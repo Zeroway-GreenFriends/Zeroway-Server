@@ -10,6 +10,6 @@ public class PostUserRes {
     private Long id;
     private String email;
     private String nickname;
-    private int challengeCount;
-    private int level;
+    private Integer challengeCount;
+    private Integer level;
 }

@@ -31,6 +31,7 @@ public class ChallengeService {
             return challengeRepository.getList(userId);
         }
         catch (Exception exception) {
+            log.error(exception.getMessage());
             throw new BaseException(DATABASE_ERROR);
         }
     }
@@ -44,6 +45,7 @@ public class ChallengeService {
             }
         }
         catch (Exception exception) {
+            System.out.println(exception);
             throw new BaseException(DATABASE_ERROR);
         }
     }
@@ -67,6 +69,7 @@ public class ChallengeService {
             return challengeRepository.findUserExp(userId);
         }
         catch (Exception exception) {
+            log.error(exception.getMessage());
             throw new BaseException(DATABASE_ERROR);
         }
     }
