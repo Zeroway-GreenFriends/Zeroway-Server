@@ -2,6 +2,7 @@ package com.zeroway.challenge;
 
 import com.zeroway.challenge.dto.GetChallengeListRes;
 import com.zeroway.challenge.dto.GetChallengeRes;
+import com.zeroway.challenge.dto.PatchChallengeCompleteRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -78,7 +79,21 @@ public class ChallengeRepository {
         this.jdbcTemplate.update(completeChallengeQuery, completeChallengeParams);
     }
 
-    public void completeChallenge(Long userId, Long challengeId) {
+    public List<PatchChallengeCompleteRes> findUserExp(Long userId) {
+        String patchChallengeCompleteQuery = "SELECT p.postIdx as postIdx, pi.imgUrl as postImgUrl\n" +
+                "                FROM Post as p\n" +
+                "                join PostImgUrl as pi on pi.postIdx = p.postIdx and pi.status = 'ACTIVE'\n" +
+                "                join User as u on u.userIdx = p.userIdx\n" +
+                "                WHERE p.status  = 'ACTIVE' and u.userIdx = ?\n" +
+                "                group by p.postIdx\n" +
+                "                HAVING min(pi.postImgUrlIdx)\n" +
+                "                order by p.postIdx;";
+
+        Long selectUserPostsParam = userId;
+        return this.jdbcTemplate.query(patchChallengeCompleteQuery,
+                (rs,rowNum) -> new PatchChallengeCompleteRes(
+                        rs.getDouble("exp")
+                ),selectUserPostsParam);
 
     }
 }

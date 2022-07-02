@@ -2,6 +2,7 @@ package com.zeroway.challenge;
 
 import com.zeroway.challenge.dto.GetChallengeListRes;
 import com.zeroway.challenge.dto.GetChallengeRes;
+import com.zeroway.challenge.dto.PatchChallengeCompleteRes;
 import com.zeroway.common.BaseException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -41,9 +42,6 @@ public class ChallengeService {
             if(result==0) {
                 throw new BaseException(REQUEST_ERROR);
             }
-            int userLevel = challengeRepository.findUserLevel(userId);
-            challengeRepository.completeChallenge(userId, challengeId);
-
         }
         catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
@@ -62,6 +60,15 @@ public class ChallengeService {
 
     public void levelUpgrade(Long userId) {
         challengeRepository.addUserLevel(userId);
+    }
+
+    public List<PatchChallengeCompleteRes> findUserExp(Long userId) throws Exception{
+        try{
+            return challengeRepository.findUserExp(userId);
+        }
+        catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
     }
 
 //    public List<Challenge> findList() {
