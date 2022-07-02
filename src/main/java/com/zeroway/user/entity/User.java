@@ -37,4 +37,8 @@ public class User extends BaseEntity {
         this.email = email;
         this.nickname = nickname;
     }
+
+    public void setLevel(Integer level) {
+        this.level = level;
+    }
 }

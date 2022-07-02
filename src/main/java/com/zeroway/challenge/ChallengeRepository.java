@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -106,4 +107,13 @@ public class ChallengeRepository {
         Object[] completeChallengeParams = new Object[]{userId};
         this.jdbcTemplate.update(completeChallengeQuery, completeChallengeParams);
     }
+
+    public List<Long> findUserChallengeId(Long userId) {
+        String patchChallengeCompleteQuery = "select challenge_id from challenge where level=(select level from user where user_id=?);";
+
+        Long patchChallengeCompleteParam = userId;
+        return this.jdbcTemplate.queryForList(patchChallengeCompleteQuery, Long.class, patchChallengeCompleteParam);
+    }
 }
+
+//  return template.queryForObject(query, new BeanPropertyRowMapper<BDto>(BDto.class));
