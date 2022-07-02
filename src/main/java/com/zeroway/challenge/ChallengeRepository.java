@@ -32,14 +32,16 @@ public class ChallengeRepository {
                         rs.getLong("user_id"),
                         rs.getInt("level"),
                         rs.getDouble("exp"),
-                        getChallengeListRes = this.jdbcTemplate.query("select c.challenge_id, uc.complete, c.content from challenge as c " +
-                                        "join user_challenge uc on c.challenge_id = uc.challenge_id\n" +
-                                        "    where c.level=(select u.level from user as u where user_id=?);",
+                        getChallengeListRes = this.jdbcTemplate.query("select c.challenge_id, uc.complete, c.content\n" +
+                                        "    from user_challenge as uc\n" +
+                                        "    join challenge as c on c.challenge_id = uc.challenge_id\n" +
+                                        "    where c.level=(select u.level from user as u where user_id=?)\n" +
+                                        "and uc.user_id=?;",
                                 (rk, rownum) -> new GetChallengeListRes(
                                         rk.getLong("challenge_id"),
                                         rk.getBoolean("complete"),
                                         rk.getString("content")
-                                ),rs.getLong("user_id")
+                                ),getChallengeParam
                         )
                 ),getChallengeParam);
     }
