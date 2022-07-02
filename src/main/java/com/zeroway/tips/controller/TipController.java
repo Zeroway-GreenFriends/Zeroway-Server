@@ -22,7 +22,6 @@ public class TipController {
      */
     @GetMapping("/all")
     public ResponseEntity<?> getAllTips() {
-
         try {
             AllTipRes allTips = tipService.getAllTips();
             return ResponseEntity.ok().body(new BaseResponse<>(allTips));
@@ -30,7 +29,5 @@ public class TipController {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
     }
-
-
 
 }
