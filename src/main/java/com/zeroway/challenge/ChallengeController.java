@@ -36,9 +36,9 @@ public class ChallengeController {
 
     @ResponseBody
     @GetMapping("")
-    public BaseResponse<List<GetChallengeRes>> getList() {
+    public BaseResponse<GetChallengeRes> getList() {
         try{
-            List<GetChallengeRes> GetChallengeRes = challengeService.getList(jwtService.getUserIdx());
+            GetChallengeRes GetChallengeRes = challengeService.getList(jwtService.getUserIdx());
             return new BaseResponse<>(GetChallengeRes);
         } catch(BaseException exception){
             log.error(exception.getMessage());
@@ -64,7 +64,7 @@ public class ChallengeController {
 
     private void checkLevelUpgrade(Long userId) {
         try {
-            if(challengeService.checkLevelUpgrade(userId)>=6){
+            if(challengeService.checkLevelUpgrade(userId)%4==0){
                 challengeService.levelUpgrade(userId);
             }
         } catch (Exception e) {
