@@ -22,7 +22,7 @@ import java.util.Optional;
 import static com.zeroway.common.BaseResponseStatus.*;
 
 @Service
-@Transactional(rollbackOn = BaseException.class)
+//@Transactional(rollbackOn = BaseException.class)
 @RequiredArgsConstructor
 public class UserService {
 
@@ -69,9 +69,8 @@ public class UserService {
                         .nickname(signInReq.getNickname())
                         .build());
                 user.setLevel(2);
-                System.out.println("user = " + user);
+                System.out.println("user = " + user.getId());
                 List<Long> challengeIds = challengeRepository.findUserChallengeId(user.getId());
-                System.out.println(challengeIds.get(0));
                 for (Long challengeId : challengeIds) {
                     challengeRepository.insertUserChallenge(challengeId, user.getId());
                 }

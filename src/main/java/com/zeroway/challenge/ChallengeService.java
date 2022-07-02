@@ -25,6 +25,7 @@ public class ChallengeService {
 
     public GetChallengeRes getList(Long userId) throws BaseException {
         try{
+
             GetChallengeRes result = challengeRepository.getList(userId);
             if(result==null) {
                 throw new BaseException(REQUEST_ERROR);

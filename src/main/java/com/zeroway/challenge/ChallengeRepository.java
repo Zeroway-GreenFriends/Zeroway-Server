@@ -110,10 +110,7 @@ public class ChallengeRepository {
 
     public List<Long> findUserChallengeId(Long userId) {
         String patchChallengeCompleteQuery = "select challenge_id from challenge where level=(select level from user where user_id=?);";
-
         Long patchChallengeCompleteParam = userId;
         return this.jdbcTemplate.queryForList(patchChallengeCompleteQuery, Long.class, patchChallengeCompleteParam);
     }
 }
-
-//  return template.queryForObject(query, new BeanPropertyRowMapper<BDto>(BDto.class));
