@@ -22,12 +22,12 @@ public class ChallengeRepository {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public List<GetChallengeRes> getList(Long userId) {
+    public GetChallengeRes getList(Long userId) {
         String getChallengeQuery = "select user_id, level, (challenge_count / (select count(c.challenge_id) from challenge as c " +
                 "where c.level= (select user.level from user where user_id=?)))*100 as exp from user where user_id=?;";
 
         Object[] getChallengeParam = new Object[]{userId, userId};
-        return this.jdbcTemplate.query(getChallengeQuery,
+        return this.jdbcTemplate.queryForObject(getChallengeQuery,
                 (rs, rowNum) -> new GetChallengeRes(
                         rs.getLong("user_id"),
                         rs.getInt("level"),

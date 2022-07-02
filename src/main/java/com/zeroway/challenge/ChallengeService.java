@@ -22,9 +22,9 @@ public class ChallengeService {
         this.challengeRepository = challengeRepository;
     }
 
-    public List<GetChallengeRes> getList(Long userId) throws BaseException {
+    public GetChallengeRes getList(Long userId) throws BaseException {
         try{
-            List<GetChallengeRes> result = challengeRepository.getList(userId);
+            GetChallengeRes result = challengeRepository.getList(userId);
             if(result==null) {
                 throw new BaseException(REQUEST_ERROR);
             }
