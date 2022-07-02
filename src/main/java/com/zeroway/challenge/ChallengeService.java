@@ -62,6 +62,14 @@ public class ChallengeService {
 
     public void levelUpgrade(Long userId) {
         challengeRepository.addUserLevel(userId);
+        //challenge_count 초기화
+        challengeRepository.resetUserChallengeCount(userId);
+
+        //챌린지아이디 찾아와서 하나씩 실행시키기!
+
+
+
+        challengeRepository.insertUserChallenge(userId, userId);
     }
 
     public PatchChallengeCompleteRes findUserExp(Long userId) throws Exception{

@@ -92,6 +92,18 @@ public class ChallengeRepository {
                         rs.getInt("level"),
                         rs.getDouble("exp")
                 ),patchChallengeCompleteParam);
+    }
 
+    public void insertUserChallenge(long challengeId, long userId){
+        String insertUserChallengeQuery = "INSERT INTO user_challenge(challenge_id, user_id) VALUES (?,?)";
+
+        Object []insertUserChallengeParams= new Object[] {challengeId, userId};
+        this.jdbcTemplate.update(insertUserChallengeQuery, insertUserChallengeParams);
+    }
+
+    public void resetUserChallengeCount(Long userId) {
+        String completeChallengeQuery = "UPDATE user SET challenge_count=0 where user_id=?;";
+        Object[] completeChallengeParams = new Object[]{userId};
+        this.jdbcTemplate.update(completeChallengeQuery, completeChallengeParams);
     }
 }
