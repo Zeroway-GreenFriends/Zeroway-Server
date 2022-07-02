@@ -31,5 +31,8 @@ public class User extends BaseEntity {
     @ColumnDefault("1")
     private Integer level = 1;
 
-
+    public User(String email, String nickname) {
+        this.email = email;
+        this.nickname = nickname;
+    }
 }

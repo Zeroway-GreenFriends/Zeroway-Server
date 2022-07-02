@@ -50,16 +50,28 @@ public class UserService {
     }
 
     /**
-     * 로그인
+     * 소셜 로그인
      */
     public PostUserRes login(SignInReq signInReq) throws BaseException {
         String email = signInReq.getEmail();
         Optional<User> userOptional = userRepository.findByEmail(email);
 
+        // 존재하지 않은 회원인 경우 -> 회원가입
+        User user;
         if (userOptional.isEmpty()) {
-            throw new BaseException(LOGIN_FAILED);
+            try {
+                user = userRepository.save(User.builder()
+                        .email(signInReq.getEmail())
+                        .nickname(signInReq.getNickname())
+                        .build());
+            }
+            catch (Exception e) {
+                throw new BaseException(DATABASE_ERROR);
+            }
+        } else {
+            user = userOptional.get();
         }
-        User user = userOptional.get();
+
         if (user.getStatus().equals(StatusType.INACTIVE)) {
             throw new BaseException(LOGIN_FAILED);
         }
