@@ -39,7 +39,7 @@ public class UserController {
     }
 
     /**
-     * 로그인 API
+     * 소셜 로그인 API
      */
     @PostMapping("/login")
     public BaseResponse<PostUserRes> login(@RequestBody SignInReq signInReq) {
