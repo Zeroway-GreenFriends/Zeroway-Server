@@ -2,12 +2,10 @@ package com.zeroway.user.controller;
 
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
-import com.zeroway.user.dto.SignInReq;
-import com.zeroway.user.dto.SignUpReq;
+import com.zeroway.user.dto.SignInAuthReq;
 import com.zeroway.user.dto.PostUserRes;
 import com.zeroway.user.service.UserService;
 import com.zeroway.utils.JwtService;
-import com.zeroway.utils.ValidationRegex;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,23 +24,10 @@ public class UserController {
     private final JwtService jwtService;
 
     /**
-     * 회원가입 API
-     */
-    @PostMapping
-    public BaseResponse<PostUserRes> createUser(@RequestBody SignUpReq signUpReq) {
-        try {
-            PostUserRes postUserRes = userService.join(signUpReq);
-            return new BaseResponse<>(postUserRes);
-        } catch (BaseException e) {
-            return new BaseResponse<>((e.getStatus()));
-        }
-    }
-
-    /**
      * 소셜 로그인 API
      */
-    @PostMapping("/login")
-    public BaseResponse<PostUserRes> login(@RequestBody SignInReq signInReq) {
+    @PostMapping("/auth/login")
+    public BaseResponse<PostUserRes> authLogin(@RequestBody SignInAuthReq signInReq) {
         try {
             if (signInReq.getEmail() == null) {
                 return new BaseResponse<>(POST_USER_EMPTY_EMAIL);
@@ -51,7 +36,7 @@ public class UserController {
                 return new BaseResponse<>(POST_USER_INVALID_EMAIL);
             }
 
-            PostUserRes postUserRes = userService.login(signInReq);
+            PostUserRes postUserRes = userService.authLogin(signInReq);
             return new BaseResponse<>(postUserRes);
         } catch (BaseException e) {
             return new BaseResponse<>(e.getStatus());
@@ -59,6 +44,7 @@ public class UserController {
     }
 
     /**
-     * 전체 회원 조회 API
+     * JWT 토큰 재발급
      */
+
 }

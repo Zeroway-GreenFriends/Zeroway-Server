@@ -5,7 +5,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class SignInReq {
+public class SignInAuthReq {
     private String email;
     private String nickname;
 }

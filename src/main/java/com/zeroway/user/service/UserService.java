@@ -5,13 +5,9 @@ import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
 import com.zeroway.user.dto.PostUserRes;
 import com.zeroway.user.dto.SignInAuthReq;
-import com.zeroway.user.dto.SignInReq;
-import com.zeroway.user.dto.SignUpReq;
 import com.zeroway.user.entity.User;
 import com.zeroway.user.repository.UserRepository;
-import com.zeroway.utils.AES128;
 import com.zeroway.utils.JwtService;
-import com.zeroway.utils.Secret.Secret;
 import lombok.RequiredArgsConstructor;
 import com.github.dozermapper.core.Mapper;
 import org.springframework.stereotype.Service;
@@ -31,52 +27,6 @@ public class UserService {
     private final ChallengeRepository challengeRepository;
     private final JwtService jwtService;
     private final Mapper mapper;
-
-    /**
-     * 회원가입
-     */
-    public PostUserRes join(SignUpReq signUpReq) throws BaseException {
-        if (userRepository.existsUserByEmailAndStatus(signUpReq.getEmail(), StatusType.ACTIVE)) {
-            throw new BaseException(POST_USERS_EXISTS_EMAIL);
-        }
-
-        String pwd;
-        try {
-            // 암호화하여 DB 저장
-            pwd = new AES128(Secret.USER_INFO_PASSWORD_KEY).encrypt(signUpReq.getPassword());
-            signUpReq.setPassword(pwd);
-        } catch (Exception exception) {
-            throw new BaseException(PASSWORD_ENCRYPTION_ERROR);
-        }
-
-        User mappedUser = mapper.map(signUpReq, User.class);
-
-        try {
-            User user = userRepository.save(mappedUser);
-
-            String refreshJwt = jwtService.createRefreshToken(user.getId());
-            String accessJwt = jwtService.createAccessToken(user.getId());
-
-            return PostUserRes.builder()
-                    .accessJwt(accessJwt)
-                    .refreshJwt(refreshJwt)
-                    .id(user.getId())
-                    .email(user.getEmail())
-                    .nickname(user.getNickname())
-                    .challengeCount(user.getChallengeCount())
-                    .level(user.getLevel())
-                    .build();
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
-
-    /**
-     * 로그인
-     */
-    public PostUserRes login(SignInReq signInReq) throws BaseException {
-
-    }
 
     /**
      * 소셜 로그인
