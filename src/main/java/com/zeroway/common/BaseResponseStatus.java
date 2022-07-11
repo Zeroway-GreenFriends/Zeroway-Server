@@ -32,6 +32,8 @@ public enum BaseResponseStatus {
      */
     // Common
     RESPONSE_ERROR(false, 3000, "값을 불러오는데 실패하였습니다."),
+    PASSWORD_ENCRYPTION_ERROR(false, 3001, "비밀번호 암호화에 실패하였습니다."),
+    EXPIRATION_JWT(false, 3002, "토큰이 만료되었습니다."),
 
 
     /**
