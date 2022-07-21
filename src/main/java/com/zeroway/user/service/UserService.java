@@ -47,8 +47,8 @@ public class UserService {
                 .id(user.getId())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
-                .challengeCount(user.getChallengeCount())
-                .level(user.getLevel())
+//                .challengeCount(user.getChallengeCount())
+                .level(user.getLevel().getId())
                 .build();
     }
 
@@ -93,8 +93,8 @@ public class UserService {
                 .id(user.getId())
                 .email(user.getEmail())
                 .nickname(user.getNickname())
-                .challengeCount(user.getChallengeCount())
-                .level(user.getLevel())
+//                .challengeCount(user.getChallengeCount())
+                .level(user.getLevel().getId())
                 .build();
     }
 }

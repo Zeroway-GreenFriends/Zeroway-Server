@@ -17,6 +17,7 @@ public class Tip {
     @Column(name = "tip_id")
     private Long id;
 
+    @Column(nullable = false)
     private String title;
 
     @Column(length = 1000)
