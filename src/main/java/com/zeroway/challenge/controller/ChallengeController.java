@@ -1,16 +1,18 @@
-package com.zeroway.challenge;
+package com.zeroway.challenge.controller;
 
-import com.zeroway.challenge.dto.GetChallengeListRes;
+import com.zeroway.challenge.dto.ChallengeRes;
+import com.zeroway.challenge.service.ChallengeService;
 import com.zeroway.challenge.dto.GetChallengeRes;
 import com.zeroway.challenge.dto.PatchChallengeCompleteRes;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
+import com.zeroway.user.entity.User;
 import com.zeroway.utils.JwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/challenge")
@@ -23,23 +25,17 @@ public class ChallengeController {
     @Autowired
     private JwtService jwtService;
 
-
     public ChallengeController(ChallengeService challengeService) {
         this.challengeService = challengeService;
     }
 
 
-//    @GetMapping("/list")
-//    public List<Challenge> challengeList(@RequestParam Long id) {
-//        return challengeService.findList();
-//    }
-
     @ResponseBody
     @GetMapping("")
-    public BaseResponse<GetChallengeRes> getList() {
+    public BaseResponse<ChallengeRes> getList() {
         try{
-            GetChallengeRes GetChallengeRes = challengeService.getList(jwtService.getUserIdx());
-            return new BaseResponse<>(GetChallengeRes);
+            ChallengeRes challengeRes = challengeService.getList(jwtService.getUserIdx());
+            return new BaseResponse<>(challengeRes);
         } catch(BaseException exception){
             log.error(exception.getMessage());
             return new BaseResponse<>((exception.getStatus()));

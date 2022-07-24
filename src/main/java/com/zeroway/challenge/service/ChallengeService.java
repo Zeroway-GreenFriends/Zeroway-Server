@@ -1,14 +1,17 @@
-package com.zeroway.challenge;
+package com.zeroway.challenge.service;
 
-import com.zeroway.challenge.dto.GetChallengeListRes;
-import com.zeroway.challenge.dto.GetChallengeRes;
+import com.zeroway.challenge.dto.ChallengeRes;
+import com.zeroway.challenge.repository.ChallengeRepo;
 import com.zeroway.challenge.dto.PatchChallengeCompleteRes;
 import com.zeroway.common.BaseException;
+import com.zeroway.user.entity.User;
+import com.zeroway.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.zeroway.common.BaseResponseStatus.DATABASE_ERROR;
 import static com.zeroway.common.BaseResponseStatus.REQUEST_ERROR;
@@ -17,20 +20,18 @@ import static com.zeroway.common.BaseResponseStatus.REQUEST_ERROR;
 @Slf4j
 public class ChallengeService {
 
-    private ChallengeRepository challengeRepository;
+    private ChallengeRepo challengeRepo;
 
-    public ChallengeService(ChallengeRepository challengeRepository) {
-        this.challengeRepository = challengeRepository;
+    @Autowired
+    private UserRepository userRepository;
+
+    public ChallengeService(ChallengeRepo challengeRepo) {
+        this.challengeRepo = challengeRepo;
     }
 
-    public GetChallengeRes getList(Long userId) throws BaseException {
+    public ChallengeRes getList(Long userId) throws BaseException {
         try{
-
-            GetChallengeRes result = challengeRepository.getList(userId);
-            if(result==null) {
-                throw new BaseException(REQUEST_ERROR);
-            }
-            return challengeRepository.getList(userId);
+            return userRepository.findChallengeRes(userId);
         }
         catch (Exception exception) {
             log.error(exception.getMessage());
@@ -40,8 +41,8 @@ public class ChallengeService {
 
     public void completeChallenge(Long userId, Long challengeId) throws Exception{
         try{
-            challengeRepository.addChallengeCount(userId);
-            int result = challengeRepository.updateChallengeCount(userId, challengeId);
+            challengeRepo.addChallengeCount(userId);
+            int result = challengeRepo.updateChallengeCount(userId, challengeId);
             if(result==0) {
                 throw new BaseException(REQUEST_ERROR);
             }
@@ -55,7 +56,7 @@ public class ChallengeService {
     public int checkLevelUpgrade(Long userId) throws Exception{
         try{
 
-            return challengeRepository.checkLevelUpgrade(userId);
+            return challengeRepo.checkLevelUpgrade(userId);
         }
         catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
@@ -63,19 +64,19 @@ public class ChallengeService {
     }
 
     public void levelUpgrade(Long userId) {
-        challengeRepository.addUserLevel(userId);
+        challengeRepo.addUserLevel(userId);
         //challenge_count 초기화
-        challengeRepository.resetUserChallengeCount(userId);
+        challengeRepo.resetUserChallengeCount(userId);
         //챌린지아이디 찾아와서 하나씩 실행시키기!
-        List<Long> challengeIds = challengeRepository.findUserChallengeId(userId);
+        List<Long> challengeIds = challengeRepo.findUserChallengeId(userId);
         for (Long challengeId : challengeIds) {
-            challengeRepository.insertUserChallenge(challengeId, userId);
+            challengeRepo.insertUserChallenge(challengeId, userId);
         }
     }
 
     public PatchChallengeCompleteRes findUserExp(Long userId) throws Exception{
         try{
-            return challengeRepository.findUserExp(userId);
+            return challengeRepo.findUserExp(userId);
         }
         catch (Exception exception) {
             log.error(exception.getMessage());
@@ -83,7 +84,4 @@ public class ChallengeService {
         }
     }
 
-//    public List<Challenge> findList() {
-//        return challengeRepository.findAll();
-//    }
 }
