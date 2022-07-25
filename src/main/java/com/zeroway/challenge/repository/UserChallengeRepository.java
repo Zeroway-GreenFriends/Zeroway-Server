@@ -12,6 +12,8 @@ import java.util.List;
 @Repository
 public interface UserChallengeRepository extends JpaRepository<User_Challenge, Long> {
 
-    @Query("select uc from User_Challenge uc where uc.challengeId.id = :challengeId and uc.userId.id = :userId and uc.complete = false")
+    @Query("select uc from User_Challenge uc where uc.challenge.id = :challengeId and uc.user.id = :userId and uc.complete = false")
     User_Challenge findChallengeList(@Param("challengeId") Long challengeId, @Param("userId") long userId);
+
+    User_Challenge findByUser_IdAndChallenge_Id(Long userId, Long challengeId);
 }

@@ -43,6 +43,10 @@ public class User extends BaseEntity {
     @Builder.Default
     private Integer exp = 0;
 
+    public void setExp(Integer exp) {
+        this.exp = exp;
+    }
+
     public User(String email, String nickname) {
         this.email = email;
         this.nickname = nickname;
