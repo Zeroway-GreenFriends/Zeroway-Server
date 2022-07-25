@@ -4,8 +4,6 @@ import com.zeroway.challenge.dto.ChallengeListRes;
 import com.zeroway.challenge.dto.ChallengeRes;
 import com.zeroway.challenge.entity.Challenge;
 import com.zeroway.challenge.entity.User_Challenge;
-import com.zeroway.challenge.repository.ChallengeRepo;
-import com.zeroway.challenge.dto.PatchChallengeCompleteRes;
 import com.zeroway.challenge.repository.ChallengeRepository;
 import com.zeroway.challenge.repository.UserChallengeRepository;
 import com.zeroway.common.BaseException;
@@ -13,7 +11,6 @@ import com.zeroway.user.entity.User;
 import com.zeroway.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,14 +18,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.zeroway.common.BaseResponseStatus.DATABASE_ERROR;
-import static com.zeroway.common.BaseResponseStatus.REQUEST_ERROR;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class ChallengeService {
 
-    private final ChallengeRepo challengeRepo;
     private final UserRepository userRepository;
     private final UserChallengeRepository userChallengeRepository;
     private final ChallengeRepository challengeRepository;
@@ -38,7 +33,7 @@ public class ChallengeService {
         try{
             return userRepository.findById(userId)
                     .map(user -> new ChallengeRes(user.getNickname(), user.getLevel().getId(), user.getExp(), user.getProfileImgUrl()))
-                    .orElse(null);
+                    .orElseThrow(IllegalArgumentException::new);
         }
         catch (Exception exception) {
             log.error(exception.getMessage());
@@ -51,7 +46,7 @@ public class ChallengeService {
         List<User_Challenge> userChallenges = new ArrayList<>();
 
         //user level에 맞는 challenge
-        User user = userRepository.findById(userId).orElse(null);
+        User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
         List<Challenge> challengeList = challengeRepository.findByLevel_Id(user.getLevel().getId());
 
         //challengeId 랜덤 생성
@@ -69,32 +64,25 @@ public class ChallengeService {
         }
 
        return userChallenges.stream()
-       .map(uc -> new ChallengeListRes(uc.getChallengeId().getId(), uc.getChallengeId().getContent(), uc.isComplete()))
+       .map(uc -> new ChallengeListRes(uc.getChallenge().getId(), uc.getChallenge().getContent(), uc.isComplete()))
        .collect(Collectors.toList());
     }
 
-    public void completeChallenge(Long userId, Long challengeId) throws Exception{
+    public void patchChallengeComplete(Long userId, Long challengeId, Integer exp) throws Exception{
         try{
-            challengeRepo.addChallengeCount(userId);
-            int result = challengeRepo.updateChallengeCount(userId, challengeId);
-            if(result==0) {
-                throw new BaseException(REQUEST_ERROR);
+            User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
+            User_Challenge uc = userChallengeRepository.findByUser_IdAndChallenge_Id(userId, challengeId);
+            if(!uc.isComplete()) {
+                uc.setComplete(true);
+                user.setExp(user.getExp()+exp);
+            } else {
+                uc.setComplete(false);
+                user.setExp(user.getExp()-exp);
             }
+            userChallengeRepository.save(uc);
         }
         catch (Exception exception) {
-            System.out.println(exception);
             throw new BaseException(DATABASE_ERROR);
         }
     }
-
-    public PatchChallengeCompleteRes findUserExp(Long userId) throws Exception{
-        try{
-            return challengeRepo.findUserExp(userId);
-        }
-        catch (Exception exception) {
-            log.error(exception.getMessage());
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
-
 }

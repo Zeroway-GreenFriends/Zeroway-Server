@@ -3,33 +3,24 @@ package com.zeroway.challenge.controller;
 import com.zeroway.challenge.dto.ChallengeListRes;
 import com.zeroway.challenge.dto.ChallengeRes;
 import com.zeroway.challenge.service.ChallengeService;
-import com.zeroway.challenge.dto.GetChallengeRes;
-import com.zeroway.challenge.dto.PatchChallengeCompleteRes;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
-import com.zeroway.user.entity.User;
 import com.zeroway.utils.JwtService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/challenge")
 @Slf4j
+@RequiredArgsConstructor
 public class ChallengeController {
 
     private final ChallengeService challengeService;
-
-    @Autowired
-    private JwtService jwtService;
-
-    public ChallengeController(ChallengeService challengeService) {
-        this.challengeService = challengeService;
-    }
+    private final JwtService jwtService;
 
     /**
      * 챌린지 프로필 API
@@ -63,16 +54,11 @@ public class ChallengeController {
 
     @ResponseBody
     @PatchMapping("/{challenge_id}/complete")
-    public BaseResponse<PatchChallengeCompleteRes> completeChallenge(@PathVariable ("challenge_id") Long challengeId) {
+    public void patchChallengeComplete(@PathVariable ("challenge_id") Long challengeId) {
         try{
-            challengeService.completeChallenge(jwtService.getUserIdx(),challengeId);
-            PatchChallengeCompleteRes PatchChallengeCompleteRes = challengeService.findUserExp(jwtService.getUserIdx());
-            return new BaseResponse<>(PatchChallengeCompleteRes);
-        } catch(BaseException exception){
-            return new BaseResponse<>((exception.getStatus()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            challengeService.patchChallengeComplete(jwtService.getUserIdx(), challengeId, 10);
+        } catch(Exception exception){
+            exception.printStackTrace();
         }
     }
 }

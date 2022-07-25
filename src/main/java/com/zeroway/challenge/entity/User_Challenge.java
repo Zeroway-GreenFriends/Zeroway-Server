@@ -17,19 +17,18 @@ public class User_Challenge extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
-    private User userId;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "challenge_id")
-    private Challenge challengeId;
+    private Challenge challenge;
 
     //챌린지 달성 여부
     @ColumnDefault("false")
     private boolean complete = false;
 
 
-
-
-
-
+    public void setComplete(boolean complete) {
+        this.complete = complete;
+    }
 }
