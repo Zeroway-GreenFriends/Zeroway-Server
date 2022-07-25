@@ -16,8 +16,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     boolean existsUserByEmailAndStatus(String email, StatusType status);
 
-    //challenge
-    @Query("select new com.zeroway.challenge.dto.ChallengeRes(u.nickname, l.id, u.exp, l.imageUrl) from User u join u.level l where u.id = :userId")
-    ChallengeRes findChallengeRes(@Param("userId") Long userId);
-
 }
