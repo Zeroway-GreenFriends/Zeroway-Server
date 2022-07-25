@@ -1,48 +1,63 @@
-package com.zeroway.challenge;
+package com.zeroway.challenge.controller;
 
-import com.zeroway.challenge.dto.GetChallengeListRes;
+import com.zeroway.challenge.dto.ChallengeListRes;
+import com.zeroway.challenge.dto.ChallengeRes;
+import com.zeroway.challenge.service.ChallengeService;
 import com.zeroway.challenge.dto.GetChallengeRes;
 import com.zeroway.challenge.dto.PatchChallengeCompleteRes;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
+import com.zeroway.user.entity.User;
 import com.zeroway.utils.JwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/challenge")
 @Slf4j
 public class ChallengeController {
 
-    @Autowired
     private final ChallengeService challengeService;
 
     @Autowired
     private JwtService jwtService;
 
-
     public ChallengeController(ChallengeService challengeService) {
         this.challengeService = challengeService;
     }
 
-
-//    @GetMapping("/list")
-//    public List<Challenge> challengeList(@RequestParam Long id) {
-//        return challengeService.findList();
-//    }
-
+    /**
+     * 챌린지 프로필 API
+     * @return 유저(nickname, level, exp, imgUrl)
+     */
     @ResponseBody
     @GetMapping("")
-    public BaseResponse<GetChallengeRes> getList() {
+    public ResponseEntity<?> getList() {
         try{
-            GetChallengeRes GetChallengeRes = challengeService.getList(jwtService.getUserIdx());
-            return new BaseResponse<>(GetChallengeRes);
+            ChallengeRes challengeRes = challengeService.getList(jwtService.getUserIdx());
+            return ResponseEntity.ok().body(challengeRes);
         } catch(BaseException exception){
-            log.error(exception.getMessage());
-            return new BaseResponse<>((exception.getStatus()));
+            return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
+        }
+    }
+
+    /**
+     * 오늘의 챌린지 API
+     * @return 챌린지(id, content, complete) 랜덤 5개 (유저 레벨별 + 수행 안 한 것)
+     */
+    @ResponseBody
+    @GetMapping("list")
+    public ResponseEntity<?> getChallengeList() {
+        try{
+            List<ChallengeListRes> challengeListRes = challengeService.getChallengeList(jwtService.getUserIdx(), 5);
+            return ResponseEntity.ok().body(challengeListRes);
+        } catch(BaseException exception){
+            return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
         }
     }
 
@@ -51,7 +66,6 @@ public class ChallengeController {
     public BaseResponse<PatchChallengeCompleteRes> completeChallenge(@PathVariable ("challenge_id") Long challengeId) {
         try{
             challengeService.completeChallenge(jwtService.getUserIdx(),challengeId);
-            checkLevelUpgrade(jwtService.getUserIdx());
             PatchChallengeCompleteRes PatchChallengeCompleteRes = challengeService.findUserExp(jwtService.getUserIdx());
             return new BaseResponse<>(PatchChallengeCompleteRes);
         } catch(BaseException exception){
@@ -61,16 +75,4 @@ public class ChallengeController {
             return null;
         }
     }
-
-    private void checkLevelUpgrade(Long userId) {
-        try {
-            if(challengeService.checkLevelUpgrade(userId)%4==0){
-                challengeService.levelUpgrade(userId);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
 }

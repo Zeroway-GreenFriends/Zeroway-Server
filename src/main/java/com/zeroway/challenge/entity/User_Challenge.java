@@ -2,11 +2,13 @@ package com.zeroway.challenge.entity;
 
 import com.zeroway.common.BaseEntity;
 import com.zeroway.user.entity.User;
+import lombok.Getter;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
 @Entity
+@Getter
 public class User_Challenge extends BaseEntity {
 
     @Id @GeneratedValue

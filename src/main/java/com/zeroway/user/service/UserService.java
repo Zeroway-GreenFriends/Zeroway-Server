@@ -1,9 +1,7 @@
 package com.zeroway.user.service;
 
-import com.zeroway.challenge.ChallengeRepository;
+import com.zeroway.challenge.repository.ChallengeRepo;
 import com.zeroway.common.BaseException;
-import com.zeroway.common.BaseResponse;
-import com.zeroway.common.BaseResponseStatus;
 import com.zeroway.common.StatusType;
 import com.zeroway.user.dto.PostUserRes;
 import com.zeroway.user.dto.SignInReq;
@@ -27,7 +25,7 @@ import static com.zeroway.common.BaseResponseStatus.*;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final ChallengeRepository challengeRepository;
+    private final ChallengeRepo challengeRepo;
     private final JwtService jwtService;
     private final Mapper mapper;
 
@@ -68,11 +66,10 @@ public class UserService {
                         .email(signInReq.getEmail())
                         .nickname(signInReq.getNickname())
                         .build());
-                user.setLevel(2);
                 System.out.println("user = " + user.getId());
-                List<Long> challengeIds = challengeRepository.findUserChallengeId(user.getId());
+                List<Long> challengeIds = challengeRepo.findUserChallengeId(user.getId());
                 for (Long challengeId : challengeIds) {
-                    challengeRepository.insertUserChallenge(challengeId, user.getId());
+                    challengeRepo.insertUserChallenge(challengeId, user.getId());
                 }
             }
             catch (Exception e) {

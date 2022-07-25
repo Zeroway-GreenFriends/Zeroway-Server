@@ -1,4 +1,4 @@
-package com.zeroway.challenge;
+package com.zeroway.challenge.repository;
 
 import com.zeroway.challenge.dto.GetChallengeListRes;
 import com.zeroway.challenge.dto.GetChallengeRes;
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public class ChallengeRepository {
+public class ChallengeRepo {
 
     private JdbcTemplate jdbcTemplate;
     private List<GetChallengeListRes> getChallengeListRes;
