@@ -1,9 +1,11 @@
 package com.zeroway.community.entity;
 
+import com.zeroway.common.BaseEntity;
+
 import javax.persistence.*;
 
 @Entity
-public class PostImage {
+public class PostImage extends BaseEntity {
 
     @Id @GeneratedValue
     @Column(name = "post_image_id")

@@ -22,7 +22,7 @@ public enum BaseResponseStatus {
     EMPTY_JWT(false, 2001, "JWT를 입력해주세요."),
     INVALID_JWT(false, 2002, "유효하지 않은 JWT입니다."),
     POST_USER_EMPTY_EMAIL(false, 2003, "이메일 값을 넣어주세요."),
-    POST_USER_INVALID_EMAIL(false, 2004, "이메일 형식을 확신해주세요."),
+    POST_USER_INVALID_EMAIL(false, 2004, "이메일 형식을 확인해주세요."),
     LOGIN_FAILED(false, 2005, "존재하지 않는 회원입니다."),
     POST_USERS_EXISTS_EMAIL(false, 2021, "이미 가입된 이메일입니다."),
     INVALID_POST_ID(false, 2100, "유효하지 않은 게시글 식별자입니다."),

@@ -12,13 +12,20 @@ Zeroway는 제로웨이스트 실천을 위한 팁과 다양한 챌린지를 제
 
 ## 💡 구현 기능
 ### 1. 소셜 로그인
+<img src="image/login.png" width="180" height="400"/> 
+<br><br>
 
 ### 2. 오늘의 팁
+<img src="image/tip.png" width="180" height="400"/> 
+
+<br><br>
 
 ### 3. 챌린지
+<img src="image/challenge.png" width="180" height="400"/> 
+<br><br>
 
 ### 4. 커뮤니티
-
+<img src="image/community.png" width="180" height="400"/> 
 <br><br>
 
 ## 💡 API 명세서
