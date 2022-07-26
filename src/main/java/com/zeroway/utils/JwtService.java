@@ -1,9 +1,11 @@
 package com.zeroway.utils;
 
 import com.zeroway.common.BaseException;
+import com.zeroway.common.BaseResponse;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -52,15 +54,26 @@ public class JwtService {
     /**
      * Header에서 Bearer으로 JWT 추출
      */
-    public String getAccess() {
+    private String getAccess() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         return request.getHeader("Bearer");
     }
 
     /**
-     * 토큰 만료 응답 or JWT에서 userIdx 추출 (유효한 토큰 시)
+     * 토큰 만료 응답 or accessToken에서 userIdx 추출 (유효한 토큰 시)
      */
     public Long getUserIdx() throws BaseException {
+
+        Jws<Claims> claims = expireToken();
+
+        // userIdx 추출
+        return claims.getBody().get("userIdx",Long.class);
+    }
+
+    /**
+     * 토큰 만료 확인
+     */
+    public Jws<Claims> expireToken() throws BaseException {
         // 1. JWT 추출
         String token = getAccess();
         if (token == null || token.length() == 0) {
@@ -84,7 +97,6 @@ public class JwtService {
             throw new BaseException(INVALID_JWT);
         }
 
-        // 3. userIdx 추출
-        return claims.getBody().get("userIdx",Long.class);
+        return claims;
     }
 }
