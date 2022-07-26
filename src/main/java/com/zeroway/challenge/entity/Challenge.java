@@ -1,10 +1,12 @@
 package com.zeroway.challenge.entity;
 
 import com.zeroway.common.BaseEntity;
+import lombok.Getter;
 
 import javax.persistence.*;
 
 @Entity
+@Getter
 public class Challenge extends BaseEntity {
 
     @Id @GeneratedValue
