@@ -1,15 +1,13 @@
 package com.zeroway.user.dto;
 
 import com.github.dozermapper.core.Mapping;
-
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class SignUpReq {
+@Builder
+public class SignInAuthReq {
 
     @Mapping("email")
     private String email;
@@ -17,5 +15,7 @@ public class SignUpReq {
     @Mapping("nickname")
     private String nickname;
 
-    private String password;
+    @Mapping("provider")
+    private String provider;
+
 }

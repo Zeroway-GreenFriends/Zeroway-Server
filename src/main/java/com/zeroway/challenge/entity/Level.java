@@ -1,6 +1,6 @@
 package com.zeroway.challenge.entity;
 
-import lombok.Getter;
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,6 +9,7 @@ import javax.persistence.Id;
 
 @Entity
 @Getter
+@Setter
 public class Level {
 
     @Id @GeneratedValue

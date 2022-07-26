@@ -20,7 +20,7 @@ import static com.zeroway.common.BaseResponseStatus.*;
 public class JwtService {
 
     private final int accessTokenMs = 1000 * 60 * 60;   // 1시간
-    private final int refreshTokenMs = 1000 * 60 * 60 * 24 * 14;    // 2주
+    private final int refreshTokenMs = 1000 * 60 * 60 * 24 * 7;    // 1주
 
     private final static SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS512;
     private final static Key key = Keys.secretKeyFor(signatureAlgorithm);
@@ -44,27 +44,25 @@ public class JwtService {
         Date now = new Date();
         return Jwts.builder()
                 .setHeaderParam("type","jwt")
-                .claim("userIdx", userId)
                 .setExpiration(new Date(now.getTime() + refreshTokenMs))
                 .signWith(key)
                 .compact();
     }
 
-
     /**
-     * Header에서 X-ACCESS-TOKEN으로 JWT 추출
+     * Header에서 Bearer으로 JWT 추출
      */
-    public String getJwt() {
+    public String getAccess() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        return request.getHeader("X-ACCESS-TOKEN");
+        return request.getHeader("Bearer");
     }
 
     /**
-     * JWT에서 userIdx 추출
+     * 토큰 만료 응답 or JWT에서 userIdx 추출 (유효한 토큰 시)
      */
     public Long getUserIdx() throws BaseException {
         // 1. JWT 추출
-        String token = getJwt();
+        String token = getAccess();
         if (token == null || token.length() == 0) {
             throw new BaseException(EMPTY_JWT);
         }
@@ -76,6 +74,12 @@ public class JwtService {
                     .setSigningKey(key.getEncoded())
                     .build()
                     .parseClaimsJws(token);
+
+            // access 토큰 만료시간이 지난 경우 만료 응답
+            if (claims.getBody().getExpiration().before(new Date())) {
+                throw new BaseException(EXPIRATION_JWT);
+            }
+
         } catch (Exception ignored) {
             throw new BaseException(INVALID_JWT);
         }

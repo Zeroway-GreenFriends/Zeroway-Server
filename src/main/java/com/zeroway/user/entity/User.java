@@ -1,5 +1,6 @@
 package com.zeroway.user.entity;
 
+import com.github.dozermapper.core.Mapping;
 import com.zeroway.challenge.entity.Level;
 import com.zeroway.common.BaseEntity;
 import lombok.*;
@@ -9,6 +10,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
+@Setter
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -37,18 +39,9 @@ public class User extends BaseEntity {
     @JoinColumn(name = "level_id")
     private Level level;
 
-
     // 경험치
     @ColumnDefault("0")
     @Builder.Default
     private Integer exp = 0;
 
-    public void setExp(Integer exp) {
-        this.exp = exp;
-    }
-
-    public User(String email, String nickname) {
-        this.email = email;
-        this.nickname = nickname;
-    }
 }
