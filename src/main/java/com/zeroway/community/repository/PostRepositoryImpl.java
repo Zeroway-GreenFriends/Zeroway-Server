@@ -8,11 +8,13 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zeroway.common.StatusType;
 import com.zeroway.community.dto.PostListRes;
 import com.zeroway.community.dto.QPostListRes;
+import com.zeroway.community.entity.QBookmark;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 
 import static com.querydsl.jpa.JPAExpressions.*;
+import static com.zeroway.community.entity.QBookmark.bookmark;
 import static com.zeroway.community.entity.QComment.comment;
 import static com.zeroway.community.entity.QPost.post;
 import static com.zeroway.community.entity.QPostLike.postLike;
@@ -54,7 +56,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                                 "postLikeCount"
                         ),
                         select(comment.count().intValue()).from(comment).where(comment.post.eq(post), comment.status.eq(StatusType.ACTIVE)), // 댓글 개수 서브 쿼리
-                        select(postLike.isNotNull()).from(postLike).where(postLike.post.eq(post), postLike.user.id.eq(userId)) //좋아요 여부 서브 쿼리
+                        select(postLike.isNotNull()).from(postLike).where(postLike.post.eq(post), postLike.user.id.eq(userId), postLike.status.eq(StatusType.ACTIVE)), // 좋아요 여부 서브 쿼리
+                        select(bookmark.isNotNull()).from(bookmark).where(bookmark.post.eq(post), bookmark.user.id.eq(userId), bookmark.status.eq(StatusType.ACTIVE))  // 북마크 여부 서브 쿼리
                 ))
                 .from(post)
                 .leftJoin(post.user, user)
