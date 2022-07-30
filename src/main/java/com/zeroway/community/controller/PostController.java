@@ -27,14 +27,13 @@ public class PostController {
 
     /**
      * 커뮤니티 글 전체 목록 조회 API
-     * @return
      */
     @GetMapping("/list")
     public ResponseEntity<?> getPostList(@RequestParam(defaultValue = "createdAt") String sort) {
         try {
             if (sortColumns.contains(sort)) {
-//                Long userId = jwtService.getUserIdx();
-                List<PostListRes> postList = postService.getPostList(1L, sort);
+                Long userId = jwtService.getUserIdx();
+                List<PostListRes> postList = postService.getPostList(userId, sort);
                 return ResponseEntity.ok().body(postList);
             }
             throw new BaseException(INVALID_PARAMETER_VALUE);
