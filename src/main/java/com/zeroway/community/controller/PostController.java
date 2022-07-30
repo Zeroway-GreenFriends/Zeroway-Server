@@ -42,10 +42,15 @@ public class PostController {
         }
     }
 
+    /**
+     * 게시글 상세 조회 API
+     * @param postId 게시글 id
+     */
     @GetMapping("/{postId}")
     public ResponseEntity<?> getPostDetail(@PathVariable Long postId) {
         try{
-            PostRes postRes = postService.getPost(postId);
+            Long userId = jwtService.getUserIdx();
+            PostRes postRes = postService.getPost(postId, userId);
             return ResponseEntity.ok().body(postRes);
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));

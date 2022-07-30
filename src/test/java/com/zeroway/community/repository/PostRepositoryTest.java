@@ -29,16 +29,12 @@ class PostRepositoryTest {
     @Test
     public void getPostList() {
 
-        Level level = new Level("레벨1이미지");
-        em.persist(level);
-
-        User user = User.builder().email("test@gmail.com").nickname("user1").provider(ProviderType.GOOGLE).level(level).build();
+        User user = User.builder().email("test@gmail.com").nickname("user1").provider(ProviderType.GOOGLE).build();
         em.persist(user);
 
         for(int i=0; i<10; i++) {
             Post post = Post.builder()
                     .user(user)
-                    .title("제목" + i)
                     .content("내용" + i)
                     .build();
             em.persist(post);

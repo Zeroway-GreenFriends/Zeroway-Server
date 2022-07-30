@@ -9,7 +9,7 @@ import javax.persistence.*;
 public class PostLike extends BaseEntity {
 
     @Id @GeneratedValue
-    @Column(name = "like_id")
+    @Column(name = "post_like_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
