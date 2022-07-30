@@ -1,6 +1,6 @@
 package com.zeroway.community.dto;
 
-import com.zeroway.community.entity.Comment;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -10,13 +10,20 @@ public class CommentListRes {
 
     private Long userId;
     private String username;
+    private String userProfileImg;
     private String content;
     private LocalDateTime createdAt;
+    private int likeCount;
+    private boolean liked;
 
-    public CommentListRes(Comment comment) {
-        this.userId = comment.getUser().getId();
-        this.username = comment.getUser().getNickname();
-        this.content = comment.getContent();
-        this.createdAt = comment.getCreatedAt();
+    @QueryProjection
+    public CommentListRes(Long userId, String username, String userProfileImg, String content, LocalDateTime createdAt, int likeCount, boolean liked) {
+        this.userId = userId;
+        this.username = username;
+        this.userProfileImg = userProfileImg;
+        this.content = content;
+        this.createdAt = createdAt;
+        this.likeCount = likeCount;
+        this.liked = liked;
     }
 }
