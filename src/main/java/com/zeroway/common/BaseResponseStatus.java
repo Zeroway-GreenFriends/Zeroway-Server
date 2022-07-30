@@ -25,7 +25,9 @@ public enum BaseResponseStatus {
     POST_USER_INVALID_EMAIL(false, 2004, "이메일 형식을 확인해주세요."),
     LOGIN_FAILED(false, 2005, "존재하지 않는 회원입니다."),
     POST_USERS_EXISTS_EMAIL(false, 2021, "이미 가입된 이메일입니다."),
+
     INVALID_POST_ID(false, 2100, "유효하지 않은 게시글 식별자입니다."),
+    INVALID_PARAMETER_VALUE(false, 2101, "잘못된 요청 파라미터 값입니다."),
 
     /**
      * 3000 : Response 오류
