@@ -3,6 +3,7 @@ package com.zeroway.community.service;
 import com.zeroway.common.BaseException;
 import com.zeroway.community.entity.Comment;
 import com.zeroway.community.repository.CommentRepository;
+import com.zeroway.community.repository.PostImageRepository;
 import com.zeroway.community.repository.PostRepository;
 import com.zeroway.community.dto.PostListRes;
 import com.zeroway.community.dto.PostRes;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.zeroway.common.BaseResponseStatus.DATABASE_ERROR;
@@ -24,20 +26,20 @@ import static com.zeroway.common.BaseResponseStatus.INVALID_POST_ID;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final PostImageRepository postImageRepository;
     private final CommentRepository commentRepository;
 
+
     // 전체 글 조회
-    public List<PostListRes> getPostList() throws BaseException {
+    public List<PostListRes> getPostList(Long userId, String sort) throws BaseException {
         List<PostListRes> result = new ArrayList<>();
         try {
-            // 최신순 조회
-            for (Post post : postRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"))) {
-                result.add(PostListRes.builder().postId(post.getId())
-                        .title(post.getTitle())
-                        .content(post.getContent())
-                        .createdAt(post.getCreatedAt())
-                        .username(post.getUser().getNickname())
-                        .build());
+            for (PostListRes post : postRepository.getPostList(userId, sort)) {
+                Long postId = post.getPostId();
+                post.getImageList().addAll(
+                        postImageRepository.findUrlByPostId(postId)
+                );
+                result.add(post);
             }
             return result;
         } catch (Exception e) {
@@ -61,5 +63,9 @@ public class PostService {
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
+    }
+
+    private class postImageUrlOnly {
+        String postImageUrl;
     }
 }
