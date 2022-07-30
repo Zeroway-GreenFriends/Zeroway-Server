@@ -1,6 +1,5 @@
 package com.zeroway.user.service;
 
-import com.zeroway.challenge.ChallengeRepository;
 import com.zeroway.challenge.LevelRepository;
 import com.zeroway.challenge.entity.Level;
 import com.zeroway.common.BaseException;
@@ -26,7 +25,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final LevelRepository levelRepository;
-    private final ChallengeRepository challengeRepository;
     private final JwtService jwtService;
     private final Mapper mapper;
 
@@ -78,4 +76,10 @@ public class UserService {
     }
 
 
+    public String refreshToken() throws BaseException {
+        jwtService.expireToken();
+
+        Long userIdx = userRepository.findByRefreshToken(jwtService.getToken()).get().getId();
+        return jwtService.createAccessToken(userIdx);
+    }
 }

@@ -8,6 +8,7 @@ import com.zeroway.user.dto.PostUserRes;
 import com.zeroway.user.service.UserService;
 import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,7 +47,15 @@ public class UserController {
     }
 
     /**
-     * JWT 토큰 재발급
+     * 액세스 토큰 재발급
      */
-
+    @PostMapping("/auth/refresh")
+    public ResponseEntity<BaseResponse<String>> authRefresh() {
+        try {
+            String accessToken = userService.refreshToken();
+            return ResponseEntity.ok().body(new BaseResponse<>(accessToken));
+        } catch (BaseException e) {
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+    }
 }
