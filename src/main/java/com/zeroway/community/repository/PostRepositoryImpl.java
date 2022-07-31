@@ -60,7 +60,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         return queryFactory
                 .select(
                     new QPostRes(
-                            post.id, user.nickname, user.profileImgUrl, post.content, post.createdAt,
+                            post.id, user.nickname, user.profileImgUrl, post.content, post.createdAt, post.challenge,
                             postLikeCount(),
                             commentCount(),
                             postLiked(userId),
@@ -77,7 +77,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     private JPAQuery<PostListRes> getPostListResJPAQuery(Long userId) {
         return queryFactory
                 .select(new QPostListRes(
-                        post.id, post.content, post.createdAt,
+                        post.id, post.content, post.createdAt, post.challenge,
                         user.nickname, user.profileImgUrl,
                         ExpressionUtils.as( // 좋아요 개수 서브 쿼리
                                 postLikeCount(), "postLikeCount"
