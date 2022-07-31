@@ -55,7 +55,11 @@ public class UserController {
             String accessToken = userService.refreshToken();
             return ResponseEntity.ok().body(new BaseResponse<>(accessToken));
         } catch (BaseException e) {
-            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+            if (e.getStatus().equals(EXPIRATION_JWT)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new BaseResponse<>(e.getStatus()));
+            } else {
+                return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+            }
         }
     }
 }
