@@ -1,6 +1,6 @@
 package com.zeroway.challenge.service;
 
-import com.zeroway.challenge.LevelRepository;
+import com.zeroway.challenge.repository.LevelRepository;
 import com.zeroway.challenge.dto.ChallengeListRes;
 import com.zeroway.challenge.dto.ChallengeRes;
 import com.zeroway.challenge.entity.Challenge;

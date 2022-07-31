@@ -1,4 +1,4 @@
-package com.zeroway.challenge;
+package com.zeroway.challenge.repository;
 
 import com.zeroway.challenge.entity.Level;
 import org.springframework.data.jpa.repository.JpaRepository;
