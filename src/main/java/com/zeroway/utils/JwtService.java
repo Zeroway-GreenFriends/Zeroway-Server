@@ -1,15 +1,12 @@
 package com.zeroway.utils;
 
 import com.zeroway.common.BaseException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Claims;
 
 import java.security.Key;
 import java.util.Date;
@@ -84,12 +81,9 @@ public class JwtService {
                     .setSigningKey(key.getEncoded())
                     .build()
                     .parseClaimsJws(token);
-
-            // access 토큰 만료시간이 지난 경우 만료 응답
-            if (claims.getBody().getExpiration().before(new Date())) {
-                throw new BaseException(EXPIRATION_JWT);
-            }
-
+        } catch (ExpiredJwtException e) {
+            e.printStackTrace();
+            throw new BaseException(EXPIRATION_JWT);
         } catch (Exception ignored) {
             ignored.printStackTrace();
             throw new BaseException(INVALID_JWT);
