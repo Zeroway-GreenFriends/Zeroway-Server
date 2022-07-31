@@ -5,14 +5,16 @@ import com.zeroway.common.BaseResponse;
 import com.zeroway.community.dto.PostListRes;
 import com.zeroway.community.dto.PostRes;
 import com.zeroway.community.service.PostService;
+import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import static com.zeroway.common.BaseResponseStatus.INVALID_PARAMETER_VALUE;
 
 @RestController
 @RequestMapping("/post")
@@ -20,25 +22,35 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
+    private final JwtService jwtService;
+    private final List<String> sortColumns = new ArrayList<>(Arrays.asList("createdAt", "like"));
 
     /**
      * 커뮤니티 글 전체 목록 조회 API
-     * @return postId, title, content, createdAt, username
      */
     @GetMapping("/list")
-    public ResponseEntity<?> getPostList() {
+    public ResponseEntity<?> getPostList(@RequestParam(defaultValue = "createdAt") String sort) {
         try {
-            List<PostListRes> postList = postService.getPostList();
-            return ResponseEntity.ok().body(new BaseResponse<>(postList));
+            if (sortColumns.contains(sort)) {
+                Long userId = jwtService.getUserIdx();
+                List<PostListRes> postList = postService.getPostList(userId, sort);
+                return ResponseEntity.ok().body(postList);
+            }
+            throw new BaseException(INVALID_PARAMETER_VALUE);
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
     }
 
+    /**
+     * 게시글 상세 조회 API
+     * @param postId 게시글 id
+     */
     @GetMapping("/{postId}")
     public ResponseEntity<?> getPostDetail(@PathVariable Long postId) {
         try{
-            PostRes postRes = postService.getPost(postId);
+            Long userId = jwtService.getUserIdx();
+            PostRes postRes = postService.getPost(postId, userId);
             return ResponseEntity.ok().body(postRes);
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));

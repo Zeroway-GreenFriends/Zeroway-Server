@@ -1,11 +1,9 @@
 package com.zeroway.utils;
 
 import com.zeroway.common.BaseException;
-import com.zeroway.common.BaseResponse;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -42,7 +40,6 @@ public class JwtService {
     }
 
     public String createRefreshToken(Long userId) {
-        Key key = Keys.secretKeyFor(signatureAlgorithm);
         Date now = new Date();
         return Jwts.builder()
                 .setHeaderParam("type","jwt")
@@ -54,7 +51,7 @@ public class JwtService {
     /**
      * Header에서 Bearer으로 JWT 추출
      */
-    private String getAccess() {
+    public String getToken() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         return request.getHeader("Bearer");
     }
@@ -75,7 +72,7 @@ public class JwtService {
      */
     public Jws<Claims> expireToken() throws BaseException {
         // 1. JWT 추출
-        String token = getAccess();
+        String token = getToken();
         if (token == null || token.length() == 0) {
             throw new BaseException(EMPTY_JWT);
         }
@@ -94,6 +91,7 @@ public class JwtService {
             }
 
         } catch (Exception ignored) {
+            ignored.printStackTrace();
             throw new BaseException(INVALID_JWT);
         }
 
