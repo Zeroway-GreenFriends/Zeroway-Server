@@ -45,6 +45,15 @@ public class JwtService {
                 .compact();
     }
 
+    public String createExpiredTokenTest() {
+        Date now = new Date();
+        return Jwts.builder()
+                .setHeaderParam("type", "jwt")
+                .setExpiration(new Date(now.getTime() + 1000))  // 1초
+                .signWith(key)
+                .compact();
+    }
+
     /**
      * Header에서 Bearer으로 JWT 추출
      */
