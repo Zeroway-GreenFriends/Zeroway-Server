@@ -77,10 +77,22 @@ public class UserService {
     }
 
 
+    /**
+    액세스토큰 재발급
+     */
     public String refreshToken() throws BaseException {
         jwtService.expireToken();
+        String refreshToken = jwtService.getToken();
 
-        Long userIdx = userRepository.findByRefreshToken(jwtService.getToken()).get().getId();
+        Optional<User> optionalUser = userRepository.findByRefreshToken(refreshToken);
+        Long userIdx;
+
+        if (optionalUser.isEmpty()) {
+            throw new BaseException(REQUEST_ERROR);
+        } else {
+            userIdx = optionalUser.get().getId();
+        }
+
         return jwtService.createAccessToken(userIdx);
     }
 }
