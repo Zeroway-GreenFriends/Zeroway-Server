@@ -1,5 +1,6 @@
 package com.zeroway.challenge.service;
 
+import com.zeroway.challenge.dto.ChallengeCompleteRes;
 import com.zeroway.challenge.repository.LevelRepository;
 import com.zeroway.challenge.dto.ChallengeListRes;
 import com.zeroway.challenge.dto.ChallengeRes;
@@ -72,7 +73,7 @@ public class ChallengeService {
                 .collect(Collectors.toList());
     }
 
-    public void patchChallengeComplete(Long userId, Long challengeId, Integer exp) throws Exception{
+    public ChallengeCompleteRes patchChallengeComplete(Long userId, Long challengeId, Integer exp) throws Exception{
         try{
             User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
             User_Challenge uc = userChallengeRepository.findByUser_IdAndChallenge_Id(userId, challengeId);
@@ -85,6 +86,7 @@ public class ChallengeService {
             }
             checkLevel(user);
             userChallengeRepository.save(uc);
+            return new ChallengeCompleteRes(user.getLevel().getId());
         }
         catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);

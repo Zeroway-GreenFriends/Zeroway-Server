@@ -1,5 +1,6 @@
 package com.zeroway.challenge.controller;
 
+import com.zeroway.challenge.dto.ChallengeCompleteRes;
 import com.zeroway.challenge.dto.ChallengeListRes;
 import com.zeroway.challenge.dto.ChallengeRes;
 import com.zeroway.challenge.service.ChallengeService;
@@ -52,13 +53,18 @@ public class ChallengeController {
         }
     }
 
+    /**
+     * 챌린지 수행/수행취소 API
+     * @return 유저(level)
+     */
     @ResponseBody
     @PatchMapping("/{challenge_id}/complete")
-    public void patchChallengeComplete(@PathVariable ("challenge_id") Long challengeId) {
+    public ResponseEntity<?> patchChallengeComplete(@PathVariable ("challenge_id") Long challengeId) {
         try{
-            challengeService.patchChallengeComplete(jwtService.getUserIdx(), challengeId, 10);
+            ChallengeCompleteRes ChallengeCompleteRes = challengeService.patchChallengeComplete(jwtService.getUserIdx(), challengeId, 10);
+            return ResponseEntity.ok().body(ChallengeCompleteRes);
         } catch(Exception exception){
-            exception.printStackTrace();
+            return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getCause()));
         }
     }
 }
