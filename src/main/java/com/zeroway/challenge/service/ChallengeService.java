@@ -17,9 +17,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import static com.zeroway.common.BaseResponseStatus.DATABASE_ERROR;
@@ -37,8 +39,17 @@ public class ChallengeService {
 
     public ChallengeRes getList(Long userId) throws BaseException {
         try{
-            return userRepository.findById(userId)
-                    .map(user -> new ChallengeRes(user.getNickname(), user.getLevel().getId(), user.getExp(), user.getProfileImgUrl()))
+            Optional<User> findUser = userRepository.findById(userId);
+            if(findUser.isEmpty()){
+                throw new BaseException(DATABASE_ERROR);
+            }
+            Optional<Level> userLevel = levelRepository.findById(findUser.get().getLevel().getId());
+            if(userLevel.isEmpty()){
+                throw new BaseException(DATABASE_ERROR);
+            }
+
+            return findUser
+                    .map(user -> new ChallengeRes(user.getNickname(), user.getLevel().getId(), user.getExp(), userLevel.get().getImageUrl()))
                     .orElseThrow(IllegalArgumentException::new);
         }
         catch (Exception exception) {
@@ -48,28 +59,24 @@ public class ChallengeService {
     }
 
     public List<ChallengeListRes> getChallengeList(long userId, Integer size) {
-        List<Long> challengeIdList = new ArrayList<>();
-        List<User_Challenge> userChallenges = new ArrayList<>();
+        List<User_Challenge> todayChallenge = new ArrayList<>();
+        LocalDateTime now = LocalDateTime.now();
 
-        //user level에 맞는 challenge
         User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
-        List<Challenge> challengeList = challengeRepository.findByLevel_Id(user.getLevel().getId());
+        LocalDateTime todayLdt = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), 0, 0, 0);
+        List<User_Challenge> challenges = userChallengeRepository.findTodayChallenge(user.getId(), user.getLevel().getId(), todayLdt);
 
-        //challengeId 랜덤 생성
-        for (long i=0; i<size; i++) {
-            Long id = (long)(Math.random()*challengeList.size()) + 1;
-            while (challengeIdList.contains(id)){
-                id = (long)(Math.random()*challengeList.size()) + 1;
+        //챌린지 랜덤 추출
+        Random rn = new Random(now.getDayOfYear());
+        for(long i=0; i<size; i++) {
+            int id = rn.nextInt(challenges.size());
+            while(todayChallenge.contains(challenges.get(id))){
+                id = rn.nextInt(challenges.size());
             }
-            challengeIdList.add(id);
+            todayChallenge.add(challenges.get(id));
         }
 
-        //user_challenge
-        for (Long id : challengeIdList) {
-            userChallenges.add(userChallengeRepository.findChallengeList(id, userId));
-        }
-
-        return userChallenges.stream()
+        return todayChallenge.stream()
                 .map(uc -> new ChallengeListRes(uc.getChallenge().getId(), uc.getChallenge().getContent(), uc.isComplete()))
                 .collect(Collectors.toList());
     }
