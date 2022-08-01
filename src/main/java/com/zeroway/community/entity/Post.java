@@ -4,12 +4,14 @@ import com.zeroway.common.BaseEntity;
 import com.zeroway.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Post extends BaseEntity {
 
     @Id @GeneratedValue

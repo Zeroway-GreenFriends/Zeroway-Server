@@ -2,6 +2,7 @@ package com.zeroway.community.entity;
 
 import com.zeroway.common.BaseEntity;
 import com.zeroway.user.entity.User;
+import lombok.Builder;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -24,4 +25,11 @@ public class Comment extends BaseEntity {
 
     @Column(length = 200)
     private String content;
+
+    @Builder
+    public Comment(Post post, User user, String content) {
+        this.post = post;
+        this.user = user;
+        this.content = content;
+    }
 }

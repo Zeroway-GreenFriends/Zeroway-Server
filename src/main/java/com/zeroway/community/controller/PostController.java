@@ -2,9 +2,11 @@ package com.zeroway.community.controller;
 
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
+import com.zeroway.community.dto.CreateCommentReq;
 import com.zeroway.community.dto.CreatePostReq;
 import com.zeroway.community.dto.PostListRes;
 import com.zeroway.community.dto.PostRes;
+import com.zeroway.community.service.CommentService;
 import com.zeroway.community.service.PostService;
 import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ public class PostController {
 
     private final PostService postService;
     private final JwtService jwtService;
+    private final CommentService commentService;
     private final List<String> sortColumns = new ArrayList<>(Arrays.asList("createdAt", "like"));
 
     /**
@@ -70,6 +73,24 @@ public class PostController {
         try {
             Long userId = jwtService.getUserIdx();
             postService.createPost(post, images, userId);
+            return ResponseEntity.ok().build();
+        } catch (BaseException e) {
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+    }
+
+
+    /**
+     * 댓글 작성 api
+     * @param postId 게시글 id
+     * @param req 댓글 내용
+     */
+    @PostMapping("/{postId}/comment")
+    public ResponseEntity<?> createComment(@PathVariable Long postId,
+                                           @RequestBody CreateCommentReq req) {
+        try {
+            Long userId = jwtService.getUserIdx();
+            commentService.createComment(req, postId, userId);
             return ResponseEntity.ok().build();
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
