@@ -2,6 +2,7 @@ package com.zeroway.community.controller;
 
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
+import com.zeroway.community.dto.CreatePostReq;
 import com.zeroway.community.dto.PostListRes;
 import com.zeroway.community.dto.PostRes;
 import com.zeroway.community.service.PostService;
@@ -9,6 +10,7 @@ import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,6 +54,23 @@ public class PostController {
             Long userId = jwtService.getUserIdx();
             PostRes postRes = postService.getPost(postId, userId);
             return ResponseEntity.ok().body(postRes);
+        } catch (BaseException e) {
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+    }
+
+    /**
+     * 글 작성 api
+     * @param post - 내용, 챌린지 인증 여부
+     * @param images - 이미지 파일 리스트
+     */
+    @PostMapping()
+    public ResponseEntity<?> createPost(@RequestPart CreatePostReq post,
+                                        @RequestPart List<MultipartFile> images) {
+        try {
+            Long userId = jwtService.getUserIdx();
+            postService.createPost(post, images, userId);
+            return ResponseEntity.ok().build();
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }

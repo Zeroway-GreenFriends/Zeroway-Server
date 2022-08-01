@@ -32,7 +32,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
                 .select(
                         new QCommentListRes(
                                 user.id, user.nickname, user.profileImgUrl,
-                                comment.content, comment.createdAt,
+                                comment.id ,comment.content, comment.createdAt,
                                 select(commentLike.count().intValue()).from(commentLike).where(commentLike.comment.eq(comment), commentLike.status.eq(StatusType.ACTIVE)),
                                 select(commentLike.isNotNull()).from(commentLike).where(commentLike.comment.eq(comment), commentLike.status.eq(StatusType.ACTIVE), commentLike.user.id.eq(userId))
                         )
