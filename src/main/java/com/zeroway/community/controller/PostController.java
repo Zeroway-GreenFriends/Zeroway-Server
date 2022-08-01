@@ -2,11 +2,9 @@ package com.zeroway.community.controller;
 
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
-import com.zeroway.community.dto.CreateCommentReq;
-import com.zeroway.community.dto.CreatePostReq;
-import com.zeroway.community.dto.PostListRes;
-import com.zeroway.community.dto.PostRes;
+import com.zeroway.community.dto.*;
 import com.zeroway.community.service.CommentService;
+import com.zeroway.community.service.PostLikeService;
 import com.zeroway.community.service.PostService;
 import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +26,7 @@ public class PostController {
     private final PostService postService;
     private final JwtService jwtService;
     private final CommentService commentService;
+    private final PostLikeService likeService;
     private final List<String> sortColumns = new ArrayList<>(Arrays.asList("createdAt", "like"));
 
     /**
@@ -92,6 +91,21 @@ public class PostController {
             Long userId = jwtService.getUserIdx();
             commentService.createComment(req, postId, userId);
             return ResponseEntity.ok().build();
+        } catch (BaseException e) {
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+    }
+
+    /**
+     * 좋아요 및 좋아요 취소 api
+     * @param postId 게시글 id
+     */
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<?> like(@PathVariable Long postId) {
+        try {
+            Long userId = jwtService.getUserIdx();
+            boolean like = likeService.like(userId, postId);
+            return ResponseEntity.ok().body(new LikeRes(like));
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
