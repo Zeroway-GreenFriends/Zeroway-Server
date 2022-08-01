@@ -64,7 +64,6 @@ public class ChallengeController {
             ChallengeCompleteRes ChallengeCompleteRes = challengeService.patchChallengeComplete(jwtService.getUserIdx(), challengeId, 10);
             return ResponseEntity.ok().body(ChallengeCompleteRes);
         } catch (Exception e) {
-            System.out.println("수행에러");
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getMessage()));
         }
     }
