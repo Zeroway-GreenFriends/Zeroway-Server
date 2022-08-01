@@ -1,4 +1,4 @@
-package com.zeroway.community.repository;
+package com.zeroway.community.repository.comment;
 
 import com.zeroway.community.dto.CommentListRes;
 

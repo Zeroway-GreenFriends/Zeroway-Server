@@ -2,9 +2,9 @@ package com.zeroway.community.controller;
 
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
-import com.zeroway.community.dto.CreatePostReq;
-import com.zeroway.community.dto.PostListRes;
-import com.zeroway.community.dto.PostRes;
+import com.zeroway.community.dto.*;
+import com.zeroway.community.service.CommentService;
+import com.zeroway.community.service.PostLikeService;
 import com.zeroway.community.service.PostService;
 import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +25,8 @@ public class PostController {
 
     private final PostService postService;
     private final JwtService jwtService;
+    private final CommentService commentService;
+    private final PostLikeService likeService;
     private final List<String> sortColumns = new ArrayList<>(Arrays.asList("createdAt", "like"));
 
     /**
@@ -71,6 +73,53 @@ public class PostController {
             Long userId = jwtService.getUserIdx();
             postService.createPost(post, images, userId);
             return ResponseEntity.ok().build();
+        } catch (BaseException e) {
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+    }
+
+
+    /**
+     * 댓글 작성 api
+     * @param postId 게시글 id
+     * @param req 댓글 내용
+     */
+    @PostMapping("/{postId}/comment")
+    public ResponseEntity<?> createComment(@PathVariable Long postId,
+                                           @RequestBody CreateCommentReq req) {
+        try {
+            Long userId = jwtService.getUserIdx();
+            commentService.createComment(req, postId, userId);
+            return ResponseEntity.ok().build();
+        } catch (BaseException e) {
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+    }
+
+    /**
+     * 좋아요 및 좋아요 취소 api
+     * @param postId 게시글 id
+     */
+    @PostMapping("/{postId}/like")
+    public ResponseEntity<?> like(@PathVariable Long postId) {
+        try {
+            Long userId = jwtService.getUserIdx();
+            boolean like = likeService.like(userId, postId);
+            return ResponseEntity.ok().body(new CreateLikeRes(like));
+        } catch (BaseException e) {
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+    }
+
+    /**
+     * 좋아요 목록 조회 api
+     * @param postId 게시글 id
+     */
+    @GetMapping("/{postId}/like")
+    public ResponseEntity<?> getLikeList(@PathVariable Long postId) {
+        try {
+            LikeListRes res = likeService.getLikeList(postId);
+            return ResponseEntity.ok().body(res);
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }

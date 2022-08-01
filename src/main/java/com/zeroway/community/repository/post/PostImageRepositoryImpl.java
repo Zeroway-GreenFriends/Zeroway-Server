@@ -1,4 +1,4 @@
-package com.zeroway.community.repository;
+package com.zeroway.community.repository.post;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
