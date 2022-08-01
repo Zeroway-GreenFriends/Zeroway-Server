@@ -2,13 +2,14 @@ package com.zeroway.challenge.entity;
 
 import com.zeroway.common.BaseEntity;
 import com.zeroway.user.entity.User;
-import lombok.Getter;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class User_Challenge extends BaseEntity {
 
     @Id @GeneratedValue
@@ -27,8 +28,13 @@ public class User_Challenge extends BaseEntity {
     @ColumnDefault("false")
     private boolean complete = false;
 
-
     public void setComplete(boolean complete) {
         this.complete = complete;
+    }
+
+    @Builder
+    public User_Challenge(User user, Challenge challenge) {
+        this.user = user;
+        this.challenge = challenge;
     }
 }

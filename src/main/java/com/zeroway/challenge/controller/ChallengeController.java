@@ -54,7 +54,7 @@ public class ChallengeController {
     }
 
     /**
-     * 챌린지 수행/수행취소 API
+     * 챌린지 수행(수행취소) API
      * @return 유저(level)
      */
     @ResponseBody
@@ -63,8 +63,9 @@ public class ChallengeController {
         try{
             ChallengeCompleteRes ChallengeCompleteRes = challengeService.patchChallengeComplete(jwtService.getUserIdx(), challengeId, 10);
             return ResponseEntity.ok().body(ChallengeCompleteRes);
-        } catch(Exception exception){
-            return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getCause()));
+        } catch (Exception e) {
+            System.out.println("수행에러");
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getMessage()));
         }
     }
 }

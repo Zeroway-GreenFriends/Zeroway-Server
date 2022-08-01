@@ -15,6 +15,7 @@ import com.zeroway.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -102,6 +103,7 @@ public class ChallengeService {
             }
             user.setLevel(levelup.get());
             user.setExp(user.getExp()-100);
+            createUC(user);
         } else if(user.getExp() < 0){
             if(user.getLevel().getId()!=1) {
                 Optional<Level> levelDown = levelRepository.findById(user.getLevel().getId() - 1);
@@ -115,5 +117,15 @@ public class ChallengeService {
             }
         }
         userRepository.save(user);
+    }
+
+    private void createUC(User user) {
+        List<Challenge> challenges = challengeRepository.findByLevel_Id(user.getLevel().getId());
+        if(userChallengeRepository.findByUser_IdAndChallenge_Id(user.getId(), challenges.get(0).getId())==null) {
+            for (Challenge challenge : challenges) {
+                userChallengeRepository.save(User_Challenge.builder()
+                        .user(user).challenge(challenge).build());
+            }
+        }
     }
 }
