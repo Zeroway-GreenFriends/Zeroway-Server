@@ -1,6 +1,7 @@
 package com.zeroway.community.entity;
 
 import com.zeroway.common.BaseEntity;
+import lombok.Builder;
 
 import javax.persistence.*;
 
@@ -17,4 +18,10 @@ public class PostImage extends BaseEntity {
 
     @Column(nullable = false)
     private String url;
+
+    @Builder
+    public PostImage(Post post, String url) {
+        this.post = post;
+        this.url = url;
+    }
 }

@@ -13,6 +13,7 @@ public class PostListRes {
     private Long postId;
     private String content;
     private LocalDateTime createdAt;
+    private boolean challenge;
     private String username;
     private String userProfileImg;
     private int likeCount;
@@ -23,10 +24,11 @@ public class PostListRes {
     private List<String> imageList = new ArrayList<>();
 
     @QueryProjection
-    public PostListRes(Long postId, String content, LocalDateTime createdAt, String username, String userProfileImg, int likeCount, int commentCount, boolean liked, boolean bookmarked) {
+    public PostListRes(Long postId, String content, LocalDateTime createdAt, boolean challenge, String username, String userProfileImg, int likeCount, int commentCount, boolean liked, boolean bookmarked) {
         this.postId = postId;
         this.content = content;
         this.createdAt = createdAt;
+        this.challenge = challenge;
         this.username = username;
         this.userProfileImg = userProfileImg;
         this.likeCount = likeCount;
