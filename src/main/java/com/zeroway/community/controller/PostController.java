@@ -105,7 +105,21 @@ public class PostController {
         try {
             Long userId = jwtService.getUserIdx();
             boolean like = likeService.like(userId, postId);
-            return ResponseEntity.ok().body(new LikeRes(like));
+            return ResponseEntity.ok().body(new CreateLikeRes(like));
+        } catch (BaseException e) {
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+    }
+
+    /**
+     * 좋아요 목록 조회 api
+     * @param postId 게시글 id
+     */
+    @GetMapping("/{postId}/like")
+    public ResponseEntity<?> getLikeList(@PathVariable Long postId) {
+        try {
+            LikeListRes res = likeService.getLikeList(postId);
+            return ResponseEntity.ok().body(res);
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }

@@ -2,10 +2,12 @@ package com.zeroway.community.service;
 
 import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
+import com.zeroway.community.dto.LikeListRes;
+import com.zeroway.community.dto.UserInfo;
 import com.zeroway.community.entity.Post;
 import com.zeroway.community.entity.PostLike;
-import com.zeroway.community.repository.PostLikeRepository;
-import com.zeroway.community.repository.PostRepository;
+import com.zeroway.community.repository.post.PostLikeRepository;
+import com.zeroway.community.repository.post.PostRepository;
 import com.zeroway.user.entity.User;
 import com.zeroway.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.zeroway.common.BaseResponseStatus.*;
@@ -50,6 +53,16 @@ public class PostLikeService {
             return true; // 좋아요
         } catch (BaseException e) {
             throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 좋아요 목록 조회
+    public LikeListRes getLikeList(Long postId) throws BaseException {
+        try {
+            List<UserInfo> postLikeList = postRepository.getPostLikeList(postId);
+            return new LikeListRes(postLikeList);
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }

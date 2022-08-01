@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class LikeRes {
+public class CreateLikeRes {
     private boolean like; // 좋아요 여부
 }
