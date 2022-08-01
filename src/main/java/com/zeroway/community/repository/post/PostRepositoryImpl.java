@@ -1,4 +1,4 @@
-package com.zeroway.community.repository;
+package com.zeroway.community.repository.post;
 
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.dsl.Expressions;
@@ -7,10 +7,8 @@ import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zeroway.common.StatusType;
-import com.zeroway.community.dto.PostListRes;
-import com.zeroway.community.dto.PostRes;
-import com.zeroway.community.dto.QPostListRes;
-import com.zeroway.community.dto.QPostRes;
+import com.zeroway.community.dto.*;
+import com.zeroway.community.entity.QPostLike;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -70,6 +68,20 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .join(post.user, user)
                 .where(post.id.eq(postId))
                 .fetchOne();
+    }
+
+    /**
+     * 좋아요 목록 조회
+     * @param postId 게시글 id
+     */
+    @Override
+    public List<UserInfo> getPostLikeList(Long postId) {
+        return queryFactory
+                .select(new QUserInfo(user.id, user.nickname, user.profileImgUrl, user.level.id))
+                .from(postLike)
+                .join(postLike.user, user)
+                .where(postLike.post.id.eq(postId))
+                .fetch();
     }
 
 
