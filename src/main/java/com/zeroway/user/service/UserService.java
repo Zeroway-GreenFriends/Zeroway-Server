@@ -1,7 +1,11 @@
 package com.zeroway.user.service;
 
+import com.zeroway.challenge.entity.Challenge;
+import com.zeroway.challenge.entity.User_Challenge;
+import com.zeroway.challenge.repository.ChallengeRepository;
 import com.zeroway.challenge.repository.LevelRepository;
 import com.zeroway.challenge.entity.Level;
+import com.zeroway.challenge.repository.UserChallengeRepository;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
 import com.zeroway.user.dto.PostUserRes;
@@ -14,6 +18,7 @@ import com.github.dozermapper.core.Mapper;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 import static com.zeroway.common.BaseResponseStatus.*;
@@ -25,6 +30,8 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final LevelRepository levelRepository;
+    private final ChallengeRepository challengeRepository;
+    private final UserChallengeRepository userChallengeRepository;
     private final JwtService jwtService;
     private final Mapper mapper;
 
@@ -43,19 +50,18 @@ public class UserService {
         if (levelOptional.isEmpty()) {
             throw new BaseException(DATABASE_ERROR);
         } else {
-            user.setLevel(levelOptional.get());
-        }
-
-        if (userOptional.isEmpty()) {
-            try {
-                user = userRepository.save(user);
+            if (userOptional.isEmpty()) {
+                try {
+                    Level levelOne = levelOptional.get();
+                    signIn(user, levelOne);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                    throw new BaseException(DATABASE_ERROR);
+                }
+            } else {
+                user = userOptional.get();
             }
-            catch (Exception e) {
-                e.printStackTrace();
-                throw new BaseException(DATABASE_ERROR);
-            }
-        } else {
-            user = userOptional.get();
         }
 
         if (user.getStatus().equals(StatusType.INACTIVE)) {
@@ -68,13 +74,30 @@ public class UserService {
         user.setRefreshToken(refreshJwt);
         userRepository.save(user);
 
-
         return PostUserRes.builder()
                 .accessToken(accessJwt)
                 .refreshToken(refreshJwt)
                 .build();
     }
 
+    public void signIn(User user, Level levelOne) throws BaseException {
+        user.setLevel(levelOne);
+        try {
+            user = userRepository.save(user);
+            List<Challenge> levelOneChallenge = challengeRepository.findByLevel_Id(levelOne.getId());
+
+            for (int i = 0; i < levelOneChallenge.size(); i++) {
+                User_Challenge userChallenge = User_Challenge.builder()
+                        .user(user)
+                        .challenge(levelOneChallenge.get(i))
+                        .build();
+                userChallengeRepository.save(userChallenge);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 
     /**
     액세스토큰 재발급

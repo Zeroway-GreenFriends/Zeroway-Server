@@ -3,8 +3,8 @@ package com.zeroway.user;
 
 import com.github.dozermapper.core.DozerBeanMapperBuilder;
 import com.github.dozermapper.core.Mapper;
-import com.zeroway.challenge.LevelRepository;
 import com.zeroway.challenge.entity.Level;
+import com.zeroway.challenge.repository.LevelRepository;
 import com.zeroway.common.BaseException;
 import com.zeroway.user.dto.PostUserRes;
 import com.zeroway.user.dto.SignInAuthReq;
@@ -43,7 +43,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+public class UserServiceMockTest {
 
     @InjectMocks
     private UserService userService;
@@ -59,6 +59,16 @@ public class UserServiceTest {
     private JwtService jwtService;
 
     private final String yejiReToken = "yejiReToken";
+
+    Optional<User> createUser() {
+        return Optional.ofNullable(User.builder()
+                .id(1L)
+                .refreshToken(yejiReToken)
+                .email("test")
+                .nickname("예지테스트")
+                .provider(ProviderType.valueOf("KAKAO"))
+                .build());
+    }
 
     @DisplayName("소셜로그인 맵핑")
     @Test
@@ -133,26 +143,13 @@ public class UserServiceTest {
         assertThat(res.getRefreshToken()).isEqualTo(optionalUser.get().getRefreshToken());
     }
 
-    @DisplayName("회원가입 실패: 이미 가입된 이메일")
-    @Test
-    void signUpX() {
-
-    }
-
     @DisplayName("토큰 재발급 성공")
     @Test
     void tokenO() throws BaseException {
-        Optional<User> user = Optional.ofNullable(User.builder()
-                .id(1L)
-                .refreshToken(yejiReToken)
-                .email("test")
-                .nickname("t")
-                .provider(ProviderType.valueOf("KAKAO"))
-                .build());
+        Optional<User> user = createUser();
 
         // given : 리프레시토큰
         when(userRepository.findByRefreshToken(any())).thenReturn(user);
-//        doReturn(yejiReToken).when(jwtService).getToken();
 
         // when
         String access = userService.refreshToken();
