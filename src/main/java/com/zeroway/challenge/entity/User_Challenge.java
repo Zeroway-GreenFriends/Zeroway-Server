@@ -9,7 +9,10 @@ import javax.persistence.*;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class User_Challenge extends BaseEntity {
 
     @Id @GeneratedValue
@@ -26,6 +29,7 @@ public class User_Challenge extends BaseEntity {
 
     //챌린지 달성 여부
     @ColumnDefault("false")
+    @Builder.Default
     private boolean complete = false;
 
     public void setComplete(boolean complete) {

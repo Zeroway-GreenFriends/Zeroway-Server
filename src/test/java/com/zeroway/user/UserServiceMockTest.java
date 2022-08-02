@@ -143,12 +143,6 @@ public class UserServiceMockTest {
         assertThat(res.getRefreshToken()).isEqualTo(optionalUser.get().getRefreshToken());
     }
 
-    @DisplayName("회원가입 실패: 이미 가입된 이메일")
-    @Test
-    void signUpX() {
-
-    }
-
     @DisplayName("토큰 재발급 성공")
     @Test
     void tokenO() throws BaseException {
@@ -156,7 +150,6 @@ public class UserServiceMockTest {
 
         // given : 리프레시토큰
         when(userRepository.findByRefreshToken(any())).thenReturn(user);
-//        doReturn(yejiReToken).when(jwtService).getToken();
 
         // when
         String access = userService.refreshToken();
