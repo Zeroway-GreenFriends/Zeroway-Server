@@ -62,7 +62,7 @@ public class PostController {
     }
 
     /**
-     * 글 작성 api
+     * 글 작성 API
      * @param post - 내용, 챌린지 인증 여부
      * @param images - 이미지 파일 리스트
      */
@@ -80,7 +80,7 @@ public class PostController {
 
 
     /**
-     * 댓글 작성 api
+     * 댓글 작성 API
      * @param postId 게시글 id
      * @param req 댓글 내용
      */
@@ -97,7 +97,7 @@ public class PostController {
     }
 
     /**
-     * 좋아요 및 좋아요 취소 api
+     * 좋아요 및 좋아요 취소 API
      * @param postId 게시글 id
      */
     @PostMapping("/{postId}/like")
@@ -112,7 +112,7 @@ public class PostController {
     }
 
     /**
-     * 좋아요 목록 조회 api
+     * 좋아요 목록 조회 API
      * @param postId 게시글 id
      */
     @GetMapping("/{postId}/like")

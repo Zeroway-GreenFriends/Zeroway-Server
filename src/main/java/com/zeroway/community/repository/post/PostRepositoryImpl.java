@@ -8,7 +8,6 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zeroway.common.StatusType;
 import com.zeroway.community.dto.*;
-import com.zeroway.community.entity.QPostLike;
 
 import javax.persistence.EntityManager;
 import java.util.List;

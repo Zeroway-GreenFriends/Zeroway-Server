@@ -4,11 +4,13 @@ import com.zeroway.common.BaseEntity;
 import com.zeroway.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Comment extends BaseEntity {
 
     @Id @GeneratedValue

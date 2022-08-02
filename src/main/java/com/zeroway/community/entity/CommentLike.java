@@ -2,6 +2,7 @@ package com.zeroway.community.entity;
 
 import com.zeroway.common.BaseEntity;
 import com.zeroway.user.entity.User;
+import lombok.Builder;
 
 import javax.persistence.*;
 
@@ -20,4 +21,10 @@ public class CommentLike extends BaseEntity {
     @JoinColumn(name = "comment_id")
     private Comment comment;
 
+
+    @Builder
+    public CommentLike(User user, Comment comment) {
+        this.user = user;
+        this.comment = comment;
+    }
 }
