@@ -8,7 +8,6 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zeroway.common.StatusType;
 import com.zeroway.community.dto.*;
-import com.zeroway.community.entity.QPostLike;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -80,7 +79,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .select(new QUserInfo(user.id, user.nickname, user.profileImgUrl, user.level.id))
                 .from(postLike)
                 .join(postLike.user, user)
-                .where(postLike.post.id.eq(postId))
+                .where(postLike.post.id.eq(postId), postLike.status.eq(StatusType.ACTIVE))
                 .fetch();
     }
 
