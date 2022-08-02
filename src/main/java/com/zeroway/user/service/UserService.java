@@ -43,19 +43,18 @@ public class UserService {
         if (levelOptional.isEmpty()) {
             throw new BaseException(DATABASE_ERROR);
         } else {
-            user.setLevel(levelOptional.get());
-        }
-
-        if (userOptional.isEmpty()) {
-            try {
-                user = userRepository.save(user);
+            if (userOptional.isEmpty()) {
+                try {
+                    user.setLevel(levelOptional.get());
+                    user = userRepository.save(user);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                    throw new BaseException(DATABASE_ERROR);
+                }
+            } else {
+                user = userOptional.get();
             }
-            catch (Exception e) {
-                e.printStackTrace();
-                throw new BaseException(DATABASE_ERROR);
-            }
-        } else {
-            user = userOptional.get();
         }
 
         if (user.getStatus().equals(StatusType.INACTIVE)) {
@@ -67,7 +66,6 @@ public class UserService {
 
         user.setRefreshToken(refreshJwt);
         userRepository.save(user);
-
 
         return PostUserRes.builder()
                 .accessToken(accessJwt)
