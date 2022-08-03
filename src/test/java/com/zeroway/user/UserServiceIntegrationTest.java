@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,26 +69,31 @@ public class UserServiceIntegrationTest {
                 .build());
     }
 
-    @DisplayName("기존 회원 재로그인 시 기존 레벨 유지됨")
+    @DisplayName("기존 회원 재로그인 시 : 기존 레벨 유지, F 응답")
     @Test
     void reLoginLevelCheck() throws BaseException {
         SignInAuthReq sign = signInAuthReq();
         User mapUser = mapper.map(sign, User.class);
+        MultipartFile multipartFile = null;
 
         Level twoLevel = levelRepository.findById(2).get();
         mapUser.setLevel(twoLevel);
         userRepository.save(mapUser);
 
-        PostUserRes login = userService.login(sign);
+        PostUserRes login = userService.login(sign, multipartFile);
 
         Optional<User> byRefreshToken = userRepository.findByRefreshToken(login.getRefreshToken());
         assertThat(byRefreshToken.get().getLevel()).isEqualTo(twoLevel);
+        assertThat(login.isNewUser()).isFalse();
     }
 
-    @DisplayName("유저 회원가입 성공: 유저챌린지 테이블 삽입 확인")
+    @DisplayName("유저 회원가입 성공: 유저챌린지 테이블 삽입 확인, T 응답")
     @Test
     void signInO() throws BaseException {
-        User user = createUser().get();
+        SignInAuthReq sign = signInAuthReq();
+        User user = mapper.map(sign, User.class);
+        user.setRefreshToken("yejiReToken");
+
         Level levelOne = levelRepository.findById(1).get();
         Challenge challenge1 = Challenge.builder()
                 .content("test")
@@ -101,7 +107,9 @@ public class UserServiceIntegrationTest {
         Challenge save1 = challengeRepository.save(challenge1);
         Challenge save2 = challengeRepository.save(challenge2);
 
-        userService.signIn(user, levelOne);
+//        userService.signIn(user, levelOne);
+        PostUserRes login = userService.login(sign, null);
+        assertThat(login.isNewUser()).isTrue();
 
         assertThat(userChallengeRepository.findAll().size()).isEqualTo(2);
         assertThat(userChallengeRepository.findByChallenge_Id(save1.getId()).getUser().getNickname()).isEqualTo(user.getNickname());

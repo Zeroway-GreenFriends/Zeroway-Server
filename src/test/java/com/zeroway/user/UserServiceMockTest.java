@@ -31,6 +31,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.security.Key;
 import java.util.Date;
@@ -104,6 +105,7 @@ public class UserServiceMockTest {
     void signUpO() throws BaseException {
         // given
         SignInAuthReq sign = signInAuthReq();
+        MultipartFile multipartFile = null;
 
         // userId 임의로 설정
         String refreshToken = jwtService.createRefreshToken(1L);
@@ -137,7 +139,7 @@ public class UserServiceMockTest {
         doReturn(refreshToken).when(jwtService).createAccessToken(any());
 
         // when
-        PostUserRes res = userService.login(sign);
+        PostUserRes res = userService.login(sign, multipartFile);
 
         // then
         assertThat(res.getRefreshToken()).isEqualTo(optionalUser.get().getRefreshToken());
