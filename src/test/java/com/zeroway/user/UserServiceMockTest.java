@@ -6,6 +6,7 @@ import com.github.dozermapper.core.Mapper;
 import com.zeroway.challenge.entity.Level;
 import com.zeroway.challenge.repository.LevelRepository;
 import com.zeroway.common.BaseException;
+import com.zeroway.common.StatusType;
 import com.zeroway.user.dto.PostUserRes;
 import com.zeroway.user.dto.SignInAuthReq;
 import com.zeroway.user.entity.ProviderType;
@@ -160,5 +161,18 @@ public class UserServiceMockTest {
         verify(jwtService, times(1)).expireToken();
         verify(jwtService, times(1)).getToken();
         verify(jwtService, times(1)).createAccessToken(any());
+    }
+
+    @DisplayName("로그아웃 성공")
+    @Test
+    void logoutO() throws BaseException {
+        Optional<User> user = createUser();
+        assertThat(user.get().getStatus()).isEqualTo(StatusType.ACTIVE);
+
+        doReturn(user.get().getId()).when(jwtService).getUserIdx();
+        doReturn(user).when(userRepository).findById(any());
+
+        userService.logout();
+        assertThat(user.get().getStatus()).isEqualTo(StatusType.LOGOUT);
     }
 }
