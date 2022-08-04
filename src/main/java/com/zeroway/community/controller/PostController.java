@@ -78,7 +78,6 @@ public class PostController {
         }
     }
 
-
     /**
      * 댓글 작성 API
      * @param postId 게시글 id
@@ -123,5 +122,21 @@ public class PostController {
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
+    }
+
+    /**
+     * 북마크 및 북마크 취소 API
+     * @param postId 게시글 id
+     */
+    @PostMapping("/{postId}/bookmark")
+    public ResponseEntity<?> bookmark(@PathVariable Long postId) {
+        try {
+            Long userId = jwtService.getUserIdx();
+            boolean bookmark = postService.bookmark(userId, postId);
+            return ResponseEntity.ok().body(new CreateBookmarkRes(bookmark));
+        } catch (BaseException e) {
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+
     }
 }
