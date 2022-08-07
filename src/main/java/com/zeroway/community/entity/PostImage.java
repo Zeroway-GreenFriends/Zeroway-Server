@@ -2,10 +2,12 @@ package com.zeroway.community.entity;
 
 import com.zeroway.common.BaseEntity;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
+@NoArgsConstructor
 public class PostImage extends BaseEntity {
 
     @Id @GeneratedValue
