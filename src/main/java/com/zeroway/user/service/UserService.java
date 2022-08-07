@@ -94,7 +94,7 @@ public class UserService {
     public void signIn(User user, Level levelOne, MultipartFile profileImg) throws BaseException {
         user.setLevel(levelOne);
         try {
-            if (!profileImg.isEmpty()) {
+            if (profileImg != null) {
                 String userProfileUrl = s3Uploader.uploadFile(profileImg, "userProfile");
                 user.setProfileImgUrl(userProfileUrl);
             }
