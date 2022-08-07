@@ -28,6 +28,13 @@ public class TipService {
         // 전체 tip 개수
         long totalCount = tipRepository.count();
 
+        // 전체 개수가 size 보다 작은 경우
+        // -> 모든 tip을 조회
+        if (totalCount <= size) {
+            return tipRepository.findAll().stream().map(tip -> new TodayTipsRes(tip.getTitle(), tip.getContent()))
+                    .collect(Collectors.toList());
+        }
+
         // 랜덤 id 생성
         for (long i=0; i<size; i++) {
             Long id = (long)(Math.random()*totalCount) + 1;
