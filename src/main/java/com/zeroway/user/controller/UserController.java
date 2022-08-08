@@ -10,10 +10,8 @@ import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import static com.zeroway.common.BaseResponseStatus.*;
 import static com.zeroway.utils.ValidationRegex.*;
@@ -24,13 +22,13 @@ import static com.zeroway.utils.ValidationRegex.*;
 public class UserController {
 
     private final UserService userService;
-    private final JwtService jwtService;
 
     /**
      * 소셜 로그인 API
      */
     @PostMapping("/auth/login")
-    public ResponseEntity<BaseResponse<PostUserRes>> authLogin(@RequestBody SignInAuthReq signInReq) {
+    public ResponseEntity<BaseResponse<PostUserRes>> authLogin(@RequestPart(value = "signInReq") SignInAuthReq signInReq,
+                                                               @RequestPart(value = "profileImg", required = false) MultipartFile profileImg) {
         try {
             if (signInReq.getEmail() == null) {
                 return ResponseEntity.badRequest().body(new BaseResponse<>(POST_USER_EMPTY_EMAIL));
@@ -39,7 +37,7 @@ public class UserController {
                 return ResponseEntity.badRequest().body(new BaseResponse<>(POST_USER_INVALID_EMAIL));
             }
 
-            PostUserRes postUserRes = userService.login(signInReq);
+            PostUserRes postUserRes = userService.login(signInReq, profileImg);
             return ResponseEntity.ok().body(new BaseResponse<>(postUserRes));
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
@@ -60,6 +58,23 @@ public class UserController {
             } else {
                 return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
             }
+        }
+    }
+
+    /**
+     * 로그아웃
+     */
+    @PatchMapping("/auth/logout")
+    public ResponseEntity<?> logout() {
+        try {
+            userService.logout();
+            return ResponseEntity.ok().build();
+        } catch (BaseException e) {
+            e.printStackTrace();
+            if (e.getStatus().equals(EXPIRATION_JWT)) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new BaseResponse<>(e.getStatus()));
+            }
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
     }
 }

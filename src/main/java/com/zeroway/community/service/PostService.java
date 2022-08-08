@@ -1,10 +1,13 @@
 package com.zeroway.community.service;
 
 import com.zeroway.common.BaseException;
+import com.zeroway.common.StatusType;
 import com.zeroway.community.dto.CreatePostReq;
+import com.zeroway.community.entity.Bookmark;
 import com.zeroway.community.entity.Post;
 import com.zeroway.community.entity.PostImage;
 import com.zeroway.community.repository.comment.CommentRepository;
+import com.zeroway.community.repository.post.BookmarkRepository;
 import com.zeroway.community.repository.post.PostImageRepository;
 import com.zeroway.community.repository.post.PostRepository;
 import com.zeroway.community.dto.PostListRes;
@@ -21,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.zeroway.common.BaseResponseStatus.*;
 
@@ -33,6 +37,7 @@ public class PostService {
     private final PostImageRepository postImageRepository;
     private final CommentRepository commentRepository;
     private final UserRepository userRepository;
+    private final BookmarkRepository bookmarkRepository;
     private final S3Uploader s3Uploader;
 
 
@@ -96,4 +101,34 @@ public class PostService {
             throw new BaseException(FILE_UPLOAD_ERROR);
         }
     }
+
+    /**
+     * 북마크 및 북마크 취소 기능
+     * @return true 북마크, false 북마크 취소
+     */
+    @Transactional
+    public boolean bookmark(Long userId, Long postId) throws BaseException {
+        try {
+            Optional<Bookmark> optional = bookmarkRepository.findByUserIdAndPostId(userId, postId);
+            if (optional.isPresent()) {
+                Bookmark bookmark = optional.get();
+                if (bookmark.getStatus().equals(StatusType.ACTIVE)) {
+                    optional.get().setStatus(StatusType.INACTIVE);
+                    return false;
+                } else {
+                    optional.get().setStatus(StatusType.ACTIVE);
+                    return true;
+                }
+            }
+            User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_JWT));
+            Post post = postRepository.findById(postId).orElseThrow(() -> new BaseException(INVALID_POST_ID));
+            bookmarkRepository.save(Bookmark.builder().user(user).post(post).build());
+            return true;
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 }
