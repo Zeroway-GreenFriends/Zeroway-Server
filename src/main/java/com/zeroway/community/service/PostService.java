@@ -131,4 +131,25 @@ public class PostService {
         }
     }
 
+
+    // 글 삭제
+    @Transactional
+    public void deletePost(Long postId, Long userId) throws BaseException {
+        try {
+            Post post = postRepository.findById(postId).orElseThrow(() -> new BaseException(INVALID_POST_ID));
+
+            // 작성자가 아닌 회원이 요청한 경우
+            if(!post.getUser().getId().equals(userId)) throw new BaseException(UNAUTHORIZED_REQUEST);
+
+            // 상태를 INACTIVE로 수정
+            post.setStatus(StatusType.INACTIVE);
+
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+    }
+
 }

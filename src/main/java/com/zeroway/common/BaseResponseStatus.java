@@ -32,6 +32,8 @@ public enum BaseResponseStatus {
 
     INVALID_STORE_ID(false, 2200, "잘못된 제로웨이스트샵 식별자입니다."),
 
+    UNAUTHORIZED_REQUEST(false, 2300, "권한이 없습니다."),
+
     /**
      * 3000 : Response 오류
      */
