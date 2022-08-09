@@ -20,7 +20,7 @@ public class StoreController {
 
     /**
      * 제로웨이스트샵 리스트 API
-     * @return 제로웨이스트샵(imageUrl, name, item, scoreAvg, addressNew, operatingTime, contact, siteUrl, instagram)
+     * @return 제로웨이스트샵(id, imageUrl, name, item, scoreAvg, addressNew, operatingTime, contact, siteUrl, instagram)
      */
     @GetMapping("/list")
     public ResponseEntity<?> getStoreList(@RequestParam(required = false) String keyword,
