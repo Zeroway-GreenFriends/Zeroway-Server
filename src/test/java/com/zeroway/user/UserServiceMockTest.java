@@ -14,32 +14,15 @@ import com.zeroway.user.entity.User;
 import com.zeroway.user.repository.UserRepository;
 import com.zeroway.user.service.UserService;
 import com.zeroway.utils.JwtService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockHttpSession;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.security.Key;
-import java.util.Date;
-import java.util.Map;
 import java.util.Optional;
 
-import static com.zeroway.common.BaseResponseStatus.EXPIRATION_JWT;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -101,49 +84,10 @@ public class UserServiceMockTest {
 
     }
 
-    @DisplayName("소셜로그인 성공")
+    @DisplayName("회원가입 성공")
     @Test
     void signUpO() throws BaseException {
-        // given
-        SignInAuthReq sign = signInAuthReq();
-        MultipartFile multipartFile = null;
 
-        // userId 임의로 설정
-        String refreshToken = jwtService.createRefreshToken(1L);
-
-        User user = User.builder()
-                .email(sign.getEmail())
-                .nickname(sign.getNickname())
-                .provider(ProviderType.valueOf(sign.getProvider()))
-                .build();
-
-        Optional<User> optionalUser = Optional.ofNullable(User.builder()
-                .email(sign.getEmail())
-                .nickname(sign.getNickname())
-                .provider(ProviderType.valueOf(sign.getProvider()))
-                .refreshToken(refreshToken)
-                .build());
-
-        doReturn(user).when(mapper).map(sign, User.class);
-
-        // 유저가 이미 존재하는 경우
-        doReturn(optionalUser).when(userRepository).findByEmail(any(String.class));
-        doReturn(optionalUser.get()).when(userRepository).save(any(User.class));
-
-        Level level = new Level();
-        level.setId(1);
-        level.setImageUrl("11");
-        Optional<Level> levelOptional = Optional.ofNullable(level);
-        doReturn(levelOptional).when(levelRepository).findById(any());
-
-        doReturn(refreshToken).when(jwtService).createRefreshToken(any());
-        doReturn(refreshToken).when(jwtService).createAccessToken(any());
-
-        // when
-        PostUserRes res = userService.login(sign, multipartFile);
-
-        // then
-        assertThat(res.getRefreshToken()).isEqualTo(optionalUser.get().getRefreshToken());
     }
 
     @DisplayName("토큰 재발급 성공")

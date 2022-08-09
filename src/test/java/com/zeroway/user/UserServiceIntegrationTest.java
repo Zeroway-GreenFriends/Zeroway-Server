@@ -3,7 +3,6 @@ package com.zeroway.user;
 import com.github.dozermapper.core.Mapper;
 import com.zeroway.challenge.entity.Challenge;
 import com.zeroway.challenge.entity.Level;
-import com.zeroway.challenge.entity.User_Challenge;
 import com.zeroway.challenge.repository.ChallengeRepository;
 import com.zeroway.challenge.repository.LevelRepository;
 import com.zeroway.challenge.repository.UserChallengeRepository;
@@ -15,7 +14,6 @@ import com.zeroway.user.entity.User;
 import com.zeroway.user.repository.UserRepository;
 import com.zeroway.user.service.UserService;
 import com.zeroway.utils.JwtService;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -69,7 +66,7 @@ public class UserServiceIntegrationTest {
                 .build());
     }
 
-    @DisplayName("기존 회원 재로그인 시 : 기존 레벨 유지, F 응답")
+    @DisplayName("기존 회원 재로그인 시 : 기존 레벨 유지")
     @Test
     void reLoginLevelCheck() throws BaseException {
         SignInAuthReq sign = signInAuthReq();
@@ -80,19 +77,19 @@ public class UserServiceIntegrationTest {
         mapUser.setLevel(twoLevel);
         userRepository.save(mapUser);
 
-        PostUserRes login = userService.login(sign, multipartFile);
+        PostUserRes login = userService.login(sign.getEmail());
 
         Optional<User> byRefreshToken = userRepository.findByRefreshToken(login.getRefreshToken());
         assertThat(byRefreshToken.get().getLevel()).isEqualTo(twoLevel);
-        assertThat(login.isNewUser()).isFalse();
     }
 
-    @DisplayName("유저 회원가입 성공: 유저챌린지 테이블 삽입 확인, T 응답")
+    @DisplayName("유저 회원가입 성공: 유저챌린지 테이블 삽입 확인")
     @Test
     void signInO() throws BaseException {
         SignInAuthReq sign = signInAuthReq();
         User user = mapper.map(sign, User.class);
         user.setRefreshToken("yejiReToken");
+        MultipartFile multipartFile = null;
 
         Level levelOne = levelRepository.findById(1).get();
         Challenge challenge1 = Challenge.builder()
@@ -107,9 +104,7 @@ public class UserServiceIntegrationTest {
         Challenge save1 = challengeRepository.save(challenge1);
         Challenge save2 = challengeRepository.save(challenge2);
 
-//        userService.signIn(user, levelOne);
-        PostUserRes login = userService.login(sign, null);
-        assertThat(login.isNewUser()).isTrue();
+        userService.signIn(sign, multipartFile);
 
         assertThat(userChallengeRepository.findAll().size()).isEqualTo(2);
         assertThat(userChallengeRepository.findByChallenge_Id(save1.getId()).getUser().getNickname()).isEqualTo(user.getNickname());
