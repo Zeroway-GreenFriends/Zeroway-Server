@@ -1,6 +1,8 @@
 package com.zeroway.store.entity;
 
+import com.zeroway.common.BaseEntity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,7 +11,8 @@ import javax.persistence.Id;
 
 @Entity
 @Getter
-public class Store {
+@NoArgsConstructor
+public class Store extends BaseEntity {
 
     @Id @GeneratedValue
     @Column(name = "store_id")
@@ -24,10 +27,12 @@ public class Store {
     @Column(length = 100, nullable = false)
     private String addressOld;
 
-    @Column(nullable = false)
+    // 경도
+    @Column(name = "coord_x")
     private Double coordX;
 
-    @Column(nullable = false)
+    // 위도
+    @Column(name = "coord_y")
     private Double coordY;
 
     // 연락처
