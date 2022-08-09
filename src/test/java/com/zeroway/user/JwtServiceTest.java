@@ -27,6 +27,7 @@ import java.util.Optional;
 
 import static com.zeroway.common.BaseResponseStatus.EXPIRATION_JWT;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 
@@ -65,7 +66,7 @@ public class JwtServiceTest {
         doReturn(bearer).when(jwtService).getToken();
 
         // when
-        BaseException baseException = Assertions.assertThrows(BaseException.class, () -> jwtService.expireToken());
+        BaseException baseException = assertThrows(BaseException.class, () -> jwtService.expireToken());
 
         // then
         assertThat(baseException.getStatus()).isEqualTo(EXPIRATION_JWT);

@@ -23,7 +23,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
+import static com.zeroway.common.BaseResponseStatus.*;
+import static com.zeroway.common.StatusType.INACTIVE;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -49,7 +52,7 @@ public class UserServiceMockTest {
         return Optional.ofNullable(User.builder()
                 .id(1L)
                 .refreshToken(yejiReToken)
-                .email("test")
+                .email("test@test")
                 .nickname("예지테스트")
                 .provider(ProviderType.valueOf("KAKAO"))
                 .build());
@@ -84,10 +87,42 @@ public class UserServiceMockTest {
 
     }
 
-    @DisplayName("회원가입 성공")
+    @DisplayName("회원가입 실패: 이미 존재 하는 유저")
     @Test
-    void signUpO() throws BaseException {
+    void signUpX() throws BaseException {
+        SignInAuthReq sign = signInAuthReq();
+        MultipartFile multipartFile = null;
+        Optional<User> optionalUser = createUser();
 
+        doReturn(optionalUser).when(userRepository).findByEmail(any());
+
+        BaseException baseException = assertThrows(BaseException.class, () -> userService.signIn(sign, multipartFile));
+
+        assertThat(baseException.getStatus()).isEqualTo(POST_USERS_EXISTS_EMAIL);
+    }
+
+    @DisplayName("로그인 실패: 존재하지 않는 유저")
+    @Test
+    void loginX() throws BaseException {
+        SignInAuthReq sign = signInAuthReq();
+        Optional<User> user = Optional.empty();
+        doReturn(user).when(userRepository).findByEmail(any());
+
+        BaseException baseException = assertThrows(BaseException.class, () -> userService.login(sign.getEmail()));
+
+        assertThat(baseException.getStatus()).isEqualTo(LOGIN_FAILED);
+    }
+
+    @DisplayName("로그인 실패: 탈퇴한 유저")
+    @Test
+    void loginX1() throws BaseException {
+        Optional<User> optionalUser = createUser();
+        optionalUser.get().setStatus(INACTIVE);
+        doReturn(optionalUser).when(userRepository).findByEmail(any());
+
+        BaseException baseException = assertThrows(BaseException.class, () -> userService.login(optionalUser.get().getEmail()));
+
+        assertThat(baseException.getStatus()).isEqualTo(POST_USER_INACTIVE);
     }
 
     @DisplayName("토큰 재발급 성공")
