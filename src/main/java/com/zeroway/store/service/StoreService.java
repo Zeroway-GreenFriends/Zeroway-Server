@@ -1,7 +1,10 @@
 package com.zeroway.store.service;
 
 import com.zeroway.common.BaseException;
+import com.zeroway.common.BaseResponseStatus;
 import com.zeroway.store.dto.StoreListRes;
+import com.zeroway.store.dto.StoreRes;
+import com.zeroway.store.entity.Store;
 import com.zeroway.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -40,5 +43,18 @@ public class StoreService {
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
+    }
+
+    // 제로웨이스트샵 상세 조회 (리뷰 제외 - 이후에 추가 필요)
+    public StoreRes getStoreDetail(Long storeId, Long userId) throws BaseException  {
+        try {
+            return new StoreRes(storeRepository.findById(storeId)
+                    .orElseThrow(() -> new BaseException(BaseResponseStatus.INVALID_STORE_ID)));
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+
     }
 }

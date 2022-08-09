@@ -5,6 +5,7 @@ import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
 import com.zeroway.store.dto.StoreListRes;
 import com.zeroway.store.service.StoreService;
+import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.List;
 public class StoreController {
 
     private final StoreService storeService;
+    private final JwtService jwtService;
 
     /**
      * 제로웨이스트샵 리스트 API
@@ -40,4 +42,16 @@ public class StoreController {
         }
     }
 
+    /**
+     * 제로웨이스트샵 상세 조회 API
+     */
+    @GetMapping("/{storeId}")
+    public ResponseEntity<?> getStoreDetail(@PathVariable Long storeId) {
+        try{
+            Long userId = jwtService.getUserIdx();
+            return ResponseEntity.ok().body(storeService.getStoreDetail(storeId, userId));
+        } catch(BaseException exception){
+            return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
+        }
+    }
 }
