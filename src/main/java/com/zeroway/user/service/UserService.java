@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,37 +43,65 @@ public class UserService {
      * 소셜 로그인
      */
     @Transactional
-    public PostUserRes login(SignInAuthReq signInReq, MultipartFile profileImg) throws BaseException {
-        String email = signInReq.getEmail();
+    public PostUserRes login(String email) throws BaseException {
         Optional<User> userOptional = userRepository.findByEmail(email);
-
-        // 존재하지 않은 회원인 경우 -> 회원가입
-        User user = mapper.map(signInReq, User.class);
-        Optional<Level> levelOptional = levelRepository.findById(1);
-        boolean newUser = false;
-
-        if (levelOptional.isEmpty()) {
-            throw new BaseException(DATABASE_ERROR);
-        } else {
-            if (userOptional.isEmpty()) {
-                try {
-                    Level levelOne = levelOptional.get();
-                    signIn(user, levelOne, profileImg);
-                    newUser = true;
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                    throw new BaseException(DATABASE_ERROR);
-                }
-            } else {
-                user = userOptional.get();
-            }
-        }
-
-        if (user.getStatus().equals(StatusType.INACTIVE)) {
+        if (userOptional.isEmpty()) {
             throw new BaseException(LOGIN_FAILED);
+        } else {
+            User user = userOptional.get();
+
+            if (user.getStatus().equals(StatusType.INACTIVE)) {
+                throw new BaseException(POST_USER_INACTIVE);
+            }
+
+            return postUser(user);
+        }
+    }
+
+    /**
+     * 신규 회원가입
+     */
+    public PostUserRes signIn(SignInAuthReq signInAuthReq, MultipartFile profileImg) throws BaseException {
+        Optional<User> optionalUser = userRepository.findByEmail(signInAuthReq.getEmail());
+        if (optionalUser.isPresent()) {
+            throw new BaseException(POST_USERS_EXISTS_EMAIL);
         }
 
+        User user = mapper.map(signInAuthReq, User.class);
+
+        // 레벨 1
+        Optional<Level> levelOptional = levelRepository.findById(1);
+        user.setLevel(levelOptional.get());
+
+        try {
+            if (profileImg != null && !profileImg.isEmpty()) {
+                String userProfileUrl = s3Uploader.uploadFile(profileImg, "userProfile");
+                user.setProfileImgUrl(userProfileUrl);
+            }
+        } catch (IOException e) {
+            throw new BaseException(FILE_UPLOAD_ERROR);
+        }
+
+        user = userRepository.save(user);
+
+        // userChallengeRepo 데이터 삽입 : 레벨1 챌린지
+        List<Challenge> levelOneChallenge = challengeRepository.findByLevel_Id(levelOptional.get().getId());
+
+        for (int i = 0; i < levelOneChallenge.size(); i++) {
+            User_Challenge userChallenge = User_Challenge.builder()
+                    .user(user)
+                    .challenge(levelOneChallenge.get(i))
+                    .build();
+            userChallengeRepository.save(userChallenge);
+        }
+
+        return postUser(user);
+    }
+
+    /**
+     * 토큰 두종류 발급
+     */
+    private PostUserRes postUser(User user) throws BaseException {
         String refreshJwt = jwtService.createRefreshToken(user.getId());
         String accessJwt = jwtService.createAccessToken(user.getId());
 
@@ -82,37 +110,9 @@ public class UserService {
         userRepository.save(user);
 
         return PostUserRes.builder()
-                .accessToken(accessJwt)
                 .refreshToken(refreshJwt)
-                .newUser(newUser)
+                .accessToken(accessJwt)
                 .build();
-    }
-
-    /**
-     * 신규 회원가입
-     */
-    public void signIn(User user, Level levelOne, MultipartFile profileImg) throws BaseException {
-        user.setLevel(levelOne);
-        try {
-            if (profileImg != null && !profileImg.isEmpty()) {
-                String userProfileUrl = s3Uploader.uploadFile(profileImg, "userProfile");
-                user.setProfileImgUrl(userProfileUrl);
-            }
-
-            user = userRepository.save(user);
-            List<Challenge> levelOneChallenge = challengeRepository.findByLevel_Id(levelOne.getId());
-
-            for (int i = 0; i < levelOneChallenge.size(); i++) {
-                User_Challenge userChallenge = User_Challenge.builder()
-                        .user(user)
-                        .challenge(levelOneChallenge.get(i))
-                        .build();
-                userChallengeRepository.save(userChallenge);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new BaseException(DATABASE_ERROR);
-        }
     }
 
     /**

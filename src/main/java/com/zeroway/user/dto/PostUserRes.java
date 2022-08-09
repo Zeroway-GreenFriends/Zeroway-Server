@@ -8,5 +8,4 @@ import lombok.Getter;
 public class PostUserRes {
     private final String accessToken;
     private final String refreshToken;
-    private boolean newUser;
 }
