@@ -27,7 +27,7 @@ public class StoreService {
         try{
             PageRequest pageRequest = PageRequest.of(page, size, Sort.by("name").ascending());
             return storeRepository.findByAddressNewContains(keyword, pageRequest).getContent().stream()
-                    .map(store -> new StoreListRes(store.getImageUrl(), store.getName(), store.getItem(), store.getScoreAvg(),
+                    .map(store -> new StoreListRes(store.getId(), store.getImageUrl(), store.getName(), store.getItem(), store.getScoreAvg(),
                             store.getAddressNew(), store.getOperatingTime(), store.getContact(), store.getSiteUrl(), store.getInstagram())).collect(Collectors.toList());
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
@@ -38,7 +38,7 @@ public class StoreService {
         try{
             PageRequest pageRequest = PageRequest.of(page, size, Sort.by("scoreAvg").descending());
             return storeRepository.findAll(pageRequest).getContent().stream()
-                    .map(store -> new StoreListRes(store.getImageUrl(), store.getName(), store.getItem(), store.getScoreAvg(),
+                    .map(store -> new StoreListRes(store.getId(), store.getImageUrl(), store.getName(), store.getItem(), store.getScoreAvg(),
                             store.getAddressNew(), store.getOperatingTime(), store.getContact(), store.getSiteUrl(), store.getInstagram())).collect(Collectors.toList());
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);

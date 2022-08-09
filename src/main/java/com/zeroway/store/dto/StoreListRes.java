@@ -7,6 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class StoreListRes {
 
+    private Long storeId;
     private String imageUrl;
     private String name;
     private String item;
