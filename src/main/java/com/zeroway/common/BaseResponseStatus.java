@@ -29,6 +29,7 @@ public enum BaseResponseStatus {
 
     INVALID_POST_ID(false, 2100, "유효하지 않은 게시글 식별자입니다."),
     INVALID_PARAMETER_VALUE(false, 2101, "잘못된 요청 파라미터 값입니다."),
+    INVALID_COMMENT_ID(false, 2102, "유효하지 않은 댓글 식별자입니다."),
 
     INVALID_STORE_ID(false, 2200, "잘못된 제로웨이스트샵 식별자입니다."),
 

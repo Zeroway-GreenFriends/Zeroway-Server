@@ -6,11 +6,11 @@ import com.zeroway.community.dto.CreateLikeRes;
 import com.zeroway.community.service.CommentService;
 import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import static com.zeroway.common.BaseResponseStatus.UNAUTHORIZED_REQUEST;
 
 @RequestMapping("/comment")
 @RestController
@@ -33,7 +33,22 @@ public class CommentController {
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
+    }
 
-
+    /**
+     * 댓글 삭제 API
+     * @param commentId 댓글 id
+     */
+    @PatchMapping("/{commentId}/delete")
+    public ResponseEntity<?> deleteComment(@PathVariable Long commentId) {
+        try {
+            Long userId = jwtService.getUserIdx();
+            commentService.deleteComment(commentId, userId);
+            return ResponseEntity.ok().build();
+        } catch (BaseException e) {
+            if(e.getStatus().equals(UNAUTHORIZED_REQUEST))
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new BaseResponse<>(e.getStatus()));
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
     }
 }
