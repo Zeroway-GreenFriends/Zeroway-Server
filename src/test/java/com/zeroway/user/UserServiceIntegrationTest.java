@@ -106,7 +106,6 @@ public class UserServiceIntegrationTest {
 
         userService.signIn(sign, multipartFile);
 
-        assertThat(userChallengeRepository.findAll().size()).isEqualTo(2);
         assertThat(userChallengeRepository.findByChallenge_Id(save1.getId()).getUser().getNickname()).isEqualTo(user.getNickname());
         assertThat(userChallengeRepository.findByChallenge_Id(save2.getId()).getUser().getNickname()).isEqualTo(user.getNickname());
         assertThat(userChallengeRepository.findByChallenge_Id(save1.getId()).isComplete()).isFalse();
