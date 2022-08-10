@@ -8,6 +8,7 @@ import com.zeroway.community.service.PostLikeService;
 import com.zeroway.community.service.PostService;
 import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.zeroway.common.BaseResponseStatus.INVALID_PARAMETER_VALUE;
+import static com.zeroway.common.BaseResponseStatus.UNAUTHORIZED_REQUEST;
 
 @RestController
 @RequestMapping("/post")
@@ -137,6 +139,22 @@ public class PostController {
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
+    }
 
+    /**
+     * 게시글 삭제 API
+     * @param postId 게시글 id
+     */
+    @PatchMapping("/{postId}/delete")
+    public ResponseEntity<?> deletePost(@PathVariable Long postId) {
+        try {
+            Long userId = jwtService.getUserIdx();
+            postService.deletePost(postId, userId);
+            return ResponseEntity.ok().build();
+        } catch (BaseException e) {
+            if(e.getStatus().equals(UNAUTHORIZED_REQUEST))
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new BaseResponse<>(e.getStatus()));
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
     }
 }

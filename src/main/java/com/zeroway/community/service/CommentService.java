@@ -34,6 +34,7 @@ public class CommentService {
     public void createComment(CreateCommentReq req, Long postId, Long userId) throws BaseException {
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_JWT));
         Post post = postRepository.findById(postId).orElseThrow(() -> new BaseException(INVALID_POST_ID));
+        if(!post.getStatus().equals(StatusType.ACTIVE)) throw new BaseException(INVALID_POST_ID);
         try {
             commentRepository.save(Comment.builder().content(req.getContent()).user(user).post(post).build());
         } catch (Exception e) {
@@ -63,6 +64,24 @@ public class CommentService {
             Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new BaseException(REQUEST_ERROR));
             commentLikeRepository.save(CommentLike.builder().user(user).comment(comment).build());
             return true; // 좋아요
+        } catch (BaseException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    // 댓글 삭제
+    @Transactional
+    public void deleteComment(Long commentId, Long userId) throws BaseException {
+        try {
+            Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new BaseException(INVALID_COMMENT_ID));
+
+            // 작성자가 아닌 회원이 요청한 경우
+            if(!comment.getUser().getId().equals(userId)) throw new BaseException(UNAUTHORIZED_REQUEST);
+
+            // 상태를 INACTIVE로 수정
+            comment.setStatus(StatusType.INACTIVE);
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {
