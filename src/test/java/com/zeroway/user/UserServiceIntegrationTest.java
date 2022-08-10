@@ -66,6 +66,19 @@ public class UserServiceIntegrationTest {
                 .build());
     }
 
+    @DisplayName("로그인 성공")
+    @Test
+    void loginO() throws BaseException {
+        Optional<User> user = createUser();
+        user.get().setLevel(levelRepository.findById(1).get());
+        userRepository.save(user.get());
+
+        PostUserRes login = userService.login(user.get().getEmail());
+
+        assertThat(login).isNotNull();
+        assertThat(user.get().getEmail()).isEqualTo(userRepository.findByRefreshToken(login.getRefreshToken()).get().getEmail());
+    }
+
     @DisplayName("기존 회원 재로그인 시 : 기존 레벨 유지")
     @Test
     void reLoginLevelCheck() throws BaseException {
