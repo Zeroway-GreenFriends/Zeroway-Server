@@ -27,7 +27,7 @@ import java.util.Optional;
 import static com.zeroway.common.BaseResponseStatus.*;
 
 @Service
-//@Transactional(rollbackOn = BaseException.class)
+@Transactional(rollbackOn = BaseException.class)
 @RequiredArgsConstructor
 public class UserService {
 
@@ -42,7 +42,6 @@ public class UserService {
     /**
      * 소셜 로그인
      */
-    @Transactional
     public PostUserRes login(String email) throws BaseException {
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isEmpty()) {
