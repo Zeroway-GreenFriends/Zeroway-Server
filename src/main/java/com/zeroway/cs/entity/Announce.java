@@ -1,12 +1,16 @@
 package com.zeroway.cs.entity;
 
+import com.zeroway.common.BaseEntity;
+import lombok.Getter;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity
-public class Announce {
+@Getter
+public class Announce extends BaseEntity {
 
     @Id @GeneratedValue
     @Column(name = "announce_id")
