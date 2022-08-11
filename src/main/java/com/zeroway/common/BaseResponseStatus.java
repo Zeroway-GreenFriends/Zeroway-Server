@@ -33,6 +33,8 @@ public enum BaseResponseStatus {
 
     INVALID_STORE_ID(false, 2200, "잘못된 제로웨이스트샵 식별자입니다."),
 
+    INVALID_USER_ID(false, 2300, "잘못된 회원 식별자입니다."),
+
     UNAUTHORIZED_REQUEST(false, 2300, "권한이 없습니다."),
 
     /**
@@ -42,7 +44,9 @@ public enum BaseResponseStatus {
     RESPONSE_ERROR(false, 3000, "값을 불러오는데 실패하였습니다."),
     PASSWORD_ENCRYPTION_ERROR(false, 3001, "비밀번호 암호화에 실패하였습니다."),
     EXPIRATION_JWT(false, 3002, "토큰이 만료되었습니다."),
+    ALREADY_DELETED(false, 3100, "이미 삭제되었습니다."),
 
+    ALREADY_WRITTEN(false, 3200, "이미 작성한 리뷰가 있습니다."),
 
     /**
      * 4000 : Database, Server 오류

@@ -1,9 +1,9 @@
 package com.zeroway.store.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import com.zeroway.store.entity.Store;
 import lombok.Data;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,18 +21,7 @@ public class StoreRes {
     private int reviewCount = 0;
     private List<ReviewInfo> reviewList = new ArrayList<>();
 
-    private static class ReviewInfo {
-        private Long reviewId;
-        private String username;
-        private String userProfileImg;
-        private Double score;
-        private String content;
-        private boolean liked;
-        private int likeCount;
-        private LocalDateTime createdAt;
-    }
-
-    public StoreRes(Store store) {
+    public StoreRes(Store store, List<ReviewInfo> reviewList) {
         this.imageUrl = store.getImageUrl();
         this.name = store.getName();
         this.item = store.getItem();
@@ -42,6 +31,8 @@ public class StoreRes {
         this.contact = store.getContact();
         this.siteUrl = store.getSiteUrl();
         this.instagram = store.getInstagram();
+        this.reviewCount = reviewList.size();
+        this.reviewList.addAll(reviewList);
     }
 
 }

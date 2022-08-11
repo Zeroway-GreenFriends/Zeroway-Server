@@ -1,6 +1,5 @@
 package com.zeroway.store.controller;
 
-import com.zeroway.challenge.dto.ChallengeRes;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
 import com.zeroway.store.dto.StoreListRes;
