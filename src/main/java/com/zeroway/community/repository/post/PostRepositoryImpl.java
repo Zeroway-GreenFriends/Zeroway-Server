@@ -64,7 +64,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                             bookmarked(userId))
                 )
                 .from(post)
-                .join(post.user, user)
+                .join(user).on(post.userId.eq(user.id))
                 .where(post.id.eq(postId), post.status.eq(StatusType.ACTIVE))
                 .fetchOne();
     }
@@ -78,8 +78,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         return queryFactory
                 .select(new QUserInfo(user.id, user.nickname, user.profileImgUrl, user.level.id))
                 .from(postLike)
-                .join(postLike.user, user)
-                .where(postLike.post.id.eq(postId), postLike.status.eq(StatusType.ACTIVE))
+                .join(user).on(postLike.userId.eq(user.id))
+                .where(
+                        postLike.postId.eq(postId),
+                        postLike.status.eq(StatusType.ACTIVE)
+                )
                 .fetch();
     }
 
@@ -98,27 +101,27 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                         bookmarked(userId)  // 북마크 여부 서브 쿼리
                 ))
                 .from(post)
-                .leftJoin(post.user, user)
+                .leftJoin(user).on(post.userId.eq(user.id))
                 .where(post.status.eq(StatusType.ACTIVE));
     }
 
     // 좋아요 개수 쿼리
     private JPQLQuery<Integer> postLikeCount() {
-        return select(postLike.count().intValue()).from(postLike).where(postLike.post.eq(post), postLike.status.eq(StatusType.ACTIVE));
+        return select(postLike.count().intValue()).from(postLike).where(postLike.postId.eq(post.id), postLike.status.eq(StatusType.ACTIVE));
     }
 
     // 댓글 개수 쿼리
     private JPQLQuery<Integer> commentCount() {
-        return select(comment.count().intValue()).from(comment).where(comment.post.eq(post), comment.status.eq(StatusType.ACTIVE));
+        return select(comment.count().intValue()).from(comment).where(comment.postId.eq(post.id), comment.status.eq(StatusType.ACTIVE));
     }
 
     // 게시글 좋아요 여부 쿼리
     private JPQLQuery<Boolean> postLiked(Long userId) {
-        return select(postLike.isNotNull()).from(postLike).where(postLike.post.eq(post), postLike.user.id.eq(userId), postLike.status.eq(StatusType.ACTIVE));
+        return select(postLike.isNotNull()).from(postLike).where(postLike.postId.eq(post.id), postLike.userId.eq(userId), postLike.status.eq(StatusType.ACTIVE));
     }
 
     // 북마크 여부 쿼리
     private JPQLQuery<Boolean> bookmarked(Long userId) {
-        return select(bookmark.isNotNull()).from(bookmark).where(bookmark.post.eq(post), bookmark.user.id.eq(userId), bookmark.status.eq(StatusType.ACTIVE));
+        return select(bookmark.isNotNull()).from(bookmark).where(bookmark.postId.eq(post.id), bookmark.userId.eq(userId), bookmark.status.eq(StatusType.ACTIVE));
     }
 }

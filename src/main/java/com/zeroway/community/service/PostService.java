@@ -13,8 +13,6 @@ import com.zeroway.community.repository.post.PostRepository;
 import com.zeroway.community.dto.PostListRes;
 import com.zeroway.community.dto.PostRes;
 import com.zeroway.s3.S3Uploader;
-import com.zeroway.user.entity.User;
-import com.zeroway.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,7 +34,6 @@ public class PostService {
     private final PostRepository postRepository;
     private final PostImageRepository postImageRepository;
     private final CommentRepository commentRepository;
-    private final UserRepository userRepository;
     private final BookmarkRepository bookmarkRepository;
     private final S3Uploader s3Uploader;
 
@@ -88,12 +85,11 @@ public class PostService {
     public void createPost(CreatePostReq req, List<MultipartFile> images, Long userId) throws BaseException {
         try {
             // post 저장
-            User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_JWT));
-            Post savedPost = postRepository.save(Post.builder().user(user).content(req.getContent()).challenge(req.isChallenge()).build());
+            Post savedPost = postRepository.save(Post.builder().userId(userId).content(req.getContent()).challenge(req.isChallenge()).build());
 
             // 이미지 파일 업로드 및 postImage 저장
             for (String url : s3Uploader.uploadFiles(images, "postImages")) {
-                postImageRepository.save(PostImage.builder().post(savedPost).url(url).build());
+                postImageRepository.save(PostImage.builder().postId(savedPost.getId()).url(url).build());
             }
 
         } catch (IOException e) {
@@ -120,12 +116,8 @@ public class PostService {
                     return true;
                 }
             }
-            User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_JWT));
-            Post post = postRepository.findById(postId).orElseThrow(() -> new BaseException(INVALID_POST_ID));
-            bookmarkRepository.save(Bookmark.builder().user(user).post(post).build());
+            bookmarkRepository.save(Bookmark.builder().userId(userId).postId(postId).build());
             return true;
-        } catch (BaseException e) {
-            throw e;
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
@@ -139,7 +131,7 @@ public class PostService {
             Post post = postRepository.findById(postId).orElseThrow(() -> new BaseException(INVALID_POST_ID));
 
             // 작성자가 아닌 회원이 요청한 경우
-            if(!post.getUser().getId().equals(userId)) throw new BaseException(UNAUTHORIZED_REQUEST);
+            if(!post.getUserId().equals(userId)) throw new BaseException(UNAUTHORIZED_REQUEST);
 
             // 상태를 INACTIVE로 수정
             post.setStatus(StatusType.INACTIVE);

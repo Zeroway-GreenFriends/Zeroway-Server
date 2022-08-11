@@ -1,7 +1,6 @@
 package com.zeroway.community.entity;
 
 import com.zeroway.common.BaseEntity;
-import com.zeroway.user.entity.User;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
@@ -15,17 +14,13 @@ public class Bookmark extends BaseEntity {
     @Column(name = "bookmark_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id")
-    private User user;
+    private Long userId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "post_id")
-    private Post post;
+    private Long postId;
 
     @Builder
-    public Bookmark(User user, Post post) {
-        this.user = user;
-        this.post = post;
+    public Bookmark(Long userId, Long postId) {
+        this.userId = userId;
+        this.postId = postId;
     }
 }

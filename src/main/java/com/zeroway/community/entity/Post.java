@@ -1,7 +1,6 @@
 package com.zeroway.community.entity;
 
 import com.zeroway.common.BaseEntity;
-import com.zeroway.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,9 +17,7 @@ public class Post extends BaseEntity {
     @Column(name = "post_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id")
-    private User user;
+    private Long userId;
 
     @Column(length = 1000)
     private String content;
@@ -29,8 +26,8 @@ public class Post extends BaseEntity {
     private boolean challenge; // 챌린지 인증 여부
 
     @Builder
-    public Post(User user, String content, boolean challenge) {
-        this.user = user;
+    public Post(Long userId, String content, boolean challenge) {
+        this.userId = userId;
         this.content = content;
         this.challenge = challenge;
     }

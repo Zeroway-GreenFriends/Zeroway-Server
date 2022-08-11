@@ -1,7 +1,6 @@
 package com.zeroway.community.entity;
 
 import com.zeroway.common.BaseEntity;
-import com.zeroway.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,21 +16,17 @@ public class Comment extends BaseEntity {
     @Column(name = "comment_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    private Post post;
+    private Long postId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    private Long userId;
 
     @Column(length = 200)
     private String content;
 
     @Builder
-    public Comment(Post post, User user, String content) {
-        this.post = post;
-        this.user = user;
+    public Comment(Long postId, Long userId, String content) {
+        this.postId = postId;
+        this.userId = userId;
         this.content = content;
     }
 }

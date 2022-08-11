@@ -20,7 +20,7 @@ public class PostImageRepositoryImpl implements PostImageRepositoryCustom{
         return queryFactory
                 .select(postImage.url)
                 .from(postImage)
-                .where(postImage.post.id.eq(postId))
+                .where(postImage.postId.eq(postId))
                 .fetch();
     }
 }
