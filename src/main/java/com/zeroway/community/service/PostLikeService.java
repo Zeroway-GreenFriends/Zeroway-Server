@@ -47,12 +47,8 @@ public class PostLikeService {
                     return true;
                 }
             }
-            User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_JWT));
-            Post post = postRepository.findById(postId).orElseThrow(() -> new BaseException(INVALID_POST_ID));
-            postLikeRepository.save(PostLike.builder().user(user).post(post).build());
+            postLikeRepository.save(PostLike.builder().userId(userId).postId(postId).build());
             return true; // 좋아요
-        } catch (BaseException e) {
-            throw e;
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }

@@ -33,14 +33,14 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
                         new QCommentListRes(
                                 user.id, user.nickname, user.profileImgUrl,
                                 comment.id ,comment.content, comment.createdAt,
-                                select(commentLike.count().intValue()).from(commentLike).where(commentLike.comment.eq(comment), commentLike.status.eq(StatusType.ACTIVE)),
-                                select(commentLike.isNotNull()).from(commentLike).where(commentLike.comment.eq(comment), commentLike.status.eq(StatusType.ACTIVE), commentLike.user.id.eq(userId))
+                                select(commentLike.count().intValue()).from(commentLike).where(commentLike.commentId.eq(comment.id), commentLike.status.eq(StatusType.ACTIVE)),
+                                select(commentLike.isNotNull()).from(commentLike).where(commentLike.commentId.eq(comment.id), commentLike.status.eq(StatusType.ACTIVE), commentLike.userId.eq(userId))
                         )
                 )
                 .from(comment)
-                .join(comment.user, user)
+                .join(user).on(comment.userId.eq(user.id))
                 .where(
-                        comment.post.id.eq(postId),
+                        comment.postId.eq(postId),
                         comment.status.eq(StatusType.ACTIVE)
                 ).fetch();
     }

@@ -70,7 +70,7 @@ public class PostController {
      */
     @PostMapping()
     public ResponseEntity<?> createPost(@RequestPart CreatePostReq post,
-                                        @RequestPart List<MultipartFile> images) {
+                                        @RequestPart(required = false) List<MultipartFile> images) {
         try {
             Long userId = jwtService.getUserIdx();
             postService.createPost(post, images, userId);

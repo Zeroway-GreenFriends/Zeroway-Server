@@ -15,17 +15,13 @@ public class PostLike extends BaseEntity {
     @Column(name = "post_like_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id")
-    private User user;
+    private Long userId;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "post_id")
-    private Post post;
+    private Long postId;
 
     @Builder
-    public PostLike(User user, Post post) {
-        this.user = user;
-        this.post = post;
+    public PostLike(Long userId, Long postId) {
+        this.userId = userId;
+        this.postId = postId;
     }
 }
