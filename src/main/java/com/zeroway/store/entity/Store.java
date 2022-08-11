@@ -60,4 +60,7 @@ public class Store extends BaseEntity {
     // 평균 별점
     private Double scoreAvg;
 
+    public void setScoreAvg(Double scoreAvg) {
+        this.scoreAvg = scoreAvg;
+    }
 }
