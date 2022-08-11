@@ -46,7 +46,7 @@ public enum BaseResponseStatus {
     EXPIRATION_JWT(false, 3002, "토큰이 만료되었습니다."),
     ALREADY_DELETED(false, 3100, "이미 삭제되었습니다."),
 
-    ALREADY_WRITTEN(false, 3200, "이미 작성된 리뷰가 있습니다."),
+    ALREADY_WRITTEN(false, 3200, "이미 작성한 리뷰가 있습니다."),
 
     /**
      * 4000 : Database, Server 오류

@@ -6,7 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface StoreReviewRepository extends JpaRepository<StoreReview, Long> {
+public interface StoreReviewRepository
+        extends JpaRepository<StoreReview, Long>, StoreReviewRepositoryCustom {
     List<StoreReview> findByStoreId(Long storeId);
     Optional<StoreReview> findByStoreIdAndUserId(Long storeId, Long userId);
 

@@ -56,6 +56,8 @@ public class StoreReviewService {
         List<StoreReview> storeReview = storeReviewRepository.findByStoreId(storeId);
         Double scoreSum = 0D;
         for (StoreReview review : storeReview) { scoreSum += review.getScore();}
-        store.setScoreAvg(scoreSum / storeReview.size());
+
+        // 소수 둘째 자리까지 반올림하여 저장
+        store.setScoreAvg(Math.round((scoreSum / storeReview.size() * 100))/100.0);
     }
 }
