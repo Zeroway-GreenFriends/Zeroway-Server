@@ -11,6 +11,7 @@ import java.util.List;
 import static com.querydsl.jpa.JPAExpressions.*;
 import static com.zeroway.community.entity.QComment.comment;
 import static com.zeroway.community.entity.QCommentLike.commentLike;
+import static com.zeroway.community.repository.post.PostRepositoryImpl.calculateWeeksAgo;
 import static com.zeroway.user.entity.QUser.user;
 
 public class CommentRepositoryImpl implements CommentRepositoryCustom {
@@ -32,7 +33,8 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
                 .select(
                         new QCommentListRes(
                                 user.id, user.nickname, user.profileImgUrl,
-                                comment.id ,comment.content, comment.createdAt,
+                                comment.id ,comment.content,
+                                calculateWeeksAgo(comment.createdAt),
                                 select(commentLike.count().intValue()).from(commentLike).where(commentLike.commentId.eq(comment.id), commentLike.status.eq(StatusType.ACTIVE)),
                                 select(commentLike.isNotNull()).from(commentLike).where(commentLike.commentId.eq(comment.id), commentLike.status.eq(StatusType.ACTIVE), commentLike.userId.eq(userId))
                         )
