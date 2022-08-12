@@ -1,8 +1,7 @@
 package com.zeroway.community.repository.post;
 
 import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -12,6 +11,7 @@ import com.zeroway.community.dto.*;
 import javax.persistence.EntityManager;
 import java.util.List;
 
+import static com.querydsl.core.types.dsl.Expressions.*;
 import static com.querydsl.jpa.JPAExpressions.*;
 import static com.zeroway.community.entity.QBookmark.bookmark;
 import static com.zeroway.community.entity.QComment.comment;
@@ -57,7 +57,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         return queryFactory
                 .select(
                     new QPostRes(
-                            post.id, user.nickname, user.profileImgUrl, post.content, post.createdAt, post.challenge,
+                            post.id, user.nickname, user.profileImgUrl, post.content, post.challenge,
+                            Expressions.numberTemplate(Integer.class, "datediff({0}, {1})/7", currentTime(), post.createdAt), // 몇 주 전인지 계산
                             postLikeCount(),
                             commentCount(),
                             postLiked(userId),
