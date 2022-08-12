@@ -15,6 +15,7 @@ import com.zeroway.community.dto.PostRes;
 import com.zeroway.s3.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -82,15 +83,15 @@ public class PostService {
 
     // 글 저장
     @Transactional
-    public void createPost(CreatePostReq req, List<MultipartFile> images, Long userId) throws BaseException {
+    public void createPost(CreatePostReq req, @Nullable List<MultipartFile> images, Long userId) throws BaseException {
         try {
             // post 저장
             Post savedPost = postRepository.save(Post.builder().userId(userId).content(req.getContent()).challenge(req.isChallenge()).build());
 
             // 이미지 파일 업로드 및 postImage 저장
-            for (String url : s3Uploader.uploadFiles(images, "postImages")) {
-                postImageRepository.save(PostImage.builder().postId(savedPost.getId()).url(url).build());
-            }
+            if(images != null)
+                for (String url : s3Uploader.uploadFiles(images, "postImages"))
+                    postImageRepository.save(PostImage.builder().postId(savedPost.getId()).url(url).build());
 
         } catch (IOException e) {
             e.printStackTrace();

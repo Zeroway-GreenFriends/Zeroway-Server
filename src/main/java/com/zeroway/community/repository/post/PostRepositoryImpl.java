@@ -1,8 +1,7 @@
 package com.zeroway.community.repository.post;
 
 import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -10,8 +9,10 @@ import com.zeroway.common.StatusType;
 import com.zeroway.community.dto.*;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.querydsl.core.types.dsl.Expressions.*;
 import static com.querydsl.jpa.JPAExpressions.*;
 import static com.zeroway.community.entity.QBookmark.bookmark;
 import static com.zeroway.community.entity.QComment.comment;
@@ -57,7 +58,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         return queryFactory
                 .select(
                     new QPostRes(
-                            post.id, user.nickname, user.profileImgUrl, post.content, post.createdAt, post.challenge,
+                            post.id, user.nickname, user.profileImgUrl, post.content, post.challenge,
+                            calculateWeeksAgo(post.createdAt), // 몇 주 전인지 계산
                             postLikeCount(),
                             commentCount(),
                             postLiked(userId),
@@ -91,7 +93,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     private JPAQuery<PostListRes> getPostListResJPAQuery(Long userId) {
         return queryFactory
                 .select(new QPostListRes(
-                        post.id, post.content, post.createdAt, post.challenge,
+                        post.id, post.content, post.challenge,
                         user.nickname, user.profileImgUrl,
                         ExpressionUtils.as( // 좋아요 개수 서브 쿼리
                                 postLikeCount(), "postLikeCount"
@@ -123,5 +125,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     // 북마크 여부 쿼리
     private JPQLQuery<Boolean> bookmarked(Long userId) {
         return select(bookmark.isNotNull()).from(bookmark).where(bookmark.postId.eq(post.id), bookmark.userId.eq(userId), bookmark.status.eq(StatusType.ACTIVE));
+    }
+
+    // 몇 주 전인지 계산
+    public static NumberTemplate<Integer> calculateWeeksAgo(DateTimePath<LocalDateTime> createdAt) {
+        return Expressions.numberTemplate(Integer.class, "datediff({0}, {1})/7", currentTime(), createdAt);
     }
 }

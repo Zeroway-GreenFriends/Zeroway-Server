@@ -13,18 +13,18 @@ public class CommentListRes {
     private String userProfileImg;
     private Long commentId;
     private String content;
-    private LocalDateTime createdAt;
+    private int weeksAgo;
     private int likeCount;
     private boolean liked;
 
     @QueryProjection
-    public CommentListRes(Long userId, String username, String userProfileImg, Long commentId, String content, LocalDateTime createdAt, int likeCount, boolean liked) {
+    public CommentListRes(Long userId, String username, String userProfileImg, Long commentId, String content, int weeksAgo, int likeCount, boolean liked) {
         this.userId = userId;
         this.username = username;
         this.userProfileImg = userProfileImg;
         this.commentId = commentId;
         this.content = content;
-        this.createdAt = createdAt;
+        this.weeksAgo = weeksAgo;
         this.likeCount = likeCount;
         this.liked = liked;
     }
