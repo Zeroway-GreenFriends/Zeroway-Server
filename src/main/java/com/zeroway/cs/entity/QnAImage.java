@@ -1,12 +1,14 @@
 package com.zeroway.cs.entity;
 
 import com.zeroway.common.BaseEntity;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor
+@Getter
 public class QnAImage extends BaseEntity {
 
     @Id
