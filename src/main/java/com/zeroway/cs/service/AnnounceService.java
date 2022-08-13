@@ -2,6 +2,7 @@ package com.zeroway.cs.service;
 
 import com.zeroway.common.BaseException;
 import com.zeroway.cs.dto.AnnounceListRes;
+import com.zeroway.cs.dto.AnnounceRes;
 import com.zeroway.cs.entity.Announce;
 import com.zeroway.cs.repository.AnnounceRepository;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.zeroway.common.BaseResponseStatus.DATABASE_ERROR;
@@ -26,6 +28,18 @@ public class AnnounceService {
                     .map(announce -> new AnnounceListRes(announce.getId(), announce.getTitle(), announce.getCreatedAt()))
                     .collect(Collectors.toList());
         } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public AnnounceRes getAnnounce(Long announceId) throws BaseException{
+        try {
+            Optional<Announce> findAnnounce = announceRepository.findById(announceId);
+            if(findAnnounce.isEmpty()) {
+                throw new BaseException(DATABASE_ERROR);
+            }
+            else return new AnnounceRes(findAnnounce.get().getTitle(), findAnnounce.get().getContent(), findAnnounce.get().getCreatedAt());
+        } catch (BaseException e) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
