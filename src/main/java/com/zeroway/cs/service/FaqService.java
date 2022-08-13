@@ -1,13 +1,10 @@
 package com.zeroway.cs.service;
 
 import com.zeroway.common.BaseException;
-import com.zeroway.cs.dto.AnnounceListRes;
 import com.zeroway.cs.dto.FaqListRes;
-import com.zeroway.cs.entity.Announce;
 import com.zeroway.cs.entity.FAQ;
 import com.zeroway.cs.repository.FaqRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
