@@ -2,7 +2,6 @@ package com.zeroway.cs.controller;
 
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
-import com.zeroway.cs.dto.AnnounceListRes;
 import com.zeroway.cs.dto.FaqListRes;
 import com.zeroway.cs.service.FaqService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +20,11 @@ public class FaqController {
 
     private final FaqService faqService;
 
+
+    /**
+     * 자주 묻는 질문 전체 조회 API
+     * @return FAQ(질문, 답변)
+     */
     @ResponseBody
     @GetMapping("")
     public ResponseEntity<?> getFaqList() {
