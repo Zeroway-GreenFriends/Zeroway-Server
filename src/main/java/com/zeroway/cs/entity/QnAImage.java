@@ -1,6 +1,7 @@
 package com.zeroway.cs.entity;
 
 import com.zeroway.common.BaseEntity;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,4 +22,9 @@ public class QnAImage extends BaseEntity {
     @Column(nullable = false)
     private String url;
 
+    @Builder
+    public QnAImage(Long qna_id, String url) {
+        this.qna_id = qna_id;
+        this.url = url;
+    }
 }

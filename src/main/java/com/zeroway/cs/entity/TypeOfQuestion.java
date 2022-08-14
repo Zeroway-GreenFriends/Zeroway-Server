@@ -3,6 +3,8 @@ package com.zeroway.cs.entity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
+
 @Getter
 @AllArgsConstructor
 public enum TypeOfQuestion {
@@ -14,5 +16,11 @@ public enum TypeOfQuestion {
     ETC("기타");
 
     private final String name;
+
+    public static TypeOfQuestion enumOf(String name) {
+        return Arrays.stream(TypeOfQuestion.values())
+                .filter(t -> t.getName().equals(name))
+                .findAny().orElse(null);
+    }
 
 }
