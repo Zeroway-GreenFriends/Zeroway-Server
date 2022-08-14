@@ -2,14 +2,18 @@ package com.zeroway.cs.service;
 
 import com.zeroway.common.BaseException;
 import com.zeroway.cs.dto.QnaListRes;
+import com.zeroway.cs.dto.QnaReq;
 import com.zeroway.cs.dto.QnaRes;
 import com.zeroway.cs.entity.QnA;
 import com.zeroway.cs.entity.QnAImage;
+import com.zeroway.cs.entity.TypeOfQuestion;
 import com.zeroway.cs.repository.QnaImageRepository;
 import com.zeroway.cs.repository.QnaRepository;
+import com.zeroway.s3.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,10 +28,11 @@ public class QnaService {
 
     private final QnaRepository qnaRepository;
     private final QnaImageRepository qnaImageRepository;
+    private final S3Uploader s3Uploader;
 
     public List<QnaListRes> getQnaList(Long userId) throws BaseException {
         try {
-            List<QnA> qnaList = qnaRepository.findByUser_Id(userId, Sort.by(Sort.Direction.DESC, "createdAt"));
+            List<QnA> qnaList = qnaRepository.findByUserId(userId, Sort.by(Sort.Direction.DESC, "createdAt"));
 
             return qnaList.stream()
                     .map(qna -> new QnaListRes(qna.getId(), qna.getTypeOfQuestion().getName()))
@@ -50,6 +55,23 @@ public class QnaService {
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
-
     }
+
+    public void createQna(QnaReq qnaReq, Long userId, List<MultipartFile> imgs) throws BaseException{
+        try {
+            TypeOfQuestion type = TypeOfQuestion.enumOf(qnaReq.getType());
+            QnA qna = qnaRepository.save(QnA.builder()
+                    .typeOfQuestion(type).question(qnaReq.getQuestion()).userId(userId).build());
+
+            if(imgs!=null && !imgs.isEmpty()) {
+                for (String qnaUrl : s3Uploader.uploadFiles(imgs, "qnaImages")) {
+                    qnaImageRepository.save(QnAImage.builder()
+                            .qna_id(qna.getId()).url(qnaUrl).build());
+                }
+            }
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 }

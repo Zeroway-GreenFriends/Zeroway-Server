@@ -8,5 +8,5 @@ import java.util.List;
 
 public interface QnaRepository extends JpaRepository<QnA, Long> {
 
-    List<QnA> findByUser_Id(Long userId, Sort createdAt);
+    List<QnA> findByUserId(Long userId, Sort createdAt);
 }

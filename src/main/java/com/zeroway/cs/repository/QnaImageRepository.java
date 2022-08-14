@@ -8,6 +8,6 @@ import java.util.List;
 
 public interface QnaImageRepository extends JpaRepository<QnAImage, Long> {
 
-    @Query("select qi.url from QnAImage qi join qi.qna q where q.id = :qnaId")
+    @Query("select qi.url from QnAImage qi where qi.qna_id = :qnaId")
     List<String> findUrlByQna_Id(Long qnaId);
 }

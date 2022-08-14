@@ -3,12 +3,14 @@ package com.zeroway.cs.controller;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
 import com.zeroway.cs.dto.QnaListRes;
+import com.zeroway.cs.dto.QnaReq;
 import com.zeroway.cs.dto.QnaRes;
 import com.zeroway.cs.service.QnaService;
 import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -51,5 +53,23 @@ public class QnaController {
         } catch (BaseException exception) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
         }
+    }
+
+    /**
+     * *
+     * 문의 내역 작성 API
+     * @param qnaReq Qna(문의 유형, 질문)
+     * @param imgs 이미지
+     */
+    @PostMapping(consumes={"multipart/form-data"})
+    public ResponseEntity<?> createQna(@RequestPart(value="qnaReq") QnaReq qnaReq, @RequestPart(value="imgs", required = false)List<MultipartFile> imgs) {
+        try{
+            Long userId = jwtService.getUserIdx();
+            qnaService.createQna(qnaReq, userId, imgs);
+            return ResponseEntity.ok().build();
+        } catch (BaseException exception) {
+            return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
+        }
+
     }
 }

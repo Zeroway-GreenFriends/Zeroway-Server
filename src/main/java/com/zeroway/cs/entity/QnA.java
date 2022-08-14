@@ -2,12 +2,15 @@ package com.zeroway.cs.entity;
 
 import com.zeroway.common.BaseEntity;
 import com.zeroway.user.entity.User;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class QnA extends BaseEntity {
 
     @Id @GeneratedValue
@@ -24,9 +27,12 @@ public class QnA extends BaseEntity {
     @Column(length = 1000)
     private String answer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    private Long userId;
 
-
+    @Builder
+    public QnA(TypeOfQuestion typeOfQuestion, String question, Long userId) {
+        this.typeOfQuestion = typeOfQuestion;
+        this.question = question;
+        this.userId = userId;
+    }
 }
