@@ -16,9 +16,7 @@ public class QnAImage extends BaseEntity {
     @Column(name = "qna_image_id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "qna_id")
-    private QnA qna;
+    private Long qna_id;
 
     @Column(nullable = false)
     private String url;

@@ -4,7 +4,6 @@ import com.zeroway.common.BaseException;
 import com.zeroway.cs.dto.QnaListRes;
 import com.zeroway.cs.dto.QnaRes;
 import com.zeroway.cs.entity.QnA;
-import com.zeroway.cs.entity.QnAImage;
 import com.zeroway.cs.repository.QnaImageRepository;
 import com.zeroway.cs.repository.QnaRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,7 @@ public class QnaService {
 
     public List<QnaListRes> getQnaList(Long userId) throws BaseException {
         try {
-            List<QnA> qnaList = qnaRepository.findByUser_Id(userId, Sort.by(Sort.Direction.DESC, "createdAt"));
+            List<QnA> qnaList = qnaRepository.findByUserId(userId, Sort.by(Sort.Direction.DESC, "createdAt"));
 
             return qnaList.stream()
                     .map(qna -> new QnaListRes(qna.getId(), qna.getTypeOfQuestion().getName()))
