@@ -16,9 +16,13 @@ import com.zeroway.user.service.UserService;
 import com.zeroway.utils.JwtService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -46,6 +50,8 @@ public class UserServiceIntegrationTest {
     ChallengeRepository challengeRepository;
     @Autowired
     UserChallengeRepository userChallengeRepository;
+    @Mock
+    private MockHttpServletRequest request;
 
     private SignInAuthReq signInAuthReq() {
         return SignInAuthReq.builder()
@@ -125,4 +131,22 @@ public class UserServiceIntegrationTest {
         assertThat(userChallengeRepository.findByChallenge_Id(save1.getId()).getChallenge().getLevel().getId()).isEqualTo(1);
     }
 
+    @DisplayName("회원 탈퇴 성공")
+    @Test
+    void signoutO() throws BaseException {
+        Long userId = userRepository.findByEmail("testYeji@test.com").get().getId();
+        String accessToken = jwtService.createAccessToken(userId);
+
+        request = new MockHttpServletRequest();
+        request.addHeader("Bearer", accessToken);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+        Long signoutId = userService.signout();
+
+        assertThat(signoutId).isEqualTo(userId);
+
+        User signoutUser = userRepository.findById(signoutId).get();
+        assertThat(signoutUser.getEmail()).isEqualTo("email@gamil.com");
+        assertThat(signoutUser.getRefreshToken()).isNull();
+    }
 }

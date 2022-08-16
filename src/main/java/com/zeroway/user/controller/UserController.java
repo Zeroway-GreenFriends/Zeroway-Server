@@ -104,4 +104,18 @@ public class UserController {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
     }
+
+    /**
+     * 회원탈퇴
+     */
+    @PatchMapping("/signout")
+    public ResponseEntity<?> signout() {
+        try {
+            userService.signout();
+            return ResponseEntity.ok().build();
+        } catch (BaseException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+    }
 }
