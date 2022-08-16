@@ -147,4 +147,27 @@ public class UserService {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    /**
+     * 회원탈퇴
+     */
+    public Long signout() throws BaseException {
+        try {
+            Long userIdx = jwtService.getUserIdx();
+            User user = userRepository.findById(userIdx).get();
+            user.setNickname("알 수 없음");
+            user.setEmail("email@gamil.com");
+            user.setProfileImgUrl(null);
+            user.setRefreshToken(null);
+            user.setLevel(levelRepository.findById(1).get());
+            user.setStatus(StatusType.INACTIVE);
+
+            User inactiveUser = userRepository.save(user);
+            return inactiveUser.getId();
+
+        } catch (BaseException e) {
+            e.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }
