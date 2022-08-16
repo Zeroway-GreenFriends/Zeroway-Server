@@ -151,23 +151,17 @@ public class UserService {
     /**
      * 회원탈퇴
      */
-    public Long signout() throws BaseException {
+    public User signout() throws BaseException {
         try {
             Long userIdx = jwtService.getUserIdx();
             User user = userRepository.findById(userIdx).get();
-            user.setNickname("알 수 없음");
-            user.setEmail("email@gamil.com");
-            user.setProfileImgUrl(null);
-            user.setRefreshToken(null);
-            user.setLevel(levelRepository.findById(1).get());
-            user.setStatus(StatusType.INACTIVE);
 
-            User inactiveUser = userRepository.save(user);
-            return inactiveUser.getId();
-
+            user.signout("알 수 없음", "email@gmail.com", null, null, levelRepository.findById(1).get(), StatusType.INACTIVE);
+            return user;
         } catch (BaseException e) {
             e.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
 }
