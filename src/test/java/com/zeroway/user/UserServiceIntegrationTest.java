@@ -141,12 +141,10 @@ public class UserServiceIntegrationTest {
         request.addHeader("Bearer", accessToken);
         RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
 
-        Long signoutId = userService.signout();
+        User signoutUser = userService.signout();
 
-        assertThat(signoutId).isEqualTo(userId);
-
-        User signoutUser = userRepository.findById(signoutId).get();
-        assertThat(signoutUser.getEmail()).isEqualTo("email@gamil.com");
+        assertThat(signoutUser.getId()).isEqualTo(userId);
+        assertThat(signoutUser.getEmail()).isEqualTo("email@gmail.com");
         assertThat(signoutUser.getRefreshToken()).isNull();
     }
 }
