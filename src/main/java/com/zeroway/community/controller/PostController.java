@@ -8,6 +8,7 @@ import com.zeroway.community.service.PostLikeService;
 import com.zeroway.community.service.PostService;
 import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
+import net.minidev.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +41,9 @@ public class PostController {
             if (sortColumns.contains(sort)) {
                 Long userId = jwtService.getUserIdx();
                 List<PostListRes> postList = postService.getPostList(userId, sort);
-                return ResponseEntity.ok().body(postList);
+                JSONObject res = new JSONObject();
+                res.put("data", postList);
+                return ResponseEntity.ok().body(res);
             }
             throw new BaseException(INVALID_PARAMETER_VALUE);
         } catch (BaseException e) {
