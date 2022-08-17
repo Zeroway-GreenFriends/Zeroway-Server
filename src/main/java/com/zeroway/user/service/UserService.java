@@ -9,6 +9,7 @@ import com.zeroway.challenge.repository.UserChallengeRepository;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
 import com.zeroway.s3.S3Uploader;
+import com.zeroway.user.dto.PatchUserInfo;
 import com.zeroway.user.dto.PostUserRes;
 import com.zeroway.user.dto.SignInAuthReq;
 import com.zeroway.user.entity.User;
@@ -151,23 +152,54 @@ public class UserService {
     /**
      * 회원탈퇴
      */
-    public Long signout() throws BaseException {
+    public User signout() throws BaseException {
         try {
             Long userIdx = jwtService.getUserIdx();
             User user = userRepository.findById(userIdx).get();
-            user.setNickname("알 수 없음");
-            user.setEmail("email@gamil.com");
-            user.setProfileImgUrl(null);
-            user.setRefreshToken(null);
-            user.setLevel(levelRepository.findById(1).get());
-            user.setStatus(StatusType.INACTIVE);
 
-            User inactiveUser = userRepository.save(user);
-            return inactiveUser.getId();
-
+            user.signout("알 수 없음", "email@gmail.com", null, null, levelRepository.findById(1).get(), StatusType.INACTIVE);
+            return user;
         } catch (BaseException e) {
             e.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }
+    }
+
+    /**
+     * 회원정보 수정
+     */
+    public void patchUser(MultipartFile profileImg, PatchUserInfo patchUserInfo) throws BaseException {
+        User user = null;
+        try {
+            Long userIdx = jwtService.getUserIdx();
+            user = userRepository.findById(userIdx).get();
+
+            if (patchUserInfo != null) {
+                String nickname = patchUserInfo.getNickname();
+                user.setNickname(nickname);
+            }
+
+            if (profileImg == null) {
+                user.setProfileImgUrl(null);
+            } else if (!profileImg.isEmpty()) {
+                String userProfile = s3Uploader.uploadFile(profileImg, "userProfile");
+                user.setProfileImgUrl(userProfile);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new BaseException(FILE_UPLOAD_ERROR);
+        } catch (BaseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 닉네임 중복 여부 확인
+     */
+    public boolean existUser(String nickname) {
+        if (nickname.equals("알 수 없음")) {
+            return true;
+        }
+        return userRepository.existsUserByNicknameAndStatusNot(nickname, StatusType.INACTIVE);
     }
 }

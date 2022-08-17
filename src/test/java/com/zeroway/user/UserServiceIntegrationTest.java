@@ -7,6 +7,8 @@ import com.zeroway.challenge.repository.ChallengeRepository;
 import com.zeroway.challenge.repository.LevelRepository;
 import com.zeroway.challenge.repository.UserChallengeRepository;
 import com.zeroway.common.BaseException;
+import com.zeroway.common.StatusType;
+import com.zeroway.user.dto.PatchUserInfo;
 import com.zeroway.user.dto.PostUserRes;
 import com.zeroway.user.dto.SignInAuthReq;
 import com.zeroway.user.entity.ProviderType;
@@ -20,6 +22,8 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -70,6 +74,17 @@ public class UserServiceIntegrationTest {
                 .nickname("예지테스트한다")
                 .provider(ProviderType.valueOf("KAKAO"))
                 .build());
+    }
+
+    private Long createRequestJWT() {
+        Long userId = userRepository.findByEmail("testYeji@test.com").get().getId();
+        String accessToken = jwtService.createAccessToken(userId);
+
+        request = new MockHttpServletRequest();
+        request.addHeader("Bearer", accessToken);
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+
+        return userId;
     }
 
     @DisplayName("로그인 성공")
@@ -134,19 +149,116 @@ public class UserServiceIntegrationTest {
     @DisplayName("회원 탈퇴 성공")
     @Test
     void signoutO() throws BaseException {
-        Long userId = userRepository.findByEmail("testYeji@test.com").get().getId();
-        String accessToken = jwtService.createAccessToken(userId);
+        Long userId = this.createRequestJWT();
 
-        request = new MockHttpServletRequest();
-        request.addHeader("Bearer", accessToken);
-        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        User signoutUser = userService.signout();
 
-        Long signoutId = userService.signout();
-
-        assertThat(signoutId).isEqualTo(userId);
-
-        User signoutUser = userRepository.findById(signoutId).get();
-        assertThat(signoutUser.getEmail()).isEqualTo("email@gamil.com");
+        assertThat(signoutUser.getId()).isEqualTo(userId);
+        assertThat(signoutUser.getEmail()).isEqualTo("email@gmail.com");
         assertThat(signoutUser.getRefreshToken()).isNull();
+    }
+
+    @DisplayName("회원 정보 수정 성공 : 프로필 & 닉네임")
+    @Test
+    void patchInfo() throws BaseException {
+        Long userId = this.createRequestJWT();
+        User existedUser = userRepository.findById(userId).get();
+        String existedImg = existedUser.getProfileImgUrl();
+        String existedNickname = existedUser.getNickname();
+
+        MultipartFile multipartFile = new MockMultipartFile("profile", new byte[5]);
+        PatchUserInfo patchUserInfo = new PatchUserInfo("닉넴");
+        userService.patchUser(multipartFile, patchUserInfo);
+
+        User resultUser = userRepository.findById(userId).get();
+        assertThat(resultUser.getId()).isEqualTo(userId);
+        assertThat(resultUser.getNickname()).isEqualTo("닉넴");
+        assertThat(resultUser.getProfileImgUrl()).contains("https://zeroway.s3");
+        assertThat(resultUser.getProfileImgUrl()).isNotEqualTo(existedImg);
+        assertThat(resultUser.getNickname()).isNotEqualTo(existedNickname);
+    }
+
+    @DisplayName("회원 정보 수정 성공 : 닉네임만 변경")
+    @Test
+    void patchInfo1() throws BaseException {
+        Long userId = this.createRequestJWT();
+        User existedUser = userRepository.findById(userId).get();
+        String existedImg = existedUser.getProfileImgUrl();
+
+        MultipartFile multipartFile = new MockMultipartFile("profile", (byte[]) null);
+        PatchUserInfo patchUserInfo = new PatchUserInfo("닉넴");
+        userService.patchUser(multipartFile, patchUserInfo);
+
+        User resultUser = userRepository.findById(userId).get();
+        assertThat(resultUser.getId()).isEqualTo(userId);
+        assertThat(resultUser.getNickname()).isEqualTo("닉넴");
+        assertThat(resultUser.getProfileImgUrl()).isEqualTo(existedImg);
+    }
+
+    @DisplayName("회원 정보 수정 성공 : 프로필 삭제 & 닉네임 변경")
+    @Test
+    void patchInfo2() throws BaseException {
+        Long userId = this.createRequestJWT();
+        User existedUser = userRepository.findById(userId).get();
+        String existedImg = existedUser.getProfileImgUrl();
+
+        PatchUserInfo patchUserInfo = new PatchUserInfo("닉넴");
+        userService.patchUser(null, patchUserInfo);
+
+        User resultUser = userRepository.findById(userId).get();
+        assertThat(resultUser.getId()).isEqualTo(userId);
+        assertThat(resultUser.getNickname()).isEqualTo("닉넴");
+        assertThat(resultUser.getProfileImgUrl()).isNull();
+        assertThat(existedImg).contains("https://zeroway.s3");
+    }
+
+    @DisplayName("회원 정보 수정 성공 : 프로필만 변경")
+    @Test
+    void patchInfo3() throws BaseException {
+        Long userId = this.createRequestJWT();
+        User existedUser = userRepository.findById(userId).get();
+        String existedNickname = existedUser.getNickname();
+
+        MultipartFile multipartFile = new MockMultipartFile("profile", new byte[5]);
+        userService.patchUser(multipartFile, null);
+
+        User resultUser = userRepository.findById(userId).get();
+        assertThat(resultUser.getId()).isEqualTo(userId);
+        assertThat(resultUser.getNickname()).isEqualTo(existedNickname);
+        assertThat(resultUser.getProfileImgUrl()).isNotNull();
+        assertThat(resultUser.getProfileImgUrl()).contains("https://zeroway.s3");
+    }
+
+    @DisplayName("닉네임 중복 여부 확인 성공: T")
+    @Test
+    void nickname() throws BaseException {
+        User user = createUser().get();
+        user.setLevel(levelRepository.findById(1).get());
+        userRepository.save(user);
+
+        boolean b = userService.existUser(user.getNickname());
+
+        assertThat(b).isTrue();
+    }
+
+    @DisplayName("닉네임 중복 여부 확인 성공: T & INACTIVE 유저 제외")
+    @Test
+    void nickname1() throws BaseException {
+        User user = createUser().get();
+        user.setLevel(levelRepository.findById(1).get());
+        user = userRepository.save(user);
+        user.setStatus(StatusType.INACTIVE);
+
+        boolean b = userService.existUser(user.getNickname());
+
+        assertThat(b).isFalse();
+    }
+
+    @DisplayName("닉네임 중복 여부 확인 성공: F")
+    @Test
+    void nickname2() throws BaseException {
+        boolean b = userService.existUser("새로운 닉네임");
+
+        assertThat(b).isFalse();
     }
 }

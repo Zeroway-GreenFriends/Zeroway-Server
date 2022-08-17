@@ -3,6 +3,7 @@ package com.zeroway.user.entity;
 import com.github.dozermapper.core.Mapping;
 import com.zeroway.challenge.entity.Level;
 import com.zeroway.common.BaseEntity;
+import com.zeroway.common.StatusType;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
@@ -44,4 +45,12 @@ public class User extends BaseEntity {
     @Builder.Default
     private Integer exp = 0;
 
+    public void signout(String nickname, String email, String profileImgUrl, String refreshToken, Level level, StatusType statusType) {
+        this.nickname = nickname;
+        this.email = email;
+        this.profileImgUrl = profileImgUrl;
+        this.refreshToken = refreshToken;
+        this.level = level;
+        this.setStatus(statusType);
+    }
 }

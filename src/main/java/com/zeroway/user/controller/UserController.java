@@ -2,6 +2,7 @@ package com.zeroway.user.controller;
 
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
+import com.zeroway.user.dto.PatchUserInfo;
 import com.zeroway.user.dto.PostUserAuthLoginReq;
 import com.zeroway.user.dto.SignInAuthReq;
 import com.zeroway.user.dto.PostUserRes;
@@ -29,7 +30,7 @@ public class UserController {
      */
     @PostMapping()
     public ResponseEntity<BaseResponse<PostUserRes>> postUser(@RequestPart(value = "signInReq") SignInAuthReq signInReq,
-                                                    @RequestPart(value = "profileImg", required = false) MultipartFile profileImg) {
+                                                              @RequestPart(value = "profileImg", required = false) MultipartFile profileImg) {
         try {
             if (signInReq.getEmail() == null) {
                 return ResponseEntity.badRequest().body(new BaseResponse<>(POST_USER_EMPTY_EMAIL));
@@ -117,5 +118,29 @@ public class UserController {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
+    }
+
+    /**
+     * 회원정보 수정 (닉네임, 프로필 이미지)
+     */
+    @PatchMapping()
+    public ResponseEntity<?> patchUser(@RequestPart(value = "profileImg", required = false) MultipartFile profileImg,
+                                   @RequestPart(value = "patchUserInfo", required = false) PatchUserInfo patchUserInfo) {
+        try {
+            userService.patchUser(profileImg, patchUserInfo);
+            return ResponseEntity.ok().build();
+        } catch (BaseException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+    }
+
+    /**
+     * 닉네임 존재 여부 확인
+     */
+    @GetMapping("/{nickname}")
+    public ResponseEntity<BaseResponse<Boolean>> existUser(@PathVariable String nickname) {
+        boolean isExistedUser = userService.existUser(nickname);
+        return ResponseEntity.ok().body(new BaseResponse<>(isExistedUser));
     }
 }
