@@ -9,6 +9,7 @@ import com.zeroway.challenge.repository.UserChallengeRepository;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
 import com.zeroway.s3.S3Uploader;
+import com.zeroway.user.dto.PatchUserInfo;
 import com.zeroway.user.dto.PostUserRes;
 import com.zeroway.user.dto.SignInAuthReq;
 import com.zeroway.user.entity.User;
@@ -161,6 +162,34 @@ public class UserService {
         } catch (BaseException e) {
             e.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 회원정보 수정
+     */
+    public void patchUser(MultipartFile profileImg, PatchUserInfo patchUserInfo) throws BaseException {
+        User user = null;
+        try {
+            Long userIdx = jwtService.getUserIdx();
+            user = userRepository.findById(userIdx).get();
+
+            if (patchUserInfo != null) {
+                String nickname = patchUserInfo.getNickname();
+                user.setNickname(nickname);
+            }
+
+            if (profileImg == null) {
+                user.setProfileImgUrl(null);
+            } else if (!profileImg.isEmpty()) {
+                String userProfile = s3Uploader.uploadFile(profileImg, "userProfile");
+                user.setProfileImgUrl(userProfile);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new BaseException(FILE_UPLOAD_ERROR);
+        } catch (BaseException e) {
+            e.printStackTrace();
         }
     }
 
