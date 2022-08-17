@@ -7,6 +7,7 @@ import com.zeroway.challenge.repository.ChallengeRepository;
 import com.zeroway.challenge.repository.LevelRepository;
 import com.zeroway.challenge.repository.UserChallengeRepository;
 import com.zeroway.common.BaseException;
+import com.zeroway.common.StatusType;
 import com.zeroway.user.dto.PatchUserInfo;
 import com.zeroway.user.dto.PostUserRes;
 import com.zeroway.user.dto.SignInAuthReq;
@@ -226,5 +227,38 @@ public class UserServiceIntegrationTest {
         assertThat(resultUser.getNickname()).isEqualTo(existedNickname);
         assertThat(resultUser.getProfileImgUrl()).isNotNull();
         assertThat(resultUser.getProfileImgUrl()).contains("https://zeroway.s3");
+    }
+
+    @DisplayName("닉네임 중복 여부 확인 성공: T")
+    @Test
+    void nickname() throws BaseException {
+        User user = createUser().get();
+        user.setLevel(levelRepository.findById(1).get());
+        userRepository.save(user);
+
+        boolean b = userService.existUser(user.getNickname());
+
+        assertThat(b).isTrue();
+    }
+
+    @DisplayName("닉네임 중복 여부 확인 성공: T & INACTIVE 유저 제외")
+    @Test
+    void nickname1() throws BaseException {
+        User user = createUser().get();
+        user.setLevel(levelRepository.findById(1).get());
+        user = userRepository.save(user);
+        user.setStatus(StatusType.INACTIVE);
+
+        boolean b = userService.existUser(user.getNickname());
+
+        assertThat(b).isFalse();
+    }
+
+    @DisplayName("닉네임 중복 여부 확인 성공: F")
+    @Test
+    void nickname2() throws BaseException {
+        boolean b = userService.existUser("새로운 닉네임");
+
+        assertThat(b).isFalse();
     }
 }
