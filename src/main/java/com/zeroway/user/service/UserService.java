@@ -193,4 +193,13 @@ public class UserService {
         }
     }
 
+    /**
+     * 닉네임 중복 여부 확인
+     */
+    public boolean existUser(String nickname) {
+        if (nickname.equals("알 수 없음")) {
+            return true;
+        }
+        return userRepository.existsUserByNicknameAndStatusNot(nickname, StatusType.INACTIVE);
+    }
 }

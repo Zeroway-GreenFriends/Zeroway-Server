@@ -134,4 +134,13 @@ public class UserController {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
     }
+
+    /**
+     * 닉네임 존재 여부 확인
+     */
+    @GetMapping("/{nickname}")
+    public ResponseEntity<BaseResponse<Boolean>> existUser(@PathVariable String nickname) {
+        boolean isExistedUser = userService.existUser(nickname);
+        return ResponseEntity.ok().body(new BaseResponse<>(isExistedUser));
+    }
 }
