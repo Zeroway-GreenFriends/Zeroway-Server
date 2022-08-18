@@ -261,4 +261,17 @@ public class UserServiceIntegrationTest {
 
         assertThat(b).isFalse();
     }
+
+    @DisplayName("로그아웃 성공")
+    @Test
+    void logout() throws BaseException {
+        Long userId = createRequestJWT();
+
+        userService.logout();
+        User user = userRepository.findById(userId).get();
+
+        // status, token
+        assertThat(user.getStatus()).isEqualTo(StatusType.LOGOUT);
+        assertThat(user.getRefreshToken()).isNull();
+    }
 }
