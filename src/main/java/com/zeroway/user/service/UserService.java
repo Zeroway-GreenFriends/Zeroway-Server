@@ -143,7 +143,7 @@ public class UserService {
             Long userIdx = jwtService.getUserIdx();
             User user = userRepository.findById(userIdx).get();
             user.setStatus(StatusType.LOGOUT);
-            userRepository.save(user);
+            user.setRefreshToken(null);
         } catch (BaseException e) {
             throw new BaseException(DATABASE_ERROR);
         }
