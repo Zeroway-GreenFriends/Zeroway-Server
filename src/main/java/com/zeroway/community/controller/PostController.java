@@ -105,11 +105,11 @@ public class PostController {
      * @param postId 게시글 id
      */
     @PostMapping("/{postId}/like")
-    public ResponseEntity<?> like(@PathVariable Long postId) {
+    public ResponseEntity<?> like(@PathVariable Long postId, @RequestBody LikeReq req) {
         try {
             Long userId = jwtService.getUserIdx();
-            boolean like = likeService.like(userId, postId);
-            return ResponseEntity.ok().body(new CreateLikeRes(like));
+            likeService.like(userId, postId, req.isLike());
+            return ResponseEntity.ok().build();
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }

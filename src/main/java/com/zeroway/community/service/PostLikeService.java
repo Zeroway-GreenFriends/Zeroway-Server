@@ -4,14 +4,12 @@ import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
 import com.zeroway.community.dto.LikeListRes;
 import com.zeroway.community.dto.UserInfo;
-import com.zeroway.community.entity.Post;
 import com.zeroway.community.entity.PostLike;
 import com.zeroway.community.repository.post.PostLikeRepository;
 import com.zeroway.community.repository.post.PostRepository;
-import com.zeroway.user.entity.User;
-import com.zeroway.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,28 +25,25 @@ public class PostLikeService {
 
     private final PostLikeRepository postLikeRepository;
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
 
     /**
      * 좋아요 기능
-     * @return true 좋아요, false 좋아요 취소
      */
     @Transactional
-    public boolean like(Long userId, Long postId) throws BaseException {
+    @Modifying(clearAutomatically = true)
+    public void like(Long userId, Long postId, boolean like) throws BaseException {
         try {
             Optional<PostLike> optional = postLikeRepository.findByUserIdAndPostId(userId, postId);
             if (optional.isPresent()) {
-                PostLike like = optional.get();
-                if(like.getStatus().equals(StatusType.ACTIVE)) {// 좋아요 취소
-                    optional.get().setStatus(StatusType.INACTIVE);
-                    return false;
-                } else {
-                    optional.get().setStatus(StatusType.ACTIVE); // 좋아요
-                    return true;
+                PostLike postLike = optional.get();
+                if (like) {// 좋아요
+                    postLike.setStatus(StatusType.ACTIVE);
+                } else { // 좋아요 취소
+                    postLike.setStatus(StatusType.INACTIVE);
                 }
             }
-            postLikeRepository.save(PostLike.builder().userId(userId).postId(postId).build());
-            return true; // 좋아요
+            // PostLike 없는 경우, 좋아요만 수행 (좋아요 취소는 수행하지 않음)
+            else if (like) postLikeRepository.save(PostLike.builder().userId(userId).postId(postId).build());
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
