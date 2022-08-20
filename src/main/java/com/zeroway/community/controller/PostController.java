@@ -134,11 +134,11 @@ public class PostController {
      * @param postId 게시글 id
      */
     @PostMapping("/{postId}/bookmark")
-    public ResponseEntity<?> bookmark(@PathVariable Long postId) {
+    public ResponseEntity<?> bookmark(@PathVariable Long postId, @RequestBody BookmarkReq req) {
         try {
             Long userId = jwtService.getUserIdx();
-            boolean bookmark = postService.bookmark(userId, postId);
-            return ResponseEntity.ok().body(new CreateBookmarkRes(bookmark));
+             postService.bookmark(userId, postId, req.isBookmark());
+            return ResponseEntity.ok().build();
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
