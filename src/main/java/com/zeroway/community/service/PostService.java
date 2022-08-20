@@ -101,24 +101,20 @@ public class PostService {
 
     /**
      * 북마크 및 북마크 취소 기능
-     * @return true 북마크, false 북마크 취소
      */
     @Transactional
-    public boolean bookmark(Long userId, Long postId) throws BaseException {
+    public void bookmark(Long userId, Long postId, boolean isBookmark) throws BaseException {
         try {
             Optional<Bookmark> optional = bookmarkRepository.findByUserIdAndPostId(userId, postId);
             if (optional.isPresent()) {
                 Bookmark bookmark = optional.get();
-                if (bookmark.getStatus().equals(StatusType.ACTIVE)) {
-                    optional.get().setStatus(StatusType.INACTIVE);
-                    return false;
+                if (isBookmark) {
+                    bookmark.setStatus(StatusType.ACTIVE);
                 } else {
-                    optional.get().setStatus(StatusType.ACTIVE);
-                    return true;
+                    bookmark.setStatus(StatusType.INACTIVE);
                 }
             }
-            bookmarkRepository.save(Bookmark.builder().userId(userId).postId(postId).build());
-            return true;
+            else if(isBookmark) bookmarkRepository.save(Bookmark.builder().userId(userId).postId(postId).build());
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
