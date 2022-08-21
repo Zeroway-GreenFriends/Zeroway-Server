@@ -7,6 +7,7 @@ import com.zeroway.store.service.StoreReviewService;
 import com.zeroway.store.service.StoreService;
 import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
+import net.minidev.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,7 +65,9 @@ public class StoreController {
     public ResponseEntity<?> getAllReviews(@PathVariable Long storeId) {
         try{
             Long userId = jwtService.getUserIdx();
-            return ResponseEntity.ok().body(storeReviewService.getAllReview(storeId, userId));
+            JSONObject res = new JSONObject();
+            res.put("data", storeReviewService.getAllReview(storeId, userId));
+            return ResponseEntity.ok().body(res);
         } catch(BaseException exception){
             return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
         }
