@@ -10,5 +10,6 @@ public interface StoreReviewRepository
         extends JpaRepository<StoreReview, Long>, StoreReviewRepositoryCustom {
     List<StoreReview> findByStoreId(Long storeId);
     Optional<StoreReview> findByStoreIdAndUserId(Long storeId, Long userId);
+    Long countByStoreId(Long storeId);
 
 }

@@ -1,6 +1,7 @@
 package com.zeroway.store.repository;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.zeroway.common.StatusType;
 import com.zeroway.store.dto.QReviewInfo;
@@ -22,9 +23,22 @@ public class StoreReviewRepositoryImpl implements StoreReviewRepositoryCustom {
         this.queryFactory = new JPAQueryFactory(em);
     }
 
-    // 제로웨이스트샵 리뷰 리스트 조회
+    // 제로웨이스트샵 리뷰 리스트 전체 조회
     @Override
     public List<ReviewInfo> getReviewInfo(Long storeId, Long userId) {
+        return getReviewInfoOrderByCreatedAt(storeId, userId)
+                .fetch();
+    }
+
+    // 제로웨이스트샵 리뷰 리스트 조회 (limit)
+    @Override
+    public List<ReviewInfo> getReviewInfo(Long storeId, Long userId, int size) {
+        return getReviewInfoOrderByCreatedAt(storeId, userId)
+                .limit(size)
+                .fetch();
+    }
+
+    private JPAQuery<ReviewInfo> getReviewInfoOrderByCreatedAt(Long storeId, Long userId) {
         return queryFactory
                 .select(new QReviewInfo(
                         storeReview.id, user.nickname, user.profileImgUrl,
@@ -37,7 +51,8 @@ public class StoreReviewRepositoryImpl implements StoreReviewRepositoryCustom {
                 .join(user).on(storeReview.userId.eq(user.id))
                 .where(
                         storeReview.storeId.eq(storeId)
-                ).fetch();
+                )
+                .orderBy(storeReview.createdAt.desc());
     }
 
     private static BooleanExpression storeReviewLikeActive() {
