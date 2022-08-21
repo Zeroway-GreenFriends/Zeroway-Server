@@ -3,9 +3,11 @@ package com.zeroway.store.controller;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
 import com.zeroway.store.dto.StoreListRes;
+import com.zeroway.store.service.StoreReviewService;
 import com.zeroway.store.service.StoreService;
 import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
+import net.minidev.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +19,7 @@ import java.util.List;
 public class StoreController {
 
     private final StoreService storeService;
+    private final StoreReviewService storeReviewService;
     private final JwtService jwtService;
 
     /**
@@ -43,12 +46,28 @@ public class StoreController {
 
     /**
      * 제로웨이스트샵 상세 조회 API
+     * 리뷰는 4개만 조회한다.
      */
     @GetMapping("/{storeId}")
     public ResponseEntity<?> getStoreDetail(@PathVariable Long storeId) {
         try{
             Long userId = jwtService.getUserIdx();
             return ResponseEntity.ok().body(storeService.getStoreDetail(storeId, userId));
+        } catch(BaseException exception){
+            return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
+        }
+    }
+
+    /**
+     * 제로웨이스트샵 전체 리뷰 조회 API
+     */
+    @GetMapping("/{storeId}/review")
+    public ResponseEntity<?> getAllReviews(@PathVariable Long storeId) {
+        try{
+            Long userId = jwtService.getUserIdx();
+            JSONObject res = new JSONObject();
+            res.put("data", storeReviewService.getAllReview(storeId, userId));
+            return ResponseEntity.ok().body(res);
         } catch(BaseException exception){
             return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
         }

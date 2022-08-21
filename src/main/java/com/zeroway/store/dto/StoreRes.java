@@ -1,12 +1,14 @@
 package com.zeroway.store.dto;
 
-import com.querydsl.core.annotations.QueryProjection;
 import com.zeroway.store.entity.Store;
 import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 제로웨이스트 샵 상세 조회 응답 데이터
+ */
 @Data
 public class StoreRes {
     private String imageUrl;
@@ -21,7 +23,7 @@ public class StoreRes {
     private int reviewCount = 0;
     private List<ReviewInfo> reviewList = new ArrayList<>();
 
-    public StoreRes(Store store, List<ReviewInfo> reviewList) {
+    public StoreRes(Store store, List<ReviewInfo> reviewList, int reviewCount) {
         this.imageUrl = store.getImageUrl();
         this.name = store.getName();
         this.item = store.getItem();
@@ -31,7 +33,7 @@ public class StoreRes {
         this.contact = store.getContact();
         this.siteUrl = store.getSiteUrl();
         this.instagram = store.getInstagram();
-        this.reviewCount = reviewList.size();
+        this.reviewCount = reviewCount;
         this.reviewList.addAll(reviewList);
     }
 

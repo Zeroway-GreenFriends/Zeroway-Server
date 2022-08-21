@@ -2,6 +2,7 @@ package com.zeroway.store.service;
 
 import com.zeroway.common.BaseException;
 import com.zeroway.store.dto.CreateReviewReq;
+import com.zeroway.store.dto.ReviewInfo;
 import com.zeroway.store.entity.Store;
 import com.zeroway.store.entity.StoreReview;
 import com.zeroway.store.repository.StoreRepository;
@@ -48,6 +49,16 @@ public class StoreReviewService {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    // 제로웨이스트샵 전체 리뷰 조회
+    public List<ReviewInfo> getAllReview(Long storeId, Long userId) throws BaseException {
+        try {
+            return storeReviewRepository.getReviewInfo(storeId, userId);
+        } catch (Exception e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 
     // 제로웨이스트 샵 평균 별점 갱신
     private void updateAvgScore(Long storeId) throws BaseException {

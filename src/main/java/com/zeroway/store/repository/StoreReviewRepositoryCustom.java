@@ -7,4 +7,5 @@ import java.util.List;
 public interface StoreReviewRepositoryCustom {
 
     List<ReviewInfo> getReviewInfo(Long storeId, Long userId);
+    List<ReviewInfo> getReviewInfo(Long storeId, Long userId, int size);
 }
