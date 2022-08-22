@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.zeroway.common.BaseResponseStatus.DATABASE_ERROR;
+import static com.zeroway.common.BaseResponseStatus.INVALID_ANNOUNCE_ID;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +37,7 @@ public class AnnounceService {
         try {
             Optional<Announce> findAnnounce = announceRepository.findById(announceId);
             if(findAnnounce.isEmpty()) {
-                throw new BaseException(DATABASE_ERROR);
+                throw new BaseException(INVALID_ANNOUNCE_ID);
             }
             else return new AnnounceRes(findAnnounce.get().getTitle(), findAnnounce.get().getContent(), findAnnounce.get().getCreatedAt());
         } catch (BaseException e) {

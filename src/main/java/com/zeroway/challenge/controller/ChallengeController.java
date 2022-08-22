@@ -61,7 +61,7 @@ public class ChallengeController {
     @PatchMapping("/{challenge_id}/complete")
     public ResponseEntity<?> patchChallengeComplete(@PathVariable ("challenge_id") Long challengeId) {
         try{
-            ChallengeCompleteRes ChallengeCompleteRes = challengeService.patchChallengeComplete(jwtService.getUserIdx(), challengeId, 10);
+            ChallengeCompleteRes ChallengeCompleteRes = challengeService.patchChallengeComplete(jwtService.getUserIdx(), challengeId, 20);
             return ResponseEntity.ok().body(ChallengeCompleteRes);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getMessage()));

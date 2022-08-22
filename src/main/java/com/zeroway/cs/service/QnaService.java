@@ -19,8 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.zeroway.common.BaseResponseStatus.DATABASE_ERROR;
-import static com.zeroway.common.BaseResponseStatus.INVALID_QNA_ID;
+import static com.zeroway.common.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -70,7 +69,7 @@ public class QnaService {
                 }
             }
         } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
+            throw new BaseException(FILE_UPLOAD_ERROR);
         }
     }
 
