@@ -41,6 +41,10 @@ public enum BaseResponseStatus {
 
     INVALID_ANNOUNCE_ID(false, 2500, "잘못된 공지 사항 식별자입니다."),
 
+    INVALID_LEVEL_ID(false, 2600, "존재하지 않는 레벨입니다."),
+
+
+
     /**
      * 3000 : Response 오류
      */
