@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 
-
 @Repository
 public interface UserChallengeRepository extends JpaRepository<User_Challenge, Long> {
 
@@ -24,4 +23,8 @@ public interface UserChallengeRepository extends JpaRepository<User_Challenge, L
 
     @Query("select uc from User_Challenge uc left join uc.challenge c where uc.user.id = :userId and c.level.id = :userLevel")
     List<User_Challenge> findByChallengeList(@Param("userId") Long userId, @Param("userLevel") Integer userLevel);
+
+    List<User_Challenge> findByUser_Id(Long userId);
+    void deleteByUser_Id(Long userId);
+
 }

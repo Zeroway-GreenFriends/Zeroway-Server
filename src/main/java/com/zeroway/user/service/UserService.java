@@ -112,6 +112,7 @@ public class UserService {
         return PostUserRes.builder()
                 .refreshToken(refreshJwt)
                 .accessToken(accessJwt)
+                .profileImgUrl(user.getProfileImgUrl())
                 .build();
     }
 
@@ -158,6 +159,7 @@ public class UserService {
             User user = userRepository.findById(userIdx).get();
 
             user.signout("알 수 없음", "email@gmail.com", null, null, levelRepository.findById(1).get(), StatusType.INACTIVE);
+            userChallengeRepository.deleteByUser_Id(userIdx);
             return user;
         } catch (BaseException e) {
             e.printStackTrace();
