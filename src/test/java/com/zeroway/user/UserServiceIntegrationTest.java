@@ -3,6 +3,7 @@ package com.zeroway.user;
 import com.github.dozermapper.core.Mapper;
 import com.zeroway.challenge.entity.Challenge;
 import com.zeroway.challenge.entity.Level;
+import com.zeroway.challenge.entity.User_Challenge;
 import com.zeroway.challenge.repository.ChallengeRepository;
 import com.zeroway.challenge.repository.LevelRepository;
 import com.zeroway.challenge.repository.UserChallengeRepository;
@@ -66,6 +67,7 @@ public class UserServiceIntegrationTest {
 
     }
 
+    // test용 유저
     Optional<User> createUser() {
         return Optional.ofNullable(User.builder()
                 .id(1L)
@@ -73,11 +75,15 @@ public class UserServiceIntegrationTest {
                 .email("test")
                 .nickname("예지테스트한다")
                 .provider(ProviderType.valueOf("KAKAO"))
+                .level(levelRepository.findById(1).get())
+                .profileImgUrl("https://zeroway.s3.ap-northeast-2.amazonaws.com/userProfile/5b31ec29-854f-4744-85af-384797423fc3_IMG_20220810_162950.jpg")
                 .build());
     }
 
     private Long createRequestJWT() {
-        Long userId = userRepository.findByEmail("testYeji@test.com").get().getId();
+        User user = createUser().get();
+        userRepository.save(user);
+        Long userId = userRepository.findByEmail(user.getEmail()).get().getId();
         String accessToken = jwtService.createAccessToken(userId);
 
         request = new MockHttpServletRequest();
@@ -146,16 +152,27 @@ public class UserServiceIntegrationTest {
         assertThat(userChallengeRepository.findByChallenge_Id(save1.getId()).getChallenge().getLevel().getId()).isEqualTo(1);
     }
 
-    @DisplayName("회원 탈퇴 성공")
+    @DisplayName("회원 탈퇴 성공: 유저 테이블, 유저 챌린지 테이블")
     @Test
     void signoutO() throws BaseException {
         Long userId = this.createRequestJWT();
+        // 유저챌린지 테이블 데이터 생성
+        userChallengeRepository.save(User_Challenge.builder()
+                .user(userRepository.findById(userId).get())
+                .challenge(challengeRepository.findAll().get(0))
+                .build());
+        userChallengeRepository.save(User_Challenge.builder()
+                .user(userRepository.findById(userId).get())
+                .challenge(challengeRepository.findAll().get(1))
+                .build());
+        assertThat(userChallengeRepository.findByUser_Id(userId).size()).isEqualTo(2);
 
         User signoutUser = userService.signout();
 
         assertThat(signoutUser.getId()).isEqualTo(userId);
         assertThat(signoutUser.getEmail()).isEqualTo("email@gmail.com");
         assertThat(signoutUser.getRefreshToken()).isNull();
+        assertThat(userChallengeRepository.findByUser_Id(userId).size()).isEqualTo(0);
     }
 
     @DisplayName("회원 정보 수정 성공 : 프로필 & 닉네임")
