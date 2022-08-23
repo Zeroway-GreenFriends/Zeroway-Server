@@ -112,6 +112,7 @@ public class UserService {
         return PostUserRes.builder()
                 .refreshToken(refreshJwt)
                 .accessToken(accessJwt)
+                .profileImgUrl(user.getProfileImgUrl())
                 .build();
     }
 
