@@ -21,4 +21,7 @@ public interface UserChallengeRepository extends JpaRepository<User_Challenge, L
     List<User_Challenge> findTodayChallenge(@Param("userId") Long userId, @Param("userLevel") Integer userLevel, @Param("todayLdt") LocalDateTime todayLdt);
 
     User_Challenge findByChallenge_Id(Long challengeId);
+
+    @Query("select uc from User_Challenge uc left join uc.challenge c where uc.user.id = :userId and c.level.id = :userLevel")
+    List<User_Challenge> findByChallengeList(@Param("userId") Long userId, @Param("userLevel") Integer userLevel);
 }

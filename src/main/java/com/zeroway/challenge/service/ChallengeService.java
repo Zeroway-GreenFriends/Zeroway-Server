@@ -50,7 +50,7 @@ public class ChallengeService {
         }
     }
 
-    public List<ChallengeListRes> getChallengeList(long userId, Integer size) throws BaseException{
+    public List<ChallengeListRes> getTodayChallengeList(long userId, Integer size) throws BaseException{
         List<User_Challenge> todayChallenge = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
         User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_USER_ID));
@@ -69,6 +69,15 @@ public class ChallengeService {
         }
 
         return todayChallenge.stream()
+                .map(uc -> new ChallengeListRes(uc.getChallenge().getId(), uc.getChallenge().getContent(), uc.isComplete()))
+                .collect(Collectors.toList());
+    }
+
+    public List<ChallengeListRes> getChallengeList(Long userId) throws BaseException{
+        User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_USER_ID));
+        List<User_Challenge> challengeList = userChallengeRepository.findByChallengeList(userId, user.getLevel().getId());
+
+        return challengeList.stream()
                 .map(uc -> new ChallengeListRes(uc.getChallenge().getId(), uc.getChallenge().getContent(), uc.isComplete()))
                 .collect(Collectors.toList());
     }
@@ -122,4 +131,5 @@ public class ChallengeService {
             }
         }
     }
+
 }
