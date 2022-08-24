@@ -3,18 +3,27 @@ package com.zeroway.utils;
 import com.zeroway.common.BaseException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 
 import java.security.Key;
+import java.time.Duration;
 import java.util.Date;
 
 import static com.zeroway.common.BaseResponseStatus.*;
 
 @Service
 public class JwtService {
+
+    private RedisService redisService;
+
+    @Autowired
+    public JwtService(RedisService redisService) {
+        this.redisService = redisService;
+    }
 
     private final int accessTokenMs = 1000 * 60 * 60;   // 1시간
     private final int refreshTokenMs = 1000 * 60 * 60 * 24 * 7;    // 1주
@@ -38,11 +47,13 @@ public class JwtService {
 
     public String createRefreshToken(Long userId) {
         Date now = new Date();
-        return Jwts.builder()
+        String refreshToken = Jwts.builder()
                 .setHeaderParam("type","jwt")
                 .setExpiration(new Date(now.getTime() + refreshTokenMs))
                 .signWith(key)
                 .compact();
+        redisService.setValues(String.valueOf(userId), refreshToken, Duration.ofMillis(refreshTokenMs));
+        return refreshToken;
     }
 
     public String createExpiredTokenTest() {
@@ -99,5 +110,22 @@ public class JwtService {
         }
 
         return claims;
+    }
+
+    /**
+     * redis 내에 토큰값 일치 여부 확인
+     */
+    public void checkRefreshTokenByRedis(Long userId, String refreshReq) throws BaseException {
+        String redisRefresh = redisService.getValues(String.valueOf(userId));
+        if (!redisRefresh.equals(refreshReq)) {
+            throw new BaseException(INVALID_JWT);
+        }
+    }
+
+    /**
+     * refreshToken 삭제
+     */
+    public void deleteRefreshToken(Long userId) throws BaseException {
+        redisService.deleteValues(String.valueOf(userId));
     }
 }

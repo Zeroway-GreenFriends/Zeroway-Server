@@ -2,10 +2,7 @@ package com.zeroway.user.controller;
 
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
-import com.zeroway.user.dto.PatchUserInfo;
-import com.zeroway.user.dto.PostUserAuthLoginReq;
-import com.zeroway.user.dto.SignInAuthReq;
-import com.zeroway.user.dto.PostUserRes;
+import com.zeroway.user.dto.*;
 import com.zeroway.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -75,9 +72,9 @@ public class UserController {
      * 액세스 토큰 재발급
      */
     @PostMapping("/auth/refresh")
-    public ResponseEntity<BaseResponse<String>> authRefresh() {
+    public ResponseEntity<BaseResponse<String>> authRefresh(@RequestBody PostRefreshReq postRefreshReq) {
         try {
-            String accessToken = userService.refreshToken();
+            String accessToken = userService.refreshToken(postRefreshReq.getEmail());
             return ResponseEntity.ok().body(new BaseResponse<>(accessToken));
         } catch (BaseException e) {
             e.printStackTrace();
