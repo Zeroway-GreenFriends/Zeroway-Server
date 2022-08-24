@@ -21,10 +21,10 @@ public class Store extends BaseEntity {
     @Column(length = 100, nullable = false)
     private String name;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 100)
     private String addressNew;
 
-    @Column(length = 100, nullable = false)
+    @Column(length = 100)
     private String addressOld;
 
     // 경도
@@ -62,5 +62,9 @@ public class Store extends BaseEntity {
 
     public void setScoreAvg(Double scoreAvg) {
         this.scoreAvg = scoreAvg;
+    }
+
+    public Store(String name) {
+        this.name = name;
     }
 }
