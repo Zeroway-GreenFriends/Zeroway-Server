@@ -2,7 +2,7 @@ package com.zeroway.community.controller;
 
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
-import com.zeroway.community.dto.CreateLikeRes;
+import com.zeroway.community.dto.LikeReq;
 import com.zeroway.community.service.CommentService;
 import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +25,11 @@ public class CommentController {
      * @param commentId 댓글 id
      */
     @PostMapping("/{commentId}/like")
-    public ResponseEntity<?> like(@PathVariable Long commentId) {
+    public ResponseEntity<?> like(@PathVariable Long commentId, @RequestBody LikeReq req) {
         try {
             Long userId = jwtService.getUserIdx();
-            boolean like = commentService.like(userId, commentId);
-            return ResponseEntity.ok().body(new CreateLikeRes(like));
+            commentService.like(userId, commentId, req.isLike());
+            return ResponseEntity.ok().build();
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
