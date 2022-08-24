@@ -2,6 +2,7 @@ package com.zeroway.store.service;
 
 import com.zeroway.challenge.repository.LevelRepository;
 import com.zeroway.store.dto.CreateReviewReq;
+import com.zeroway.store.entity.Store;
 import com.zeroway.store.entity.StoreReview;
 import com.zeroway.store.repository.StoreRepository;
 import com.zeroway.store.repository.StoreReviewRepository;
@@ -41,8 +42,10 @@ class StoreReviewServiceTest {
         User user = userRepository.save(new User(1L, "a@test.com", "이름", ProviderType.GOOGLE, null, levelRepository.findById(1).get(), 0));
 
         // 리뷰
+
+        Store store = storeRepository.save(new Store("상점"));
         CreateReviewReq req = new CreateReviewReq();
-        req.setStoreId(1L);
+        req.setStoreId(store.getId());
         req.setScore(4.5);
         req.setContent("정말 친절하고 좋아요!");
 
@@ -51,7 +54,7 @@ class StoreReviewServiceTest {
 
         // then
         StoreReview storeReview = storeReviewRepository.findById(reviewId).get();
-        assertThat(storeReview.getStoreId()).isEqualTo(1L);
+        assertThat(storeReview.getStoreId()).isEqualTo(store.getId());
         assertThat(storeReview.getScore()).isEqualTo(4.5);
         assertThat(storeReview.getUserId()).isEqualTo(user.getId());
         assertThat(storeReview.getContent()).isEqualTo("정말 친절하고 좋아요!");
