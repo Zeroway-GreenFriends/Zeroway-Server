@@ -33,8 +33,6 @@ public class User extends BaseEntity {
 
     private String profileImgUrl;
 
-    private String refreshToken;
-
     // 캐릭터 레벨
     @ManyToOne(optional = false)
     @JoinColumn(name = "level_id")
@@ -45,11 +43,10 @@ public class User extends BaseEntity {
     @Builder.Default
     private Integer exp = 0;
 
-    public void signout(String nickname, String email, String profileImgUrl, String refreshToken, Level level, StatusType statusType) {
+    public void signout(String nickname, String email, String profileImgUrl, Level level, StatusType statusType) {
         this.nickname = nickname;
         this.email = email;
         this.profileImgUrl = profileImgUrl;
-        this.refreshToken = refreshToken;
         this.level = level;
         this.setStatus(statusType);
     }

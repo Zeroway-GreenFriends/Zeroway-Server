@@ -105,9 +105,7 @@ public class UserService {
         String refreshJwt = jwtService.createRefreshToken(user.getId());
         String accessJwt = jwtService.createAccessToken(user.getId());
 
-        user.setRefreshToken(refreshJwt);
         user.setStatus(StatusType.ACTIVE);
-        userRepository.save(user);
 
         return PostUserRes.builder()
                 .refreshToken(refreshJwt)
@@ -119,17 +117,20 @@ public class UserService {
     /**
     액세스토큰 재발급
      */
-    public String refreshToken() throws BaseException {
+    public String refreshToken(String email) throws BaseException {
+        // refresh 만료 확인
         jwtService.expireToken();
         String refreshToken = jwtService.getToken();
 
-        Optional<User> optionalUser = userRepository.findByRefreshToken(refreshToken);
+        Optional<User> optionalUser = userRepository.findByEmail(email);
         Long userIdx;
 
         if (optionalUser.isEmpty()) {
             throw new BaseException(REQUEST_ERROR);
         } else {
             userIdx = optionalUser.get().getId();
+            // redis 토큰값 일치 확인
+            jwtService.checkRefreshTokenByRedis(userIdx, refreshToken);
         }
 
         return jwtService.createAccessToken(userIdx);
@@ -144,7 +145,7 @@ public class UserService {
             Long userIdx = jwtService.getUserIdx();
             User user = userRepository.findById(userIdx).get();
             user.setStatus(StatusType.LOGOUT);
-            user.setRefreshToken(null);
+            jwtService.deleteRefreshToken(userIdx);
         } catch (BaseException e) {
             throw new BaseException(DATABASE_ERROR);
         }
@@ -158,7 +159,8 @@ public class UserService {
             Long userIdx = jwtService.getUserIdx();
             User user = userRepository.findById(userIdx).get();
 
-            user.signout("알 수 없음", "email@gmail.com", null, null, levelRepository.findById(1).get(), StatusType.INACTIVE);
+            user.signout("알 수 없음", "email@gmail.com", null, levelRepository.findById(1).get(), StatusType.INACTIVE);
+            jwtService.deleteRefreshToken(userIdx);
             userChallengeRepository.deleteByUser_Id(userIdx);
             return user;
         } catch (BaseException e) {
