@@ -51,7 +51,6 @@ public class UserServiceMockTest {
     Optional<User> createUser() {
         return Optional.ofNullable(User.builder()
                 .id(1L)
-                .refreshToken(yejiReToken)
                 .email("test@test")
                 .nickname("예지테스트")
                 .provider(ProviderType.valueOf("KAKAO"))
@@ -62,20 +61,12 @@ public class UserServiceMockTest {
     @Test
     void signUpMapping() throws BaseException {
         mapper = DozerBeanMapperBuilder.buildDefault();
-        jwtService = new JwtService();
 
         // given
         SignInAuthReq request = signInAuthReq();
         User user = mapper.map(request, User.class);
 
         assertThat(user.getEmail()).isEqualTo(request.getEmail());
-
-        String refreshToken = jwtService.createRefreshToken(user.getId());
-        user = User.builder()
-                .refreshToken(refreshToken)
-                .build();
-
-        assertThat(user.getRefreshToken()).isEqualTo(refreshToken);
     }
 
     private SignInAuthReq signInAuthReq() {
@@ -131,10 +122,10 @@ public class UserServiceMockTest {
         Optional<User> user = createUser();
 
         // given : 리프레시토큰
-        when(userRepository.findByRefreshToken(any())).thenReturn(user);
+        when(userRepository.findByEmail(any())).thenReturn(user);
 
         // when
-        String access = userService.refreshToken();
+        String access = userService.refreshToken(user.get().getEmail());
 
         // then : 액세스토큰
         verify(jwtService, times(1)).expireToken();

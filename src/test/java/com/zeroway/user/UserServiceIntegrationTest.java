@@ -17,6 +17,7 @@ import com.zeroway.user.entity.User;
 import com.zeroway.user.repository.UserRepository;
 import com.zeroway.user.service.UserService;
 import com.zeroway.utils.JwtService;
+import com.zeroway.utils.RedisService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -55,6 +56,8 @@ public class UserServiceIntegrationTest {
     ChallengeRepository challengeRepository;
     @Autowired
     UserChallengeRepository userChallengeRepository;
+    @Autowired
+    RedisService redisService;
     @Mock
     private MockHttpServletRequest request;
 
@@ -71,7 +74,6 @@ public class UserServiceIntegrationTest {
     Optional<User> createUser() {
         return Optional.ofNullable(User.builder()
                 .id(1L)
-                .refreshToken("yejiReToken")
                 .email("test")
                 .nickname("예지테스트한다")
                 .provider(ProviderType.valueOf("KAKAO"))
@@ -98,12 +100,12 @@ public class UserServiceIntegrationTest {
     void loginO() throws BaseException {
         Optional<User> user = createUser();
         user.get().setLevel(levelRepository.findById(1).get());
-        userRepository.save(user.get());
+        User user1 = userRepository.save(user.get());
 
         PostUserRes login = userService.login(user.get().getEmail());
 
         assertThat(login).isNotNull();
-        assertThat(user.get().getEmail()).isEqualTo(userRepository.findByRefreshToken(login.getRefreshToken()).get().getEmail());
+        assertThat(login.getRefreshToken()).isEqualTo(redisService.getValues(String.valueOf(user1.getId())));
     }
 
     @DisplayName("기존 회원 재로그인 시 : 기존 레벨 유지")
@@ -119,8 +121,8 @@ public class UserServiceIntegrationTest {
 
         PostUserRes login = userService.login(sign.getEmail());
 
-        Optional<User> byRefreshToken = userRepository.findByRefreshToken(login.getRefreshToken());
-        assertThat(byRefreshToken.get().getLevel()).isEqualTo(twoLevel);
+        User user = userRepository.findByEmail(sign.getEmail()).get();
+        assertThat(user.getLevel()).isEqualTo(twoLevel);
     }
 
     @DisplayName("유저 회원가입 성공: 유저챌린지 테이블 삽입 확인")
@@ -128,7 +130,6 @@ public class UserServiceIntegrationTest {
     void signInO() throws BaseException {
         SignInAuthReq sign = signInAuthReq();
         User user = mapper.map(sign, User.class);
-        user.setRefreshToken("yejiReToken");
         MultipartFile multipartFile = null;
 
         Level levelOne = levelRepository.findById(1).get();
@@ -171,7 +172,7 @@ public class UserServiceIntegrationTest {
 
         assertThat(signoutUser.getId()).isEqualTo(userId);
         assertThat(signoutUser.getEmail()).isEqualTo("email@gmail.com");
-        assertThat(signoutUser.getRefreshToken()).isNull();
+        assertThat(redisService.getValues(String.valueOf(signoutUser.getId()))).isNull();
         assertThat(userChallengeRepository.findByUser_Id(userId).size()).isEqualTo(0);
     }
 
@@ -289,6 +290,6 @@ public class UserServiceIntegrationTest {
 
         // status, token
         assertThat(user.getStatus()).isEqualTo(StatusType.LOGOUT);
-        assertThat(user.getRefreshToken()).isNull();
+        assertThat(redisService.getValues(String.valueOf(user.getId()))).isNull();
     }
 }
