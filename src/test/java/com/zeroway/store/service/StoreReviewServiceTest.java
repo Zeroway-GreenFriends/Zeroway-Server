@@ -38,7 +38,7 @@ class StoreReviewServiceTest {
 
         // given
         // 회원
-        User user = userRepository.save(new User(1L, "a@test.com", "이름", ProviderType.GOOGLE, null, null, levelRepository.findById(1).get(), 0));
+        User user = userRepository.save(new User(1L, "a@test.com", "이름", ProviderType.GOOGLE, null, levelRepository.findById(1).get(), 0));
 
         // 리뷰
         CreateReviewReq req = new CreateReviewReq();

@@ -3,7 +3,7 @@ package com.zeroway.post;
 import com.zeroway.challenge.repository.LevelRepository;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
-import com.zeroway.community.dto.GetPostByUserRes;
+//import com.zeroway.community.dto.GetPostByUserRes;
 import com.zeroway.community.entity.Bookmark;
 import com.zeroway.community.entity.Comment;
 import com.zeroway.community.entity.Post;
@@ -151,6 +151,7 @@ public class PostServiceIntegrationTest {
 
     }
 
+    /*
     @DisplayName("내가 쓴 글 조회")
     @Test
     void post() throws BaseException {
@@ -189,4 +190,5 @@ public class PostServiceIntegrationTest {
         assertThat(getPostByUserRes.get(3).getImgCount()).isEqualTo(0);
         assertThat(getPostByUserRes.get(0).isScraped()).isFalse();
     }
+    */
 }
