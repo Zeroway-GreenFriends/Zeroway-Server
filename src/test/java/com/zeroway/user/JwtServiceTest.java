@@ -4,6 +4,7 @@ import com.zeroway.common.BaseException;
 import com.zeroway.user.entity.ProviderType;
 import com.zeroway.user.entity.User;
 import com.zeroway.utils.JwtService;
+import com.zeroway.utils.RedisService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -36,10 +37,12 @@ public class JwtServiceTest {
 
     @Spy
     @InjectMocks
-    private JwtService jwtService = new JwtService();
+    private JwtService jwtService;
 
     @Mock
     private MockHttpServletRequest request;
+    @Mock
+    private RedisService redisService;
 
     @Test
     @DisplayName("만료된 토큰 검증")
@@ -57,7 +60,6 @@ public class JwtServiceTest {
 
         Optional<User> user = Optional.ofNullable(User.builder()
                 .id(1L)
-                .refreshToken(refreshToken)
                 .email("test")
                 .nickname("t")
                 .provider(ProviderType.valueOf("KAKAO"))
