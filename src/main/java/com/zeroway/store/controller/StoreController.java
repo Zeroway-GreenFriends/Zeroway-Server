@@ -3,11 +3,9 @@ package com.zeroway.store.controller;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
 import com.zeroway.store.dto.StoreListRes;
-import com.zeroway.store.service.StoreReviewService;
 import com.zeroway.store.service.StoreService;
 import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
-import net.minidev.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,12 +17,11 @@ import java.util.List;
 public class StoreController {
 
     private final StoreService storeService;
-    private final StoreReviewService storeReviewService;
     private final JwtService jwtService;
 
     /**
      * 제로웨이스트샵 리스트 API
-     * @return 제로웨이스트샵(id, imageUrl, name, item, scoreAvg, addressNew, operatingTime, contact, siteUrl, instagram)
+     * @return 제로웨이스트샵(id, imageUrl, name, item, addressNew, operatingTime, contact, siteUrl, instagram, description)
      */
     @GetMapping("/list")
     public ResponseEntity<?> getStoreList(@RequestParam(required = false) String keyword,
@@ -46,28 +43,13 @@ public class StoreController {
 
     /**
      * 제로웨이스트샵 상세 조회 API
-     * 리뷰는 4개만 조회한다.
+     * @param storeId
+     * @return 이미지 url, 이름, 품목, 주소, 운영시간, 전화번호, 사이트 url, 인스타그램, 설명(제로웨이스트 실천 내용 포함)
      */
     @GetMapping("/{storeId}")
     public ResponseEntity<?> getStoreDetail(@PathVariable Long storeId) {
         try{
-            Long userId = jwtService.getUserIdx();
-            return ResponseEntity.ok().body(storeService.getStoreDetail(storeId, userId));
-        } catch(BaseException exception){
-            return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
-        }
-    }
-
-    /**
-     * 제로웨이스트샵 전체 리뷰 조회 API
-     */
-    @GetMapping("/{storeId}/review")
-    public ResponseEntity<?> getAllReviews(@PathVariable Long storeId) {
-        try{
-            Long userId = jwtService.getUserIdx();
-            JSONObject res = new JSONObject();
-            res.put("data", storeReviewService.getAllReview(storeId, userId));
-            return ResponseEntity.ok().body(res);
+            return ResponseEntity.ok().body(storeService.getStoreDetail(storeId));
         } catch(BaseException exception){
             return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
         }
