@@ -1,6 +1,7 @@
 package com.zeroway.community.repository.post;
 
 import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -30,20 +31,29 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
     /**
      * 게시글 전체 목록 조회
-     * @param userId 회원 id (좋아요 여부, 북마크 여부)
-     * @param sort 정렬 기준
+     *
+     * @param userId    회원 id (좋아요 여부, 북마크 여부)
+     * @param sort      정렬 기준
+     * @param challenge 챌린지 인증 여부
+     * @param review    리뷰 여부
+     * @param page      페이지
+     * @param size      개수
      */
     @Override
-    public List<PostListRes> getPostList(Long userId, String sort) {
+    public List<PostListRes> getPostList(Long userId, String sort, Boolean challenge, Boolean review, int page, int size) {
         if(sort.equals("createdAt")) {  // 최신순 조회
-            return getPostListResJPAQuery(userId)
+            return getPostListResJPAQuery(userId, challenge, review)
                     .orderBy(post.createdAt.desc())
+                    .offset((long) (page - 1) * size)
+                    .limit(size)
                     .fetch();
         } else {  // 인기순 조회
             // alias 설정
             NumberPath<Long> postLikeCount = Expressions.numberPath(Long.class, "postLikeCount");
-            return getPostListResJPAQuery(userId)
+            return getPostListResJPAQuery(userId, challenge, review)
                     .orderBy(postLikeCount.desc())
+                    .offset((long) (page - 1) * size)
+                    .limit(size)
                     .fetch();
         }
     }
@@ -58,7 +68,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
         return queryFactory
                 .select(
                     new QPostRes(
-                            post.id, user.nickname, user.profileImgUrl, post.content, post.challenge,
+                            post.id, user.nickname, user.profileImgUrl, post.content, post.challenge, post.review,
                             calculateWeeksAgo(post.createdAt), // 몇 주 전인지 계산
                             postLikeCount(),
                             commentCount(),
@@ -90,10 +100,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
 
 
     // 게시글 조회 jpa query - 정렬 적용 전
-    private JPAQuery<PostListRes> getPostListResJPAQuery(Long userId) {
+    private JPAQuery<PostListRes> getPostListResJPAQuery(Long userId, Boolean challenge, Boolean review) {
         return queryFactory
                 .select(new QPostListRes(
-                        post.id, post.content, post.challenge,
+                        post.id, post.content, post.challenge, post.review,
                         user.nickname, user.profileImgUrl,
                         ExpressionUtils.as( // 좋아요 개수 서브 쿼리
                                 postLikeCount(), "postLikeCount"
@@ -104,7 +114,19 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 ))
                 .from(post)
                 .leftJoin(user).on(post.userId.eq(user.id))
-                .where(post.status.eq(StatusType.ACTIVE));
+                .where(
+                        post.status.eq(StatusType.ACTIVE),
+                        challengeFilter(challenge),
+                        reviewFilter(review)
+                );
+    }
+
+    private static Predicate reviewFilter(Boolean review) {
+        return review != null && review ? post.review.eq(true) : null;
+    }
+
+    private static Predicate challengeFilter(Boolean challenge) {
+        return challenge != null && challenge ? post.challenge.eq(true) : null;
     }
 
     // 좋아요 개수 쿼리

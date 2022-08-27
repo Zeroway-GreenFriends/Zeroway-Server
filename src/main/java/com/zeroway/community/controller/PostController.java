@@ -36,11 +36,19 @@ public class PostController {
      * 커뮤니티 글 전체 목록 조회 API
      */
     @GetMapping("/list")
-    public ResponseEntity<?> getPostList(@RequestParam(defaultValue = "createdAt") String sort) {
+    public ResponseEntity<?> getPostList(@RequestParam(defaultValue = "createdAt") String sort,
+                                         @RequestParam(required = false) Boolean challenge,
+                                         @RequestParam(required = false) Boolean review,
+                                         @RequestParam(defaultValue = "1") int page,
+                                         @RequestParam(defaultValue = "30") int size) {
         try {
             if (sortColumns.contains(sort)) {
                 Long userId = jwtService.getUserIdx();
-                List<PostListRes> postList = postService.getPostList(userId, sort);
+                System.out.println("challenge = " + challenge);
+                System.out.println("review = " + review);
+                System.out.println("page = " + page);
+                System.out.println("size = " + size);
+                List<PostListRes> postList = postService.getPostList(userId, sort, challenge, review, page, size);
                 JSONObject res = new JSONObject();
                 res.put("data", postList);
                 return ResponseEntity.ok().body(res);

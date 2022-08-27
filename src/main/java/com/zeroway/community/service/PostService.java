@@ -40,10 +40,10 @@ public class PostService {
 
 
     // 전체 글 조회
-    public List<PostListRes> getPostList(Long userId, String sort) throws BaseException {
+    public List<PostListRes> getPostList(Long userId, String sort, Boolean challenge, Boolean review, int page, int size) throws BaseException {
         List<PostListRes> result = new ArrayList<>();
         try {
-            for (PostListRes post : postRepository.getPostList(userId, sort)) {
+            for (PostListRes post : postRepository.getPostList(userId, sort, challenge, review, page, size)) {
                 Long postId = post.getPostId();
                 // 게시글 이미지 조회
                 post.getImageList().addAll(postImageRepository.findUrlByPostId(postId));
@@ -86,7 +86,12 @@ public class PostService {
     public void createPost(CreatePostReq req, @Nullable List<MultipartFile> images, Long userId) throws BaseException {
         try {
             // post 저장
-            Post savedPost = postRepository.save(Post.builder().userId(userId).content(req.getContent()).challenge(req.isChallenge()).build());
+            Post savedPost = postRepository.save(Post.builder()
+                    .userId(userId)
+                    .content(req.getContent())
+                    .challenge(req.isChallenge())
+                    .review(req.isReview())
+                    .build());
 
             // 이미지 파일 업로드 및 postImage 저장
             if(images != null)
