@@ -27,14 +27,6 @@ public class Store extends BaseEntity {
     @Column(length = 100)
     private String addressOld;
 
-    // 경도
-    @Column(name = "coord_x")
-    private Double coordX;
-
-    // 위도
-    @Column(name = "coord_y")
-    private Double coordY;
-
     // 연락처
     @Column(length = 13)
     private String contact;
@@ -54,14 +46,20 @@ public class Store extends BaseEntity {
     // 취급품목
     private String item;
 
-    // 제로웨이스트 실천 내용
-    private String practice;
+    // 소개 및 제로웨이스트 실천 내용
+    private String description;
 
-    // 평균 별점
-    private Double scoreAvg;
-
-    public void setScoreAvg(Double scoreAvg) {
-        this.scoreAvg = scoreAvg;
+    public Store(String name, String addressNew, String addressOld, String contact, String siteUrl, String instagram, String imageUrl, String operatingTime, String item, String description) {
+        this.name = name;
+        this.addressNew = addressNew;
+        this.addressOld = addressOld;
+        this.contact = contact;
+        this.siteUrl = siteUrl;
+        this.instagram = instagram;
+        this.imageUrl = imageUrl;
+        this.operatingTime = operatingTime;
+        this.item = item;
+        this.description = description;
     }
 
     public Store(String name) {

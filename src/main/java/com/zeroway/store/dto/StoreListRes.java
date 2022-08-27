@@ -11,7 +11,6 @@ public class StoreListRes {
     private String imageUrl;
     private String name;
     private String item;
-    private Double scoreAvg;
     private String addressNew;
     private String operatingTime;
     private String contact;
