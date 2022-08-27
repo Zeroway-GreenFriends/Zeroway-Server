@@ -40,7 +40,7 @@ public class PostService {
 
 
     // 전체 글 조회
-    public List<PostListRes> getPostList(Long userId, String sort, Boolean challenge, Boolean review, int page, int size) throws BaseException {
+    public List<PostListRes> getPostList(Long userId, String sort, Boolean challenge, Boolean review, long page, long size) throws BaseException {
         List<PostListRes> result = new ArrayList<>();
         try {
             for (PostListRes post : postRepository.getPostList(userId, sort, challenge, review, page, size)) {

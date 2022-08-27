@@ -40,11 +40,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
      * @param size      개수
      */
     @Override
-    public List<PostListRes> getPostList(Long userId, String sort, Boolean challenge, Boolean review, int page, int size) {
+    public List<PostListRes> getPostList(Long userId, String sort, Boolean challenge, Boolean review, long page, long size) {
         if(sort.equals("createdAt")) {  // 최신순 조회
             return getPostListResJPAQuery(userId, challenge, review)
                     .orderBy(post.createdAt.desc())
-                    .offset((long) (page - 1) * size)
+                    .offset((page - 1) * size)
                     .limit(size)
                     .fetch();
         } else {  // 인기순 조회
@@ -52,7 +52,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
             NumberPath<Long> postLikeCount = Expressions.numberPath(Long.class, "postLikeCount");
             return getPostListResJPAQuery(userId, challenge, review)
                     .orderBy(postLikeCount.desc())
-                    .offset((long) (page - 1) * size)
+                    .offset((page - 1) * size)
                     .limit(size)
                     .fetch();
         }
