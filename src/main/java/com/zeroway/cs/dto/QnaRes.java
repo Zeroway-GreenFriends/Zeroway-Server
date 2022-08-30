@@ -12,7 +12,7 @@ public class QnaRes {
     private String question;
     private String answer;
 
-    public QnaRes(String type, String question, List<String> imgList, String answer) {
+    public QnaRes(String type, String question, String answer) {
         this.type = type;
         this.question = question;
         this.answer = answer;
