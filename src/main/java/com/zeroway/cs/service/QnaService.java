@@ -56,6 +56,17 @@ public class QnaService {
         }
     }
 
+    public void createQna(QnaReq qnaReq, Long userId) throws BaseException{
+        try {
+            TypeOfQuestion type = TypeOfQuestion.enumOf(qnaReq.getType());
+            QnA qna = qnaRepository.save(QnA.builder()
+                    .typeOfQuestion(type).question(qnaReq.getQuestion()).userId(userId).build());
+
+        } catch (Exception e) {
+            throw new BaseException(FILE_UPLOAD_ERROR);
+        }
+    }
+
     public void createQna(QnaReq qnaReq, Long userId, List<MultipartFile> imgs) throws BaseException{
         try {
             TypeOfQuestion type = TypeOfQuestion.enumOf(qnaReq.getType());
