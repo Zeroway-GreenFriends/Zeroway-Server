@@ -45,14 +45,25 @@ public class QnaService {
         try {
             Optional<QnA> qna = qnaRepository.findById(qnaId);
             if(qna.isEmpty()) throw new BaseException(INVALID_QNA_ID);
-            List<String> qnaImgList = qnaImageRepository.findUrlByQna_Id(qnaId);
 
             return new QnaRes(qna.get().getTypeOfQuestion().getName(),
                     qna.get().getQuestion(),
-                    qnaImgList,
                     qna.get().getAnswer());
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public void createQna(QnaReq qnaReq, Long userId) throws BaseException{
+        try {
+            TypeOfQuestion type = TypeOfQuestion.enumOf(qnaReq.getType());
+            if(type == null) {throw new BaseException(INVALID_QUESION_TYPE);}
+
+            QnA qna = qnaRepository.save(QnA.builder()
+                    .typeOfQuestion(type).question(qnaReq.getQuestion()).userId(userId).build());
+
+        } catch (Exception e) {
+            throw new BaseException(FILE_UPLOAD_ERROR);
         }
     }
 
