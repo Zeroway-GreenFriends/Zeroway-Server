@@ -43,6 +43,8 @@ public enum BaseResponseStatus {
 
     INVALID_LEVEL_ID(false, 2600, "존재하지 않는 레벨입니다."),
 
+    INVALID_QUESION_TYPE(false, 2700, "잘못된 질문 유형입니다."),
+
 
 
     /**

@@ -42,7 +42,7 @@ public class QnaController {
     /**
      * 문의 내역 상세 조회 API
      * @param qnaId
-     * @return 문의 유형, 문의 내용, 문의 사진 url(리스트), 답변
+     * @return 문의 유형, 문의 내용, 답변
      */
     @ResponseBody
     @GetMapping("/{qna_id}")
