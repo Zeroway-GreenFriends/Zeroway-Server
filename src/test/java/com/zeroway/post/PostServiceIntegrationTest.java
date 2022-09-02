@@ -230,4 +230,16 @@ public class PostServiceIntegrationTest {
 
         // 4번 게시물은 다른 유저가 작성한거라서 조회 안됨
     }
+
+    @DisplayName("내가 쓴 글 조회 : 작성한 글이 없는 경우")
+    @Test
+    void post1() throws BaseException {
+        Long userId = createRequestJWT();
+        Long page = 1L;
+        Long size = 30L;
+
+        List<GetPostByUserRes> postListByUser = postService.getPostListByUser(page, size);
+
+        assertThat(postListByUser.size()).isEqualTo(0);
+    }
 }
