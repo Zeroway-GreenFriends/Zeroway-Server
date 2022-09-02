@@ -3,6 +3,7 @@ package com.zeroway.community.service;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
 import com.zeroway.community.dto.CreatePostReq;
+import com.zeroway.community.dto.GetPostByUserRes;
 import com.zeroway.community.entity.Bookmark;
 import com.zeroway.community.entity.Post;
 import com.zeroway.community.entity.PostImage;
@@ -13,6 +14,7 @@ import com.zeroway.community.repository.post.PostRepository;
 import com.zeroway.community.dto.PostListRes;
 import com.zeroway.community.dto.PostRes;
 import com.zeroway.s3.S3Uploader;
+import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
@@ -37,7 +39,7 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final BookmarkRepository bookmarkRepository;
     private final S3Uploader s3Uploader;
-
+    private final JwtService jwtService;
 
     // 전체 글 조회
     public List<PostListRes> getPostList(Long userId, String sort, Boolean challenge, Boolean review, long page, long size) throws BaseException {
@@ -144,6 +146,18 @@ public class PostService {
             throw new BaseException(DATABASE_ERROR);
         }
 
+    }
+
+    /**
+     * 내가 쓴 글 조회
+     */
+    public List<GetPostByUserRes> getPostListByUser(Long page, Long size) throws BaseException {
+        try {
+            Long userId = jwtService.getUserIdx();
+            return postRepository.getPostListByUser(userId, page, size);
+        } catch (BaseException e) {
+            throw new BaseException(DATABASE_ERROR);
+        }
     }
 
 }

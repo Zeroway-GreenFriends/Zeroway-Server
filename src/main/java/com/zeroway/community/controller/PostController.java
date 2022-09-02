@@ -164,6 +164,20 @@ public class PostController {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
     }
+
+    /**
+     * 내가 쓴 글 조회 API
+     */
+    @GetMapping("/user")
+    public ResponseEntity<BaseResponse<List<GetPostByUserRes>>> getPostListByUser(@RequestParam(defaultValue = "1") Long page, @RequestParam(defaultValue = "30") Long size) {
+        try {
+            List<GetPostByUserRes> postListByUser = postService.getPostListByUser(page, size);
+            return ResponseEntity.ok().body(new BaseResponse<>(postListByUser));
+        } catch (BaseException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+    }
 }
 
 

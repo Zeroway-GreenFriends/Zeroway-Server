@@ -18,6 +18,7 @@ import static com.querydsl.jpa.JPAExpressions.*;
 import static com.zeroway.community.entity.QBookmark.bookmark;
 import static com.zeroway.community.entity.QComment.comment;
 import static com.zeroway.community.entity.QPost.post;
+import static com.zeroway.community.entity.QPostImage.postImage;
 import static com.zeroway.community.entity.QPostLike.postLike;
 import static com.zeroway.user.entity.QUser.user;
 
@@ -152,5 +153,27 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     // 몇 주 전인지 계산
     public static NumberTemplate<Integer> calculateWeeksAgo(DateTimePath<LocalDateTime> createdAt) {
         return Expressions.numberTemplate(Integer.class, "datediff({0}, {1})/7", currentTime(), createdAt);
+    }
+
+    /**
+     * 내가 쓴 글 조회
+     */
+    public List<GetPostByUserRes> getPostListByUser(Long userId, Long page, Long size) {
+        return queryFactory
+                .select(new QGetPostByUserRes(
+                        user.profileImgUrl, user.nickname, post.content, postLikeCount(), commentCount(), postImgCount(), bookmarked(userId))
+                )
+                .from(user)
+                .leftJoin(post).on(user.id.eq(post.userId))
+                .where(user.id.eq(userId), post.status.eq(StatusType.ACTIVE))
+                .orderBy(post.createdAt.desc())
+                .offset((page - 1) * size)
+                .limit(size)
+                .fetch();
+    }
+
+    // 글 이미지 개수 쿼리
+    private JPQLQuery<Integer> postImgCount() {
+        return select(postImage.count().intValue()).from(postImage).where(postImage.postId.eq(post.id), postImage.status.eq(StatusType.ACTIVE));
     }
 }
