@@ -34,24 +34,22 @@ public class CommentService {
 
     /**
      * 좋아요 기능
-     * @return true 좋아요, false 좋아요 취소
      */
     @Transactional
-    public boolean like(Long userId, Long commentId) throws BaseException {
+    public void like(Long userId, Long commentId, boolean like) throws BaseException {
         try {
             Optional<CommentLike> optional = commentLikeRepository.findByUserIdAndCommentId(userId, commentId);
             if (optional.isPresent()) {
-                CommentLike like = optional.get();
-                if(like.getStatus().equals(StatusType.ACTIVE)) {// 좋아요 취소
-                    optional.get().setStatus(StatusType.INACTIVE);
-                    return false;
-                } else {
-                    optional.get().setStatus(StatusType.ACTIVE); // 좋아요
-                    return true;
+                CommentLike commentLike = optional.get();
+                if(like) { // 좋아요
+                    commentLike.setStatus(StatusType.ACTIVE);
+                } else { // 좋아요 취소
+                    commentLike.setStatus(StatusType.INACTIVE);
                 }
             }
-            commentLikeRepository.save(CommentLike.builder().userId(userId).commentId(commentId).build());
-            return true; // 좋아요
+            // CommentLike 없는 경우
+            // 좋아요만 수행 (좋아요 취소는 수행하지 않음)
+            else if (like) commentLikeRepository.save(CommentLike.builder().userId(userId).commentId(commentId).build());
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@Deprecated
 @Entity
 @NoArgsConstructor
 @Getter

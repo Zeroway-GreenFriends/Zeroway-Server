@@ -43,10 +43,25 @@ public class ChallengeController {
      * @return 챌린지(id, content, complete) 랜덤 5개 (유저 레벨별 + 수행 안 한 것)
      */
     @ResponseBody
+    @GetMapping("list/today")
+    public ResponseEntity<?> getTodayChallengeList() {
+        try{
+            List<ChallengeListRes> challengeListRes = challengeService.getTodayChallengeList(jwtService.getUserIdx(), 5);
+            return ResponseEntity.ok().body(challengeListRes);
+        } catch(BaseException exception){
+            return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
+        }
+    }
+
+    /**
+     * 레벨별 챌린지 API
+     * @return 챌린지(id, content, complete) (유저 레벨별)
+     */
+    @ResponseBody
     @GetMapping("list")
     public ResponseEntity<?> getChallengeList() {
         try{
-            List<ChallengeListRes> challengeListRes = challengeService.getChallengeList(jwtService.getUserIdx(), 5);
+            List<ChallengeListRes> challengeListRes = challengeService.getChallengeList(jwtService.getUserIdx());
             return ResponseEntity.ok().body(challengeListRes);
         } catch(BaseException exception){
             return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
@@ -61,7 +76,7 @@ public class ChallengeController {
     @PatchMapping("/{challenge_id}/complete")
     public ResponseEntity<?> patchChallengeComplete(@PathVariable ("challenge_id") Long challengeId) {
         try{
-            ChallengeCompleteRes ChallengeCompleteRes = challengeService.patchChallengeComplete(jwtService.getUserIdx(), challengeId, 10);
+            ChallengeCompleteRes ChallengeCompleteRes = challengeService.patchChallengeComplete(jwtService.getUserIdx(), challengeId, 20);
             return ResponseEntity.ok().body(ChallengeCompleteRes);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getMessage()));

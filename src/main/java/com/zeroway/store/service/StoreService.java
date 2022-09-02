@@ -5,7 +5,6 @@ import com.zeroway.common.BaseResponseStatus;
 import com.zeroway.store.dto.StoreListRes;
 import com.zeroway.store.dto.StoreRes;
 import com.zeroway.store.repository.StoreRepository;
-import com.zeroway.store.repository.StoreReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -21,13 +20,12 @@ import static com.zeroway.common.BaseResponseStatus.DATABASE_ERROR;
 public class StoreService {
 
     private final StoreRepository storeRepository;
-    private final StoreReviewRepository storeReviewRepository;
 
     public List<StoreListRes> searchStoreList(String keyword, int page, int size) throws BaseException {
         try{
             PageRequest pageRequest = PageRequest.of(page, size, Sort.by("name").ascending());
             return storeRepository.findByAddressNewContains(keyword, pageRequest).getContent().stream()
-                    .map(store -> new StoreListRes(store.getId(), store.getImageUrl(), store.getName(), store.getItem(), store.getScoreAvg(),
+                    .map(store -> new StoreListRes(store.getId(), store.getImageUrl(), store.getName(), store.getItem(),
                             store.getAddressNew(), store.getOperatingTime(), store.getContact(), store.getSiteUrl(), store.getInstagram())).collect(Collectors.toList());
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
@@ -38,21 +36,18 @@ public class StoreService {
         try{
             PageRequest pageRequest = PageRequest.of(page, size, Sort.by("scoreAvg").descending());
             return storeRepository.findAll(pageRequest).getContent().stream()
-                    .map(store -> new StoreListRes(store.getId(), store.getImageUrl(), store.getName(), store.getItem(), store.getScoreAvg(),
+                    .map(store -> new StoreListRes(store.getId(), store.getImageUrl(), store.getName(), store.getItem(),
                             store.getAddressNew(), store.getOperatingTime(), store.getContact(), store.getSiteUrl(), store.getInstagram())).collect(Collectors.toList());
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
 
-    // 제로웨이스트샵 상세 조회 - 리뷰는 4개만 조회
-    public StoreRes getStoreDetail(Long storeId, Long userId) throws BaseException  {
+    // 제로웨이스트샵 상세 조회
+    public StoreRes getStoreDetail(Long storeId) throws BaseException  {
         try {
-            return new StoreRes(
-                    storeRepository.findById(storeId).orElseThrow(() -> new BaseException(BaseResponseStatus.INVALID_STORE_ID)),
-                    storeReviewRepository.getReviewInfo(storeId, userId, 4),
-                    Math.toIntExact(storeReviewRepository.countByStoreId(storeId))
-                );
+            return new StoreRes(storeRepository.findById(storeId)
+                    .orElseThrow(() -> new BaseException(BaseResponseStatus.INVALID_STORE_ID)));
         } catch (BaseException e) {
             throw e;
         } catch (Exception e) {

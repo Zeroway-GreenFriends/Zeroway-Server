@@ -42,7 +42,7 @@ public class QnaController {
     /**
      * 문의 내역 상세 조회 API
      * @param qnaId
-     * @return 문의 유형, 문의 내용, 문의 사진 url(리스트), 답변
+     * @return 문의 유형, 문의 내용, 답변
      */
     @ResponseBody
     @GetMapping("/{qna_id}")
@@ -55,21 +55,34 @@ public class QnaController {
         }
     }
 
+//    /**
+//     * *
+//     * 문의 내역 작성 API
+//     * @param qnaReq Qna(문의 유형, 질문)
+//     * @param imgs 이미지
+//     */
+//    @PostMapping(consumes={"multipart/form-data"})
+//    public ResponseEntity<?> createQna(@RequestPart(value="qnaReq") QnaReq qnaReq, @RequestPart(value="imgs", required = false)List<MultipartFile> imgs) {
+//        try{
+//            Long userId = jwtService.getUserIdx();
+//            qnaService.createQna(qnaReq, userId, imgs);
+//            return ResponseEntity.ok().build();
+//        } catch (BaseException exception) {
+//            return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
+//        }
+
     /**
-     * *
      * 문의 내역 작성 API
      * @param qnaReq Qna(문의 유형, 질문)
-     * @param imgs 이미지
      */
-    @PostMapping(consumes={"multipart/form-data"})
-    public ResponseEntity<?> createQna(@RequestPart(value="qnaReq") QnaReq qnaReq, @RequestPart(value="imgs", required = false)List<MultipartFile> imgs) {
-        try{
-            Long userId = jwtService.getUserIdx();
-            qnaService.createQna(qnaReq, userId, imgs);
-            return ResponseEntity.ok().build();
-        } catch (BaseException exception) {
-            return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
-        }
-
+        @PostMapping(consumes={"multipart/form-data"})
+        public ResponseEntity<?> createQna(@RequestPart(value="qnaReq") QnaReq qnaReq) {
+            try{
+                Long userId = jwtService.getUserIdx();
+                qnaService.createQna(qnaReq, userId);
+                return ResponseEntity.ok().build();
+            } catch (BaseException exception) {
+                return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
+            }
     }
 }

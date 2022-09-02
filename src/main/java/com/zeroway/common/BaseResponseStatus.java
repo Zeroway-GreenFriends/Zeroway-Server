@@ -37,7 +37,15 @@ public enum BaseResponseStatus {
 
     UNAUTHORIZED_REQUEST(false, 2300, "권한이 없습니다."),
 
-    INVALID_QNA_ID(false, 2100, "잘못된 문의 내역 식별자입니다."),
+    INVALID_QNA_ID(false, 2400, "잘못된 문의 내역 식별자입니다."),
+
+    INVALID_ANNOUNCE_ID(false, 2500, "잘못된 공지 사항 식별자입니다."),
+
+    INVALID_LEVEL_ID(false, 2600, "존재하지 않는 레벨입니다."),
+
+    INVALID_QUESION_TYPE(false, 2700, "잘못된 질문 유형입니다."),
+
+
 
     /**
      * 3000 : Response 오류

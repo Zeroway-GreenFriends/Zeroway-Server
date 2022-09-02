@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static com.zeroway.common.BaseResponseStatus.DATABASE_ERROR;
+import static com.zeroway.common.BaseResponseStatus.*;
 
 @Service
 @Slf4j
@@ -39,18 +39,10 @@ public class ChallengeService {
 
     public ChallengeRes getList(Long userId) throws BaseException {
         try{
-            Optional<User> findUser = userRepository.findById(userId);
-            if(findUser.isEmpty()){
-                throw new BaseException(DATABASE_ERROR);
-            }
-            Optional<Level> userLevel = levelRepository.findById(findUser.get().getLevel().getId());
-            if(userLevel.isEmpty()){
-                throw new BaseException(DATABASE_ERROR);
-            }
+            User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_USER_ID));
+            Level userLevel = levelRepository.findById(user.getLevel().getId()).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));
 
-            return findUser
-                    .map(user -> new ChallengeRes(user.getNickname(), user.getLevel().getId(), user.getExp(), userLevel.get().getImageUrl()))
-                    .orElseThrow(IllegalArgumentException::new);
+            return new ChallengeRes(user.getNickname(), user.getLevel().getId(), user.getExp(), userLevel.getImageUrl());
         }
         catch (Exception exception) {
             log.error(exception.getMessage());
@@ -58,15 +50,15 @@ public class ChallengeService {
         }
     }
 
-    public List<ChallengeListRes> getChallengeList(long userId, Integer size) {
+    public List<ChallengeListRes> getTodayChallengeList(long userId, Integer size) throws BaseException{
         List<User_Challenge> todayChallenge = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
+        User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_USER_ID));
 
-        User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
+        //오늘의 챌린지 선별
         LocalDateTime todayLdt = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), 0, 0, 0);
         List<User_Challenge> challenges = userChallengeRepository.findTodayChallenge(user.getId(), user.getLevel().getId(), todayLdt);
 
-        //챌린지 랜덤 추출
         Random rn = new Random(now.getDayOfYear());
         for(long i=0; i<size; i++) {
             int id = rn.nextInt(challenges.size());
@@ -81,9 +73,18 @@ public class ChallengeService {
                 .collect(Collectors.toList());
     }
 
+    public List<ChallengeListRes> getChallengeList(Long userId) throws BaseException{
+        User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_USER_ID));
+        List<User_Challenge> challengeList = userChallengeRepository.findByChallengeList(userId, user.getLevel().getId());
+
+        return challengeList.stream()
+                .map(uc -> new ChallengeListRes(uc.getChallenge().getId(), uc.getChallenge().getContent(), uc.isComplete()))
+                .collect(Collectors.toList());
+    }
+
     public ChallengeCompleteRes patchChallengeComplete(Long userId, Long challengeId, Integer exp) throws Exception{
         try{
-            User user = userRepository.findById(userId).orElseThrow(IllegalArgumentException::new);
+            User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_USER_ID));
             User_Challenge uc = userChallengeRepository.findByUser_IdAndChallenge_Id(userId, challengeId);
             if(!uc.isComplete()) {
                 uc.setComplete(true);
@@ -104,20 +105,15 @@ public class ChallengeService {
     //레벨업&다운
     private void checkLevel(User user) throws BaseException {
         if(user.getExp() >= 100) {
-            Optional<Level> levelup = levelRepository.findById(user.getLevel().getId() + 1);
-            if(levelup.isEmpty()) {
-                throw new BaseException(DATABASE_ERROR);
-            }
-            user.setLevel(levelup.get());
+            Level levelup = levelRepository.findById(user.getLevel().getId() + 1).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));
+            user.setLevel(levelup);
             user.setExp(user.getExp()-100);
             createUC(user);
+
         } else if(user.getExp() < 0){
             if(user.getLevel().getId()!=1) {
-                Optional<Level> levelDown = levelRepository.findById(user.getLevel().getId() - 1);
-                if(levelDown.isEmpty()) {
-                    throw new BaseException(DATABASE_ERROR);
-                }
-                user.setLevel(levelDown.get());
+                Level levelDown = levelRepository.findById(user.getLevel().getId() - 1).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));;;
+                user.setLevel(levelDown);
                 user.setExp(user.getExp()+100);
             } else {
                 user.setExp(0);
@@ -135,4 +131,5 @@ public class ChallengeService {
             }
         }
     }
+
 }
