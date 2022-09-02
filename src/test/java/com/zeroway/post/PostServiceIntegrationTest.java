@@ -15,8 +15,6 @@ import com.zeroway.user.entity.ProviderType;
 import com.zeroway.user.entity.User;
 import com.zeroway.user.repository.UserRepository;
 import com.zeroway.utils.JwtService;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
