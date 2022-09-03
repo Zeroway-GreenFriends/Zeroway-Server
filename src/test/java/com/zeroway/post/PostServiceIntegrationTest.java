@@ -4,6 +4,7 @@ import com.zeroway.challenge.repository.LevelRepository;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
 import com.zeroway.community.dto.GetPostByUserRes;
+import com.zeroway.community.dto.GetPostBycommentRes;
 import com.zeroway.community.entity.*;
 import com.zeroway.community.repository.comment.CommentRepository;
 import com.zeroway.community.repository.post.BookmarkRepository;
@@ -241,14 +242,25 @@ public class PostServiceIntegrationTest {
         assertThat(postListByUser.size()).isEqualTo(0);
     }
 
-    @DisplayName("댓글 단 글 조회")
+    @DisplayName("내가 댓글 단 글 조회")
     @Test
     void comment() throws BaseException {
+        User other = userRepository.save(User.builder()
+                .id(2L)
+                .email("2")
+                .nickname("2")
+                .provider(ProviderType.KAKAO)
+                .level(levelRepository.findById(1).get())
+                .build());
+
         Long userId = createRequestJWT();
         Long page = 1L;
         Long size = 30L;
 
-        // 댓글 2개 달았음
+        // 내가 댓글 단 게시물 갯수
+        int cnt = commentRepository.findByUserIdAndStatus(userId, StatusType.ACTIVE).size();
+
+        // 댓글 2개 달았음 (+1)
         Post post1 = postRepository.save(Post.builder()
                 .userId(userId)
                 .content("글1")
@@ -267,10 +279,7 @@ public class PostServiceIntegrationTest {
 
         List<Post> all = postRepository.findAll();
         Post post2 = all.get(0);
-
-        List<Comment> byPostId = commentRepository.findByPostId(post2.getId());
-        int cnt = byPostId.size();    // 기존 댓글 갯수
-        // 댓글 1개 달았음
+        // 댓글 1개 달았음 (+1)
         commentRepository.save(Comment.builder()
                 .postId(post2.getId())
                 .content("댓글")
@@ -280,11 +289,13 @@ public class PostServiceIntegrationTest {
         commentRepository.save(Comment.builder()
                 .postId(post2.getId())
                 .content("댓글!")
-                .userId(1L)
+                .userId(other.getId())
                 .build());
 
         List<GetPostBycommentRes> postListByComment = postService.getPostListBycomment(page, size);
-
-        assertThat(postListByComment.size()).isEqualTo(cnt + 3);
+        for (GetPostBycommentRes g : postListByComment) {
+            System.out.println(g.getContent());
+        }
+        assertThat(postListByComment.size()).isEqualTo(cnt + 2);
     }
 }
