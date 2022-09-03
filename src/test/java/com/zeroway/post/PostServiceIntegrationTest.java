@@ -240,4 +240,51 @@ public class PostServiceIntegrationTest {
 
         assertThat(postListByUser.size()).isEqualTo(0);
     }
+
+    @DisplayName("댓글 단 글 조회")
+    @Test
+    void comment() throws BaseException {
+        Long userId = createRequestJWT();
+        Long page = 1L;
+        Long size = 30L;
+
+        // 댓글 2개 달았음
+        Post post1 = postRepository.save(Post.builder()
+                .userId(userId)
+                .content("글1")
+                .challenge(false)
+                .build());
+        commentRepository.save(Comment.builder()
+                .postId(post1.getId())
+                .content("댓글")
+                .userId(userId)
+                .build());
+        commentRepository.save(Comment.builder()
+                .postId(post1.getId())
+                .content("또댓글")
+                .userId(userId)
+                .build());
+
+        List<Post> all = postRepository.findAll();
+        Post post2 = all.get(0);
+
+        List<Comment> byPostId = commentRepository.findByPostId(post2.getId());
+        int cnt = byPostId.size();    // 기존 댓글 갯수
+        // 댓글 1개 달았음
+        commentRepository.save(Comment.builder()
+                .postId(post2.getId())
+                .content("댓글")
+                .userId(userId)
+                .build());
+        // 다른 사람이 단 댓글 (카운트 X)
+        commentRepository.save(Comment.builder()
+                .postId(post2.getId())
+                .content("댓글!")
+                .userId(1L)
+                .build());
+
+        List<GetPostBycommentRes> postListByComment = postService.getPostListBycomment(page, size);
+
+        assertThat(postListByComment.size()).isEqualTo(cnt + 3);
+    }
 }
