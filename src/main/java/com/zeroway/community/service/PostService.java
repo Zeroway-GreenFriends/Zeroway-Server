@@ -183,4 +183,17 @@ public class PostService {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    /**
+     * 스크랩한 글 조회
+     */
+    public List<GetPostListByMypageRes> getPostListByScrap(Long page, Long size) throws BaseException {
+        try {
+            Long userId = jwtService.getUserIdx();
+            return postRepository.getPostListByScrap(userId, page, size);
+        } catch (BaseException e) {
+            e.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

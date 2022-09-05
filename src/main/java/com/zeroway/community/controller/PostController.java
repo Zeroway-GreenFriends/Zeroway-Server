@@ -214,6 +214,21 @@ public class PostController {
         }
 
     }
+
+    /**
+     * 스크랩한 글 조회 API
+     */
+    @GetMapping("/scrap")
+    public ResponseEntity<BaseResponse<List<GetPostListByMypageRes>>> getPostListByScrap(@RequestParam(defaultValue = "1") Long page, @RequestParam(defaultValue = "30") Long size) {
+        try {
+            List<GetPostListByMypageRes> resultList = postService.getPostListByScrap(page, size);
+            return ResponseEntity.ok().body(new BaseResponse<>(resultList));
+        } catch (BaseException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+
+    }
 }
 
 

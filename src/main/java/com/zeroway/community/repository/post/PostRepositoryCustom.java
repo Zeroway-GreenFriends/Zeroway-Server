@@ -12,4 +12,5 @@ public interface PostRepositoryCustom {
     List<GetPostListByMypageRes> getPostListByUser(Long userId, Long page, Long size);
     List<GetPostListByMypageRes> getPostListByComment(Long userId, Long page, Long size);
     List<GetPostListByMypageRes> getPostListByLike(Long userId, Long page, Long size);
+    List<GetPostListByMypageRes> getPostListByScrap(Long userId, Long page, Long size);
 }

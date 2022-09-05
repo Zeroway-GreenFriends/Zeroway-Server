@@ -212,4 +212,23 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .limit(size)
                 .fetch();
     }
+
+    /**
+     * 스크랩한 글 조회
+     */
+    public List<GetPostListByMypageRes> getPostListByScrap(Long userId, Long page, Long size) {
+        return queryFactory
+                .select(new QGetPostListByMypageRes(
+                        user.profileImgUrl, user.nickname, post.content, postLikeCount(), commentCount(), postImgCount(), bookmarked(userId))
+                )
+                .from(user)
+                .leftJoin(bookmark).on(bookmark.userId.eq(user.id))
+                .leftJoin(post).on(post.id.eq(bookmark.postId))
+                .where(bookmark.userId.eq(userId), bookmark.status.eq(StatusType.ACTIVE), post.status.eq(StatusType.ACTIVE))
+                .orderBy(post.createdAt.desc())
+                .offset((page - 1) * size)
+                .limit(size)
+                .fetch();
+    }
+
 }
