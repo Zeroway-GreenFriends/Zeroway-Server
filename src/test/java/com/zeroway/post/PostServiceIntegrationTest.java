@@ -363,6 +363,14 @@ public class PostServiceIntegrationTest {
                 .userId(userId)
                 .build());
 
+        // 스크랩 && 취소
+        Post post2 = all.get(1);
+        Bookmark save = bookmarkRepository.save(Bookmark.builder()
+                .postId(post2.getId())
+                .userId(userId)
+                .build());
+        save.setStatus(StatusType.INACTIVE);
+
         List<GetPostListByMypageRes> result = postService.getPostListByScrap(page, size);
 
         assertThat(result.size()).isEqualTo(cnt + 1);
