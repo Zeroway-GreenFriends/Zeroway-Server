@@ -1,4 +1,4 @@
-package com.zeroway.cs.entity;
+package com.zeroway.cs.entity.report;
 
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -34,7 +34,6 @@ public class Report {
 
     //신고 확인 여부
     @ColumnDefault("false")
-    @Builder.Default
     private boolean check;
 
     @Builder

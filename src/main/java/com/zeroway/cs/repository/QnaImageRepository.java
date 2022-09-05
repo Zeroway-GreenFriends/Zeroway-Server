@@ -1,6 +1,6 @@
 package com.zeroway.cs.repository;
 
-import com.zeroway.cs.entity.QnAImage;
+import com.zeroway.cs.entity.qna.QnAImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

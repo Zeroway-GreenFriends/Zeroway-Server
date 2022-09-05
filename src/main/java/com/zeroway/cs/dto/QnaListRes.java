@@ -1,6 +1,5 @@
 package com.zeroway.cs.dto;
 
-import com.zeroway.cs.entity.TypeOfQuestion;
 import lombok.Data;
 
 @Data
