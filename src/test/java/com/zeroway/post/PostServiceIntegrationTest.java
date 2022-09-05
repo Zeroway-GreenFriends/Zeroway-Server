@@ -336,4 +336,35 @@ public class PostServiceIntegrationTest {
 
         assertThat(result.size()).isEqualTo(cnt + 1);
     }
+
+    @DisplayName("내가 스크랩한 글 조회")
+    @Test
+    void scraped() throws BaseException {
+        User other = userRepository.save(User.builder()
+                .id(2L)
+                .email("2")
+                .nickname("2")
+                .provider(ProviderType.KAKAO)
+                .level(levelRepository.findById(1).get())
+                .build());
+
+        Long userId = createRequestJWT();
+        Long page = 1L;
+        Long size = 30L;
+
+        // 내가 좋아한 게시물 갯수
+        int cnt = bookmarkRepository.findByUserIdAndStatus(userId, StatusType.ACTIVE).size();
+        List<Post> all = postRepository.findAll();
+
+        // 스크랩 +1
+        Post post1 = all.get(0);
+        bookmarkRepository.save(Bookmark.builder()
+                .postId(post1.getId())
+                .userId(userId)
+                .build());
+
+        List<GetPostListByMypageRes> result = postService.getPostListByScrap(page, size);
+
+        assertThat(result.size()).isEqualTo(cnt + 1);
+    }
 }
