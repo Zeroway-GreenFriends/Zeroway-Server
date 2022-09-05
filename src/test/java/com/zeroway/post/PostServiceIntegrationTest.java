@@ -332,7 +332,7 @@ public class PostServiceIntegrationTest {
                 .build());
         save.setStatus(StatusType.INACTIVE);
 
-        List<Post> result = postRepository.getPostListByLike(page, size);
+        List<GetPostListByMypageRes> result = postService.getPostListByLike(page, size);
 
         assertThat(result.size()).isEqualTo(cnt + 1);
     }
