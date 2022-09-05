@@ -61,7 +61,7 @@ public class PostController {
      */
     @GetMapping("/{postId}")
     public ResponseEntity<?> getPostDetail(@PathVariable Long postId) {
-        try{
+        try {
             Long userId = jwtService.getUserIdx();
             PostRes postRes = postService.getPost(postId, userId);
             return ResponseEntity.ok().body(postRes);
@@ -141,7 +141,7 @@ public class PostController {
     public ResponseEntity<?> bookmark(@PathVariable Long postId, @RequestBody BookmarkReq req) {
         try {
             Long userId = jwtService.getUserIdx();
-             postService.bookmark(userId, postId, req.isBookmark());
+            postService.bookmark(userId, postId, req.isBookmark());
             return ResponseEntity.ok().build();
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
@@ -159,7 +159,7 @@ public class PostController {
             postService.deletePost(postId, userId);
             return ResponseEntity.ok().build();
         } catch (BaseException e) {
-            if(e.getStatus().equals(UNAUTHORIZED_REQUEST))
+            if (e.getStatus().equals(UNAUTHORIZED_REQUEST))
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new BaseResponse<>(e.getStatus()));
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
@@ -173,6 +173,20 @@ public class PostController {
         try {
             List<GetPostByUserRes> postListByUser = postService.getPostListByUser(page, size);
             return ResponseEntity.ok().body(new BaseResponse<>(postListByUser));
+        } catch (BaseException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+    }
+
+    /**
+     * 내가 댓글 단 글 조회 API
+     */
+    @GetMapping("/comment")
+    public ResponseEntity<BaseResponse<List<GetPostBycommentRes>>> getPostListByComment(@RequestParam(defaultValue = "1") Long page, @RequestParam(defaultValue = "30") Long size) {
+        try {
+            List<GetPostBycommentRes> postListByComment = postService.getPostListBycomment(page, size);
+            return ResponseEntity.ok().body(new BaseResponse<>(postListByComment));
         } catch (BaseException e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));

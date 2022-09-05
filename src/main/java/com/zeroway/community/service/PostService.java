@@ -2,8 +2,7 @@ package com.zeroway.community.service;
 
 import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
-import com.zeroway.community.dto.CreatePostReq;
-import com.zeroway.community.dto.GetPostByUserRes;
+import com.zeroway.community.dto.*;
 import com.zeroway.community.entity.Bookmark;
 import com.zeroway.community.entity.Post;
 import com.zeroway.community.entity.PostImage;
@@ -11,8 +10,6 @@ import com.zeroway.community.repository.comment.CommentRepository;
 import com.zeroway.community.repository.post.BookmarkRepository;
 import com.zeroway.community.repository.post.PostImageRepository;
 import com.zeroway.community.repository.post.PostRepository;
-import com.zeroway.community.dto.PostListRes;
-import com.zeroway.community.dto.PostRes;
 import com.zeroway.s3.S3Uploader;
 import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -156,8 +153,21 @@ public class PostService {
             Long userId = jwtService.getUserIdx();
             return postRepository.getPostListByUser(userId, page, size);
         } catch (BaseException e) {
+            e.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }
     }
 
+    /**
+     * 댓글 단 글 조회
+     */
+    public List<GetPostBycommentRes> getPostListBycomment(Long page, Long size) throws BaseException {
+        try {
+            Long userId = jwtService.getUserIdx();
+            return postRepository.getPostListByComment(userId, page, size);
+        } catch (BaseException e) {
+            e.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

@@ -1,5 +1,6 @@
 package com.zeroway.community.repository.comment;
 
+import com.zeroway.common.StatusType;
 import com.zeroway.community.entity.Comment;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -12,4 +13,5 @@ public interface CommentRepository
 
     List<Comment> findByPostId(Long post);
     Optional<Comment> findByIdAndUserId(Long id, Long userId);
+    List<Comment> findByUserIdAndStatus(Long userId, StatusType status);
 }
