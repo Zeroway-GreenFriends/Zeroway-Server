@@ -188,7 +188,8 @@ public class PostServiceIntegrationTest {
     @DisplayName("내가 쓴 글 repo test")
     @Test
     void postRepo() throws BaseException {
-        List<GetPostListByMypageRes> getPostByUserRes = postRepository.getPostListByUser(this.userId, 1L, 30L);
+        Long userId = createRequestJWT();
+        List<GetPostListByMypageRes> getPostByUserRes = postRepository.getPostListByUser(userId, 1L, 30L);
 
         for (GetPostListByMypageRes p : getPostByUserRes) {
             System.out.println(p.getContent());
