@@ -57,6 +57,7 @@ public class PostController {
 
     /**
      * 게시글 상세 조회 API
+     *
      * @param postId 게시글 id
      */
     @GetMapping("/{postId}")
@@ -72,7 +73,8 @@ public class PostController {
 
     /**
      * 글 작성 API
-     * @param post - 내용, 챌린지 인증 여부
+     *
+     * @param post   - 내용, 챌린지 인증 여부
      * @param images - 이미지 파일 리스트
      */
     @PostMapping()
@@ -89,8 +91,9 @@ public class PostController {
 
     /**
      * 댓글 작성 API
+     *
      * @param postId 게시글 id
-     * @param req 댓글 내용
+     * @param req    댓글 내용
      */
     @PostMapping("/{postId}/comment")
     public ResponseEntity<?> createComment(@PathVariable Long postId,
@@ -106,6 +109,7 @@ public class PostController {
 
     /**
      * 좋아요 및 좋아요 취소 API
+     *
      * @param postId 게시글 id
      */
     @PostMapping("/{postId}/like")
@@ -121,6 +125,7 @@ public class PostController {
 
     /**
      * 좋아요 목록 조회 API
+     *
      * @param postId 게시글 id
      */
     @GetMapping("/{postId}/like")
@@ -135,6 +140,7 @@ public class PostController {
 
     /**
      * 북마크 및 북마크 취소 API
+     *
      * @param postId 게시글 id
      */
     @PostMapping("/{postId}/bookmark")
@@ -150,6 +156,7 @@ public class PostController {
 
     /**
      * 게시글 삭제 API
+     *
      * @param postId 게시글 id
      */
     @PatchMapping("/{postId}/delete")
@@ -191,6 +198,21 @@ public class PostController {
             e.printStackTrace();
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
+    }
+
+    /**
+     * 좋아요 누른 글 조회 API
+     */
+    @GetMapping("/like")
+    public ResponseEntity<BaseResponse<List<GetPostListByMypageRes>>> getPostListByLike(@RequestParam(defaultValue = "1") Long page, @RequestParam(defaultValue = "30") Long size) {
+        try {
+            List<GetPostListByMypageRes> resultList = postService.getPostListByLike(page, size);
+            return ResponseEntity.ok().body(new BaseResponse<>(resultList));
+        } catch (BaseException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+
     }
 }
 

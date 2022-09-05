@@ -194,4 +194,22 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
                 .limit(size)
                 .fetch();
     }
+
+    /**
+     * 좋아요 누른 글 조회
+     */
+    public List<GetPostListByMypageRes> getPostListByLike(Long userId, Long page, Long size) {
+        return queryFactory
+                .select(new QGetPostListByMypageRes(
+                        user.profileImgUrl, user.nickname, post.content, postLikeCount(), commentCount(), postImgCount(), bookmarked(userId))
+                )
+                .from(user)
+                .leftJoin(postLike).on(postLike.userId.eq(user.id))
+                .leftJoin(post).on(post.id.eq(postLike.postId))
+                .where(postLike.userId.eq(userId), postLike.status.eq(StatusType.ACTIVE), post.status.eq(StatusType.ACTIVE))
+                .orderBy(post.createdAt.desc())
+                .offset((page - 1) * size)
+                .limit(size)
+                .fetch();
+    }
 }
