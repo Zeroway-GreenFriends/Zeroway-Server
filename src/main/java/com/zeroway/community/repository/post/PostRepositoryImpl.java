@@ -158,9 +158,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     /**
      * 내가 쓴 글 조회
      */
-    public List<GetPostByUserRes> getPostListByUser(Long userId, Long page, Long size) {
+    public List<GetPostListByMypageRes> getPostListByUser(Long userId, Long page, Long size) {
         return queryFactory
-                .select(new QGetPostByUserRes(
+                .select(new QGetPostListByMypageRes(
                         user.profileImgUrl, user.nickname, post.content, postLikeCount(), commentCount(), postImgCount(), bookmarked(userId))
                 )
                 .from(user)
@@ -176,4 +176,59 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     private JPQLQuery<Integer> postImgCount() {
         return select(postImage.count().intValue()).from(postImage).where(postImage.postId.eq(post.id), postImage.status.eq(StatusType.ACTIVE));
     }
+
+    /**
+     * 댓글 단 글 조회
+     */
+    public List<GetPostListByMypageRes> getPostListByComment(Long userId, Long page, Long size) {
+        return queryFactory
+                .select(new QGetPostListByMypageRes(
+                        user.profileImgUrl, user.nickname, post.content, postLikeCount(), commentCount(), postImgCount(), bookmarked(userId))
+                )
+                .from(user)
+                .leftJoin(comment).on(comment.userId.eq(user.id))
+                .leftJoin(post).on(post.id.eq(comment.postId)).groupBy(post.id)
+                .where(comment.userId.eq(userId), comment.status.eq(StatusType.ACTIVE), post.status.eq(StatusType.ACTIVE))
+                .orderBy(post.createdAt.desc())
+                .offset((page - 1) * size)
+                .limit(size)
+                .fetch();
+    }
+
+    /**
+     * 좋아요 누른 글 조회
+     */
+    public List<GetPostListByMypageRes> getPostListByLike(Long userId, Long page, Long size) {
+        return queryFactory
+                .select(new QGetPostListByMypageRes(
+                        user.profileImgUrl, user.nickname, post.content, postLikeCount(), commentCount(), postImgCount(), bookmarked(userId))
+                )
+                .from(user)
+                .leftJoin(postLike).on(postLike.userId.eq(user.id))
+                .leftJoin(post).on(post.id.eq(postLike.postId))
+                .where(postLike.userId.eq(userId), postLike.status.eq(StatusType.ACTIVE), post.status.eq(StatusType.ACTIVE))
+                .orderBy(post.createdAt.desc())
+                .offset((page - 1) * size)
+                .limit(size)
+                .fetch();
+    }
+
+    /**
+     * 스크랩한 글 조회
+     */
+    public List<GetPostListByMypageRes> getPostListByScrap(Long userId, Long page, Long size) {
+        return queryFactory
+                .select(new QGetPostListByMypageRes(
+                        user.profileImgUrl, user.nickname, post.content, postLikeCount(), commentCount(), postImgCount(), bookmarked(userId))
+                )
+                .from(user)
+                .leftJoin(bookmark).on(bookmark.userId.eq(user.id))
+                .leftJoin(post).on(post.id.eq(bookmark.postId))
+                .where(bookmark.userId.eq(userId), bookmark.status.eq(StatusType.ACTIVE), post.status.eq(StatusType.ACTIVE))
+                .orderBy(post.createdAt.desc())
+                .offset((page - 1) * size)
+                .limit(size)
+                .fetch();
+    }
+
 }

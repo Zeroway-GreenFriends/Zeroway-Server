@@ -3,7 +3,7 @@ package com.zeroway.post;
 import com.zeroway.challenge.repository.LevelRepository;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
-import com.zeroway.community.dto.GetPostByUserRes;
+import com.zeroway.community.dto.GetPostListByMypageRes;
 import com.zeroway.community.entity.*;
 import com.zeroway.community.repository.comment.CommentRepository;
 import com.zeroway.community.repository.post.BookmarkRepository;
@@ -188,9 +188,10 @@ public class PostServiceIntegrationTest {
     @DisplayName("내가 쓴 글 repo test")
     @Test
     void postRepo() throws BaseException {
-        List<GetPostByUserRes> getPostByUserRes = postRepository.getPostListByUser(this.userId, 1L, 30L);
+        Long userId = createRequestJWT();
+        List<GetPostListByMypageRes> getPostByUserRes = postRepository.getPostListByUser(userId, 1L, 30L);
 
-        for (GetPostByUserRes p : getPostByUserRes) {
+        for (GetPostListByMypageRes p : getPostByUserRes) {
             System.out.println(p.getContent());
         }
     }
@@ -204,7 +205,7 @@ public class PostServiceIntegrationTest {
         Long page = 1L;
         Long size = 30L;
 
-        List<GetPostByUserRes> getPostByUserRes = postService.getPostListByUser(page, size);
+        List<GetPostListByMypageRes> getPostByUserRes = postService.getPostListByUser(page, size);
 
         assertThat(getPostByUserRes.get(0).getNickname()).isEqualTo(this.user.getNickname());
         assertThat(getPostByUserRes.get(0).getProfileImgUrl()).isEqualTo(this.user.getProfileImgUrl());
@@ -236,8 +237,143 @@ public class PostServiceIntegrationTest {
         Long page = 1L;
         Long size = 30L;
 
-        List<GetPostByUserRes> postListByUser = postService.getPostListByUser(page, size);
+        List<GetPostListByMypageRes> postListByUser = postService.getPostListByUser(page, size);
 
         assertThat(postListByUser.size()).isEqualTo(0);
+    }
+
+    @DisplayName("내가 댓글 단 글 조회")
+    @Test
+    void comment() throws BaseException {
+        User other = userRepository.save(User.builder()
+                .id(2L)
+                .email("2")
+                .nickname("2")
+                .provider(ProviderType.KAKAO)
+                .level(levelRepository.findById(1).get())
+                .build());
+
+        Long userId = createRequestJWT();
+        Long page = 1L;
+        Long size = 30L;
+
+        // 내가 댓글 단 게시물 갯수
+        int cnt = commentRepository.findByUserIdAndStatus(userId, StatusType.ACTIVE).size();
+
+        // 댓글 2개 달았음 (+1)
+        Post post1 = postRepository.save(Post.builder()
+                .userId(userId)
+                .content("글1")
+                .challenge(false)
+                .build());
+        commentRepository.save(Comment.builder()
+                .postId(post1.getId())
+                .content("댓글")
+                .userId(userId)
+                .build());
+        commentRepository.save(Comment.builder()
+                .postId(post1.getId())
+                .content("또댓글")
+                .userId(userId)
+                .build());
+
+        List<Post> all = postRepository.findAll();
+        Post post2 = all.get(0);
+        // 댓글 1개 달았음 (+1)
+        commentRepository.save(Comment.builder()
+                .postId(post2.getId())
+                .content("댓글")
+                .userId(userId)
+                .build());
+        // 다른 사람이 단 댓글 (카운트 X)
+        commentRepository.save(Comment.builder()
+                .postId(post2.getId())
+                .content("댓글!")
+                .userId(other.getId())
+                .build());
+
+        List<GetPostListByMypageRes> postListByComment = postService.getPostListBycomment(page, size);
+        for (GetPostListByMypageRes g : postListByComment) {
+            System.out.println(g.getContent());
+        }
+        assertThat(postListByComment.size()).isEqualTo(cnt + 2);
+    }
+
+    @DisplayName("내가 좋아요 누른 글 조회")
+    @Test
+    void like() throws BaseException {
+        User other = userRepository.save(User.builder()
+                .id(2L)
+                .email("2")
+                .nickname("2")
+                .provider(ProviderType.KAKAO)
+                .level(levelRepository.findById(1).get())
+                .build());
+
+        Long userId = createRequestJWT();
+        Long page = 1L;
+        Long size = 30L;
+
+        // 내가 좋아한 게시물 갯수
+        int cnt = postLikeRepository.findByUserIdAndStatus(userId, StatusType.ACTIVE).size();
+        List<Post> all = postRepository.findAll();
+
+        // 좋아요 +1
+        Post post1 = all.get(0);
+        postLikeRepository.save(PostLike.builder()
+                .postId(post1.getId())
+                .userId(userId)
+                .build());
+
+        // 좋아요 && 취소
+        Post post2 = all.get(1);
+        PostLike save = postLikeRepository.save(PostLike.builder()
+                .postId(post2.getId())
+                .userId(userId)
+                .build());
+        save.setStatus(StatusType.INACTIVE);
+
+        List<GetPostListByMypageRes> result = postService.getPostListByLike(page, size);
+
+        assertThat(result.size()).isEqualTo(cnt + 1);
+    }
+
+    @DisplayName("내가 스크랩한 글 조회")
+    @Test
+    void scraped() throws BaseException {
+        User other = userRepository.save(User.builder()
+                .id(2L)
+                .email("2")
+                .nickname("2")
+                .provider(ProviderType.KAKAO)
+                .level(levelRepository.findById(1).get())
+                .build());
+
+        Long userId = createRequestJWT();
+        Long page = 1L;
+        Long size = 30L;
+
+        // 내가 좋아한 게시물 갯수
+        int cnt = bookmarkRepository.findByUserIdAndStatus(userId, StatusType.ACTIVE).size();
+        List<Post> all = postRepository.findAll();
+
+        // 스크랩 +1
+        Post post1 = all.get(0);
+        bookmarkRepository.save(Bookmark.builder()
+                .postId(post1.getId())
+                .userId(userId)
+                .build());
+
+        // 스크랩 && 취소
+        Post post2 = all.get(1);
+        Bookmark save = bookmarkRepository.save(Bookmark.builder()
+                .postId(post2.getId())
+                .userId(userId)
+                .build());
+        save.setStatus(StatusType.INACTIVE);
+
+        List<GetPostListByMypageRes> result = postService.getPostListByScrap(page, size);
+
+        assertThat(result.size()).isEqualTo(cnt + 1);
     }
 }
