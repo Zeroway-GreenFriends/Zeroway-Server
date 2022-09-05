@@ -169,9 +169,9 @@ public class PostController {
      * 내가 쓴 글 조회 API
      */
     @GetMapping("/user")
-    public ResponseEntity<BaseResponse<List<GetPostByUserRes>>> getPostListByUser(@RequestParam(defaultValue = "1") Long page, @RequestParam(defaultValue = "30") Long size) {
+    public ResponseEntity<BaseResponse<List<GetPostListByMypageRes>>> getPostListByUser(@RequestParam(defaultValue = "1") Long page, @RequestParam(defaultValue = "30") Long size) {
         try {
-            List<GetPostByUserRes> postListByUser = postService.getPostListByUser(page, size);
+            List<GetPostListByMypageRes> postListByUser = postService.getPostListByUser(page, size);
             return ResponseEntity.ok().body(new BaseResponse<>(postListByUser));
         } catch (BaseException e) {
             e.printStackTrace();
@@ -183,9 +183,9 @@ public class PostController {
      * 내가 댓글 단 글 조회 API
      */
     @GetMapping("/comment")
-    public ResponseEntity<BaseResponse<List<GetPostBycommentRes>>> getPostListByComment(@RequestParam(defaultValue = "1") Long page, @RequestParam(defaultValue = "30") Long size) {
+    public ResponseEntity<BaseResponse<List<GetPostListByMypageRes>>> getPostListByComment(@RequestParam(defaultValue = "1") Long page, @RequestParam(defaultValue = "30") Long size) {
         try {
-            List<GetPostBycommentRes> postListByComment = postService.getPostListBycomment(page, size);
+            List<GetPostListByMypageRes> postListByComment = postService.getPostListBycomment(page, size);
             return ResponseEntity.ok().body(new BaseResponse<>(postListByComment));
         } catch (BaseException e) {
             e.printStackTrace();

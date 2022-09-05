@@ -158,9 +158,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     /**
      * 내가 쓴 글 조회
      */
-    public List<GetPostByUserRes> getPostListByUser(Long userId, Long page, Long size) {
+    public List<GetPostListByMypageRes> getPostListByUser(Long userId, Long page, Long size) {
         return queryFactory
-                .select(new QGetPostByUserRes(
+                .select(new QGetPostListByMypageRes(
                         user.profileImgUrl, user.nickname, post.content, postLikeCount(), commentCount(), postImgCount(), bookmarked(userId))
                 )
                 .from(user)
@@ -180,9 +180,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom{
     /**
      * 댓글 단 글 조회
      */
-    public List<GetPostBycommentRes> getPostListByComment(Long userId, Long page, Long size) {
+    public List<GetPostListByMypageRes> getPostListByComment(Long userId, Long page, Long size) {
         return queryFactory
-                .select(new QGetPostBycommentRes(
+                .select(new QGetPostListByMypageRes(
                         user.profileImgUrl, user.nickname, post.content, postLikeCount(), commentCount(), postImgCount(), bookmarked(userId))
                 )
                 .from(user)

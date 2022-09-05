@@ -148,7 +148,7 @@ public class PostService {
     /**
      * 내가 쓴 글 조회
      */
-    public List<GetPostByUserRes> getPostListByUser(Long page, Long size) throws BaseException {
+    public List<GetPostListByMypageRes> getPostListByUser(Long page, Long size) throws BaseException {
         try {
             Long userId = jwtService.getUserIdx();
             return postRepository.getPostListByUser(userId, page, size);
@@ -161,7 +161,7 @@ public class PostService {
     /**
      * 댓글 단 글 조회
      */
-    public List<GetPostBycommentRes> getPostListBycomment(Long page, Long size) throws BaseException {
+    public List<GetPostListByMypageRes> getPostListBycomment(Long page, Long size) throws BaseException {
         try {
             Long userId = jwtService.getUserIdx();
             return postRepository.getPostListByComment(userId, page, size);

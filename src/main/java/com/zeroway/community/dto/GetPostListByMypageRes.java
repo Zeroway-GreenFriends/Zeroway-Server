@@ -6,9 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Data
-@Getter
 @NoArgsConstructor
-public class GetPostBycommentRes {
+@Getter
+public class GetPostListByMypageRes {
 
     private String profileImgUrl;
     private String nickname;
@@ -19,7 +19,7 @@ public class GetPostBycommentRes {
     private boolean isScraped;
 
     @QueryProjection
-    public GetPostBycommentRes(String profileImgUrl, String nickname, String content, int likeCount, int commentCount, int imgCount, boolean isScraped) {
+    public GetPostListByMypageRes(String profileImgUrl, String nickname, String content, int likeCount, int commentCount, int imgCount, boolean isScraped) {
         this.profileImgUrl = profileImgUrl;
         this.nickname = nickname;
         this.content = content;
