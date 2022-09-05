@@ -70,6 +70,7 @@
 - Spring Data JPA, Querydsl
 - AWS RDS, EC2, S3, 53 Route
 - Intellij
+- Jenkins
 
 <br/>
 
