@@ -34,7 +34,7 @@ public class StoreService {
 
     public List<StoreListRes> getStoreList(int page, int size) throws BaseException {
         try{
-            PageRequest pageRequest = PageRequest.of(page, size, Sort.by("scoreAvg").descending());
+            PageRequest pageRequest = PageRequest.of(page, size);
             return storeRepository.findAll(pageRequest).getContent().stream()
                     .map(store -> new StoreListRes(store.getId(), store.getImageUrl(), store.getName(), store.getItem(),
                             store.getAddressNew(), store.getOperatingTime(), store.getContact(), store.getSiteUrl(), store.getInstagram())).collect(Collectors.toList());
