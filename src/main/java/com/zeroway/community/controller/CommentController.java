@@ -3,7 +3,9 @@ package com.zeroway.community.controller;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
 import com.zeroway.community.dto.LikeReq;
+import com.zeroway.community.dto.ReportReq;
 import com.zeroway.community.service.CommentService;
+import com.zeroway.cs.dto.QnaReq;
 import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -49,6 +51,17 @@ public class CommentController {
             if(e.getStatus().equals(UNAUTHORIZED_REQUEST))
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new BaseResponse<>(e.getStatus()));
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+    }
+
+    @PostMapping("/report")
+    public ResponseEntity<?> reportComment(@RequestBody ReportReq reportReq) {
+        try{
+            Long userId = jwtService.getUserIdx();
+            commentService.reportComment(userId, reportReq);
+            return ResponseEntity.ok().build();
+        } catch (BaseException exception) {
+            return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
         }
     }
 }
