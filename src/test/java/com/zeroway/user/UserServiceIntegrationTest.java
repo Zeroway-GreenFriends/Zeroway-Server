@@ -157,14 +157,24 @@ public class UserServiceIntegrationTest {
     @Test
     void signoutO() throws BaseException {
         Long userId = this.createRequestJWT();
+
+        Challenge chall1 = challengeRepository.save(Challenge.builder()
+                .content("1번 챌린지")
+                .level(levelRepository.findById(1).get())
+                .build());
+        Challenge chall2 = challengeRepository.save(Challenge.builder()
+                .content("2번 챌린지")
+                .level(levelRepository.findById(1).get())
+                .build());
+
         // 유저챌린지 테이블 데이터 생성
         userChallengeRepository.save(User_Challenge.builder()
                 .user(userRepository.findById(userId).get())
-                .challenge(challengeRepository.findAll().get(0))
+                .challenge(chall1)
                 .build());
         userChallengeRepository.save(User_Challenge.builder()
                 .user(userRepository.findById(userId).get())
-                .challenge(challengeRepository.findAll().get(1))
+                .challenge(chall2)
                 .build());
         assertThat(userChallengeRepository.findByUser_Id(userId).size()).isEqualTo(2);
 
