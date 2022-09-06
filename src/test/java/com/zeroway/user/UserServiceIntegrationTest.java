@@ -153,7 +153,7 @@ public class UserServiceIntegrationTest {
         assertThat(userChallengeRepository.findByChallenge_Id(save1.getId()).getChallenge().getLevel().getId()).isEqualTo(1);
     }
 
-    @DisplayName("회원 탈퇴 성공: 유저 테이블, 유저 챌린지 테이블")
+    @DisplayName("회원 탈퇴 성공: 유저 테이블, 유저 챌린지 테이블, redis")
     @Test
     void signoutO() throws BaseException {
         Long userId = this.createRequestJWT();
