@@ -89,7 +89,7 @@ public class PostServiceIntegrationTest {
      * 글 좋아요 4개 : 1, 2, 3, 4 (모든 게시물 1개씩)
      * 게시물 이미지 1개 : 3번 게시물 1개
      */
-    void setPostData() {
+    void setPostData() throws InterruptedException {
         this.userId = createRequestJWT();
 
         User u2 = userRepository.save(User.builder()
@@ -152,6 +152,8 @@ public class PostServiceIntegrationTest {
                 .postId(saveMe2.getId())
                 .build());
 
+        Thread.sleep(2000l);
+
         // 내가 쓴 글 3
         Post saveMe3 = postRepository.save(Post.builder()
                 .userId(this.userId)
@@ -198,7 +200,7 @@ public class PostServiceIntegrationTest {
 
     @DisplayName("내가 쓴 글 조회")
     @Test
-    void post() throws BaseException {
+    void post() throws BaseException, InterruptedException {
         setPostData();
 
         // given : userId
