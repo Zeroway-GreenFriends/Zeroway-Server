@@ -118,7 +118,7 @@ public class PostServiceIntegrationTest {
 
         // 내가 쓴 글 1
         Post saveMe = postRepository.save(Post.builder()
-                .userId(userId)
+                .userId(this.userId)
                 .content("1번 게시물")
                 .challenge(false)
                 .build());
@@ -212,20 +212,20 @@ public class PostServiceIntegrationTest {
         assertThat(getPostByUserRes.size()).isEqualTo(2);
 
         // 1번 게시물
-        assertThat(getPostByUserRes.get(0).getContent()).isEqualTo("1번 게시물");
-        assertThat(getPostByUserRes.get(0).getLikeCount()).isEqualTo(1);
-        assertThat(getPostByUserRes.get(0).getCommentCount()).isEqualTo(1);
-        assertThat(getPostByUserRes.get(0).getImgCount()).isEqualTo(0);
-        assertThat(getPostByUserRes.get(0).isScraped()).isFalse();
+        assertThat(getPostByUserRes.get(1).getContent()).isEqualTo("1번 게시물");
+        assertThat(getPostByUserRes.get(1).getLikeCount()).isEqualTo(1);
+        assertThat(getPostByUserRes.get(1).getCommentCount()).isEqualTo(1);
+        assertThat(getPostByUserRes.get(1).getImgCount()).isEqualTo(0);
+        assertThat(getPostByUserRes.get(1).isScraped()).isFalse();
 
         // 2번 게시물은 삭제됐기 때문에 조회 안됨
 
-        // 3번 게시물
-        assertThat(getPostByUserRes.get(1).getContent()).isEqualTo("3번 게시물");
-        assertThat(getPostByUserRes.get(1).getLikeCount()).isEqualTo(1);
-        assertThat(getPostByUserRes.get(1).getCommentCount()).isEqualTo(0);
-        assertThat(getPostByUserRes.get(1).getImgCount()).isEqualTo(1);
-        assertThat(getPostByUserRes.get(1).isScraped()).isTrue();
+        // 3번 게시물 (최신순 조회라서 0번)
+        assertThat(getPostByUserRes.get(0).getContent()).isEqualTo("3번 게시물");
+        assertThat(getPostByUserRes.get(0).getLikeCount()).isEqualTo(1);
+        assertThat(getPostByUserRes.get(0).getCommentCount()).isEqualTo(0);
+        assertThat(getPostByUserRes.get(0).getImgCount()).isEqualTo(1);
+        assertThat(getPostByUserRes.get(0).isScraped()).isTrue();
 
         // 4번 게시물은 다른 유저가 작성한거라서 조회 안됨
     }
@@ -277,8 +277,11 @@ public class PostServiceIntegrationTest {
                 .userId(userId)
                 .build());
 
-        List<Post> all = postRepository.findAll();
-        Post post2 = all.get(0);
+        Post post2 = postRepository.save(Post.builder()
+                .userId(userId)
+                .content("글2")
+                .challenge(false)
+                .build());
         // 댓글 1개 달았음 (+1)
         commentRepository.save(Comment.builder()
                 .postId(post2.getId())
@@ -318,24 +321,26 @@ public class PostServiceIntegrationTest {
         int cnt = postLikeRepository.findByUserIdAndStatus(userId, StatusType.ACTIVE).size();
         List<Post> all = postRepository.findAll();
 
-        // 좋아요 +1
-        Post post1 = all.get(0);
-        postLikeRepository.save(PostLike.builder()
-                .postId(post1.getId())
-                .userId(userId)
-                .build());
+        if (all.size() != 0) {
+            // 좋아요 +1
+            Post post1 = all.get(0);
+            postLikeRepository.save(PostLike.builder()
+                    .postId(post1.getId())
+                    .userId(userId)
+                    .build());
 
-        // 좋아요 && 취소
-        Post post2 = all.get(1);
-        PostLike save = postLikeRepository.save(PostLike.builder()
-                .postId(post2.getId())
-                .userId(userId)
-                .build());
-        save.setStatus(StatusType.INACTIVE);
+            // 좋아요 && 취소
+            Post post2 = all.get(1);
+            PostLike save = postLikeRepository.save(PostLike.builder()
+                    .postId(post2.getId())
+                    .userId(userId)
+                    .build());
+            save.setStatus(StatusType.INACTIVE);
 
-        List<GetPostListByMypageRes> result = postService.getPostListByLike(page, size);
+            List<GetPostListByMypageRes> result = postService.getPostListByLike(page, size);
 
-        assertThat(result.size()).isEqualTo(cnt + 1);
+            assertThat(result.size()).isEqualTo(cnt + 1);
+        }
     }
 
     @DisplayName("내가 스크랩한 글 조회")
@@ -357,23 +362,25 @@ public class PostServiceIntegrationTest {
         int cnt = bookmarkRepository.findByUserIdAndStatus(userId, StatusType.ACTIVE).size();
         List<Post> all = postRepository.findAll();
 
-        // 스크랩 +1
-        Post post1 = all.get(0);
-        bookmarkRepository.save(Bookmark.builder()
-                .postId(post1.getId())
-                .userId(userId)
-                .build());
+        if (all.size() != 0) {
+            // 스크랩 +1
+            Post post1 = all.get(0);
+            bookmarkRepository.save(Bookmark.builder()
+                    .postId(post1.getId())
+                    .userId(userId)
+                    .build());
 
-        // 스크랩 && 취소
-        Post post2 = all.get(1);
-        Bookmark save = bookmarkRepository.save(Bookmark.builder()
-                .postId(post2.getId())
-                .userId(userId)
-                .build());
-        save.setStatus(StatusType.INACTIVE);
+            // 스크랩 && 취소
+            Post post2 = all.get(1);
+            Bookmark save = bookmarkRepository.save(Bookmark.builder()
+                    .postId(post2.getId())
+                    .userId(userId)
+                    .build());
+            save.setStatus(StatusType.INACTIVE);
 
-        List<GetPostListByMypageRes> result = postService.getPostListByScrap(page, size);
+            List<GetPostListByMypageRes> result = postService.getPostListByScrap(page, size);
 
-        assertThat(result.size()).isEqualTo(cnt + 1);
+            assertThat(result.size()).isEqualTo(cnt + 1);
+        }
     }
 }
