@@ -6,4 +6,5 @@ import lombok.Data;
 public class CreatePostReq {
     private String content;
     private boolean challenge;
+    private boolean review;
 }

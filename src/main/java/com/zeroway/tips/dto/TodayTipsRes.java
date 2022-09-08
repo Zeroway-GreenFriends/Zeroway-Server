@@ -7,6 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class TodayTipsRes {
 
+    private String tipNum;
     private String title;
     private String content;
 }

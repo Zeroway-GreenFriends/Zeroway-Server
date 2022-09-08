@@ -39,11 +39,15 @@ public class PostController {
      * 커뮤니티 글 전체 목록 조회 API
      */
     @GetMapping("/list")
-    public ResponseEntity<?> getPostList(@RequestParam(defaultValue = "createdAt") String sort) {
+    public ResponseEntity<?> getPostList(@RequestParam(defaultValue = "createdAt") String sort,
+                                         @RequestParam(required = false) Boolean challenge,
+                                         @RequestParam(required = false) Boolean review,
+                                         @RequestParam(defaultValue = "1") long page,
+                                         @RequestParam(defaultValue = "30") long size) {
         try {
             if (sortColumns.contains(sort)) {
                 Long userId = jwtService.getUserIdx();
-                List<PostListRes> postList = postService.getPostList(userId, sort);
+                List<PostListRes> postList = postService.getPostList(userId, sort, challenge, review, page, size);
                 JSONObject res = new JSONObject();
                 res.put("data", postList);
                 return ResponseEntity.ok().body(res);
@@ -56,11 +60,12 @@ public class PostController {
 
     /**
      * 게시글 상세 조회 API
+     *
      * @param postId 게시글 id
      */
     @GetMapping("/{postId}")
     public ResponseEntity<?> getPostDetail(@PathVariable Long postId) {
-        try{
+        try {
             Long userId = jwtService.getUserIdx();
             PostRes postRes = postService.getPost(postId, userId);
             return ResponseEntity.ok().body(postRes);
@@ -71,7 +76,8 @@ public class PostController {
 
     /**
      * 글 작성 API
-     * @param post - 내용, 챌린지 인증 여부
+     *
+     * @param post   - 내용, 챌린지 인증 여부
      * @param images - 이미지 파일 리스트
      */
     @PostMapping()
@@ -88,8 +94,9 @@ public class PostController {
 
     /**
      * 댓글 작성 API
+     *
      * @param postId 게시글 id
-     * @param req 댓글 내용
+     * @param req    댓글 내용
      */
     @PostMapping("/{postId}/comment")
     public ResponseEntity<?> createComment(@PathVariable Long postId,
@@ -105,6 +112,7 @@ public class PostController {
 
     /**
      * 좋아요 및 좋아요 취소 API
+     *
      * @param postId 게시글 id
      */
     @PostMapping("/{postId}/like")
@@ -120,6 +128,7 @@ public class PostController {
 
     /**
      * 좋아요 목록 조회 API
+     *
      * @param postId 게시글 id
      */
     @GetMapping("/{postId}/like")
@@ -134,13 +143,14 @@ public class PostController {
 
     /**
      * 북마크 및 북마크 취소 API
+     *
      * @param postId 게시글 id
      */
     @PostMapping("/{postId}/bookmark")
     public ResponseEntity<?> bookmark(@PathVariable Long postId, @RequestBody BookmarkReq req) {
         try {
             Long userId = jwtService.getUserIdx();
-             postService.bookmark(userId, postId, req.isBookmark());
+            postService.bookmark(userId, postId, req.isBookmark());
             return ResponseEntity.ok().build();
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
@@ -149,6 +159,7 @@ public class PostController {
 
     /**
      * 게시글 삭제 API
+     *
      * @param postId 게시글 id
      */
     @PatchMapping("/{postId}/delete")
@@ -158,7 +169,7 @@ public class PostController {
             postService.deletePost(postId, userId);
             return ResponseEntity.ok().build();
         } catch (BaseException e) {
-            if(e.getStatus().equals(UNAUTHORIZED_REQUEST))
+            if (e.getStatus().equals(UNAUTHORIZED_REQUEST))
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new BaseResponse<>(e.getStatus()));
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
@@ -179,4 +190,65 @@ public class PostController {
             return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
         }
     }
+
+    /**
+     * 내가 쓴 글 조회 API
+     */
+    @GetMapping("/user")
+    public ResponseEntity<BaseResponse<List<GetPostListByMypageRes>>> getPostListByUser(@RequestParam(defaultValue = "1") Long page, @RequestParam(defaultValue = "30") Long size) {
+        try {
+            List<GetPostListByMypageRes> postListByUser = postService.getPostListByUser(page, size);
+            return ResponseEntity.ok().body(new BaseResponse<>(postListByUser));
+        } catch (BaseException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+    }
+
+    /**
+     * 내가 댓글 단 글 조회 API
+     */
+    @GetMapping("/comment")
+    public ResponseEntity<BaseResponse<List<GetPostListByMypageRes>>> getPostListByComment(@RequestParam(defaultValue = "1") Long page, @RequestParam(defaultValue = "30") Long size) {
+        try {
+            List<GetPostListByMypageRes> postListByComment = postService.getPostListBycomment(page, size);
+            return ResponseEntity.ok().body(new BaseResponse<>(postListByComment));
+        } catch (BaseException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+    }
+
+    /**
+     * 좋아요 누른 글 조회 API
+     */
+    @GetMapping("/like")
+    public ResponseEntity<BaseResponse<List<GetPostListByMypageRes>>> getPostListByLike(@RequestParam(defaultValue = "1") Long page, @RequestParam(defaultValue = "30") Long size) {
+        try {
+            List<GetPostListByMypageRes> resultList = postService.getPostListByLike(page, size);
+            return ResponseEntity.ok().body(new BaseResponse<>(resultList));
+        } catch (BaseException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+
+    }
+
+    /**
+     * 스크랩한 글 조회 API
+     */
+    @GetMapping("/scrap")
+    public ResponseEntity<BaseResponse<List<GetPostListByMypageRes>>> getPostListByScrap(@RequestParam(defaultValue = "1") Long page, @RequestParam(defaultValue = "30") Long size) {
+        try {
+            List<GetPostListByMypageRes> resultList = postService.getPostListByScrap(page, size);
+            return ResponseEntity.ok().body(new BaseResponse<>(resultList));
+        } catch (BaseException e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+
+    }
+
 }
+
+

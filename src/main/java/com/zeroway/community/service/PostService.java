@@ -2,7 +2,7 @@ package com.zeroway.community.service;
 
 import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
-import com.zeroway.community.dto.CreatePostReq;
+import com.zeroway.community.dto.*;
 import com.zeroway.community.entity.Bookmark;
 import com.zeroway.community.entity.Post;
 import com.zeroway.community.entity.PostImage;
@@ -10,9 +10,8 @@ import com.zeroway.community.repository.comment.CommentRepository;
 import com.zeroway.community.repository.post.BookmarkRepository;
 import com.zeroway.community.repository.post.PostImageRepository;
 import com.zeroway.community.repository.post.PostRepository;
-import com.zeroway.community.dto.PostListRes;
-import com.zeroway.community.dto.PostRes;
 import com.zeroway.s3.S3Uploader;
+import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
@@ -37,13 +36,13 @@ public class PostService {
     private final CommentRepository commentRepository;
     private final BookmarkRepository bookmarkRepository;
     private final S3Uploader s3Uploader;
-
+    private final JwtService jwtService;
 
     // 전체 글 조회
-    public List<PostListRes> getPostList(Long userId, String sort) throws BaseException {
+    public List<PostListRes> getPostList(Long userId, String sort, Boolean challenge, Boolean review, long page, long size) throws BaseException {
         List<PostListRes> result = new ArrayList<>();
         try {
-            for (PostListRes post : postRepository.getPostList(userId, sort)) {
+            for (PostListRes post : postRepository.getPostList(userId, sort, challenge, review, page, size)) {
                 Long postId = post.getPostId();
                 // 게시글 이미지 조회
                 post.getImageList().addAll(postImageRepository.findUrlByPostId(postId));
@@ -86,7 +85,12 @@ public class PostService {
     public void createPost(CreatePostReq req, @Nullable List<MultipartFile> images, Long userId) throws BaseException {
         try {
             // post 저장
-            Post savedPost = postRepository.save(Post.builder().userId(userId).content(req.getContent()).challenge(req.isChallenge()).build());
+            Post savedPost = postRepository.save(Post.builder()
+                    .userId(userId)
+                    .content(req.getContent())
+                    .challenge(req.isChallenge())
+                    .review(req.isReview())
+                    .build());
 
             // 이미지 파일 업로드 및 postImage 저장
             if(images != null)
@@ -141,4 +145,55 @@ public class PostService {
 
     }
 
+    /**
+     * 내가 쓴 글 조회
+     */
+    public List<GetPostListByMypageRes> getPostListByUser(Long page, Long size) throws BaseException {
+        try {
+            Long userId = jwtService.getUserIdx();
+            return postRepository.getPostListByUser(userId, page, size);
+        } catch (BaseException e) {
+            e.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 댓글 단 글 조회
+     */
+    public List<GetPostListByMypageRes> getPostListBycomment(Long page, Long size) throws BaseException {
+        try {
+            Long userId = jwtService.getUserIdx();
+            return postRepository.getPostListByComment(userId, page, size);
+        } catch (BaseException e) {
+            e.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 좋아요 누른 글 조회
+     */
+    public List<GetPostListByMypageRes> getPostListByLike(Long page, Long size) throws BaseException {
+        try {
+            Long userId = jwtService.getUserIdx();
+            return postRepository.getPostListByLike(userId, page, size);
+        } catch (BaseException e) {
+            e.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 스크랩한 글 조회
+     */
+    public List<GetPostListByMypageRes> getPostListByScrap(Long page, Long size) throws BaseException {
+        try {
+            Long userId = jwtService.getUserIdx();
+            return postRepository.getPostListByScrap(userId, page, size);
+        } catch (BaseException e) {
+            e.printStackTrace();
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

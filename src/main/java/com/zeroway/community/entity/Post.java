@@ -25,10 +25,14 @@ public class Post extends BaseEntity {
     @ColumnDefault("false")
     private boolean challenge; // 챌린지 인증 여부
 
+    @ColumnDefault("false")
+    private boolean review; // 리뷰 여부
+
     @Builder
-    public Post(Long userId, String content, boolean challenge) {
+    public Post(Long userId, String content, boolean challenge, boolean review) {
         this.userId = userId;
         this.content = content;
         this.challenge = challenge;
+        this.review = review;
     }
 }
