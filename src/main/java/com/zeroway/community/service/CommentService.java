@@ -3,14 +3,10 @@ package com.zeroway.community.service;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
 import com.zeroway.community.dto.CreateCommentReq;
-import com.zeroway.community.dto.ReportReq;
 import com.zeroway.community.entity.Comment;
 import com.zeroway.community.entity.CommentLike;
 import com.zeroway.community.repository.comment.CommentLikeRepository;
 import com.zeroway.community.repository.comment.CommentRepository;
-import com.zeroway.cs.entity.report.CategoryOfReport;
-import com.zeroway.cs.entity.report.Report;
-import com.zeroway.cs.entity.report.TypeOfReport;
 import com.zeroway.cs.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +22,6 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final CommentLikeRepository commentLikeRepository;
-    private final ReportRepository reportRepository;
 
     // 댓글 저장
     @Transactional
@@ -77,22 +72,6 @@ public class CommentService {
             throw e;
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
-        }
-    }
-
-    //댓글 신고
-    public void reportComment(Long userId, ReportReq reportReq) throws BaseException{
-        try {
-            TypeOfReport type = TypeOfReport.enumOf(reportReq.getType());
-            if(type == null) {throw new BaseException(INVALID_REPORT_TYPE);}
-
-            reportRepository.save(Report.builder().userId(userId)
-                    .category(CategoryOfReport.COMMENT).
-                    targetId(reportReq.getTargetId()).
-                    type(type).build());
-
-        } catch (Exception e) {
-            throw new BaseException(FILE_UPLOAD_ERROR);
         }
     }
 }

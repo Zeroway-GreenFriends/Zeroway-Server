@@ -5,7 +5,8 @@ import com.zeroway.common.BaseResponse;
 import com.zeroway.community.dto.LikeReq;
 import com.zeroway.community.dto.ReportReq;
 import com.zeroway.community.service.CommentService;
-import com.zeroway.cs.dto.QnaReq;
+import com.zeroway.cs.entity.report.CategoryOfReport;
+import com.zeroway.cs.service.ReportService;
 import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ public class CommentController {
 
     private final CommentService commentService;
     private final JwtService jwtService;
+    private final ReportService reportService;
 
     /**
      * 댓글 좋아요 및 좋아요 취소 API
@@ -54,11 +56,16 @@ public class CommentController {
         }
     }
 
+    /**
+     * 댓글 신고 API
+     * @param reportReq (targetId-신고할 댓글 id, type-신고유형)
+     */
     @PostMapping("/report")
     public ResponseEntity<?> reportComment(@RequestBody ReportReq reportReq) {
         try{
             Long userId = jwtService.getUserIdx();
-            commentService.reportComment(userId, reportReq);
+            CategoryOfReport category = CategoryOfReport.COMMENT;
+            reportService.reportTarget(userId, category, reportReq);
             return ResponseEntity.ok().build();
         } catch (BaseException exception) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));

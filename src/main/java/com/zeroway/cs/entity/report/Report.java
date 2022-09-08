@@ -35,7 +35,7 @@ public class Report extends BaseEntity {
 
     //신고 확인 여부
     @ColumnDefault("false")
-    private boolean check;
+    private boolean reportCheck;
 
     @Builder
     public Report(long userId, CategoryOfReport category, long targetId, TypeOfReport type) {
