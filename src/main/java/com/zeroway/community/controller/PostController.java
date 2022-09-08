@@ -6,6 +6,8 @@ import com.zeroway.community.dto.*;
 import com.zeroway.community.service.CommentService;
 import com.zeroway.community.service.PostLikeService;
 import com.zeroway.community.service.PostService;
+import com.zeroway.cs.entity.report.CategoryOfReport;
+import com.zeroway.cs.service.ReportService;
 import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
@@ -30,6 +32,7 @@ public class PostController {
     private final JwtService jwtService;
     private final CommentService commentService;
     private final PostLikeService likeService;
+    private final ReportService reportService;
     private final List<String> sortColumns = new ArrayList<>(Arrays.asList("createdAt", "like"));
 
     /**
@@ -158,6 +161,22 @@ public class PostController {
             if(e.getStatus().equals(UNAUTHORIZED_REQUEST))
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new BaseResponse<>(e.getStatus()));
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
+        }
+    }
+
+    /**
+     * 글 신고 API
+     * @param reportReq (targetId-신고할 글 id, type-신고유형)
+     */
+    @PostMapping("/report")
+    public ResponseEntity<?> reportPost(@RequestBody ReportReq reportReq) {
+        try{
+            Long userId = jwtService.getUserIdx();
+            CategoryOfReport category = CategoryOfReport.POST;
+            reportService.reportTarget(userId, category, reportReq);
+            return ResponseEntity.ok().build();
+        } catch (BaseException exception) {
+            return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
         }
     }
 }
