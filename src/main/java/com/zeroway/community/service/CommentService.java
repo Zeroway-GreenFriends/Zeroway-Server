@@ -7,6 +7,7 @@ import com.zeroway.community.entity.Comment;
 import com.zeroway.community.entity.CommentLike;
 import com.zeroway.community.repository.comment.CommentLikeRepository;
 import com.zeroway.community.repository.comment.CommentRepository;
+import com.zeroway.cs.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

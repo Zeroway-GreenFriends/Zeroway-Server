@@ -1,7 +1,6 @@
-package com.zeroway.cs.entity;
+package com.zeroway.cs.entity.qna;
 
 import com.zeroway.common.BaseEntity;
-import com.zeroway.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

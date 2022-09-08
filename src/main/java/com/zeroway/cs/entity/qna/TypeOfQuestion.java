@@ -1,4 +1,4 @@
-package com.zeroway.cs.entity;
+package com.zeroway.cs.entity.qna;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
