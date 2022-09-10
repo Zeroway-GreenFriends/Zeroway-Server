@@ -1,6 +1,7 @@
 package com.zeroway.challenge.service;
 
 import com.zeroway.challenge.dto.ChallengeCompleteRes;
+import com.zeroway.challenge.entity.RedisChallenge;
 import com.zeroway.challenge.repository.LevelRepository;
 import com.zeroway.challenge.dto.ChallengeListRes;
 import com.zeroway.challenge.dto.ChallengeRes;
@@ -8,6 +9,7 @@ import com.zeroway.challenge.entity.Challenge;
 import com.zeroway.challenge.entity.Level;
 import com.zeroway.challenge.entity.User_Challenge;
 import com.zeroway.challenge.repository.ChallengeRepository;
+import com.zeroway.challenge.repository.RedisChallengeRepository;
 import com.zeroway.challenge.repository.UserChallengeRepository;
 import com.zeroway.common.BaseException;
 import com.zeroway.user.entity.User;
@@ -18,10 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.zeroway.common.BaseResponseStatus.*;
@@ -35,8 +34,9 @@ public class ChallengeService {
     private final UserChallengeRepository userChallengeRepository;
     private final ChallengeRepository challengeRepository;
     private final LevelRepository levelRepository;
+    private final RedisChallengeRepository redisChallengeRepository;
 
-
+    //챌린지 프로필
     public ChallengeRes getList(Long userId) throws BaseException {
         try{
             User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_USER_ID));
@@ -50,6 +50,119 @@ public class ChallengeService {
         }
     }
 
+    //오늘의 챌린지
+    @Transactional
+    public List<ChallengeListRes> getChallenge(Long userId, int size) throws BaseException{
+        try {
+            Optional<RedisChallenge> optional = redisChallengeRepository.findById(userId);
+
+            //redis에 회원의 오늘의 챌린지가 없는 경우
+            if (optional.isEmpty()) {
+
+                //내일 0시
+                Calendar tomorrow = new GregorianCalendar(TimeZone.getTimeZone("Asia/Seoul"), Locale.KOREA);
+                tomorrow.add(Calendar.DAY_OF_MONTH, 1);
+                tomorrow.set(Calendar.HOUR_OF_DAY, 0);
+                tomorrow.set(Calendar.MINUTE, 0);
+                tomorrow.set(Calendar.SECOND, 0);
+                tomorrow.set(Calendar.MILLISECOND, 0);
+
+                //redis에 오늘의 챌린지 저장
+                redisChallengeRepository.save(RedisChallenge.builder()
+                        .userId(userId)
+                        .challenge(getTodayChallenge(size))
+                        .expiration((tomorrow.getTimeInMillis() - new Date().getTime()) / 1000) //오늘이 지나면 만료
+                        .build());
+            }
+            RedisChallenge redisChallenge = redisChallengeRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_USER_ID));
+
+            return redisChallenge.getChallenge().stream()
+                    .map(c -> new ChallengeListRes(c.getId(), challengeRepository.findById(c.getId()).get().getContent(), c.getComplete()))
+                    .collect(Collectors.toList());
+
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    //랜덤 챌린지 3개 가져오기
+    private List<Long> getTodayChallenge(int size) throws BaseException{
+        try {
+            LocalDateTime now = LocalDateTime.now();
+            List<Challenge> challengeIdList = challengeRepository.findAll();
+            List<Long> todayChallengeId = new ArrayList<>();
+
+            Random rn = new Random(now.getDayOfYear());
+            for (long i = 0; i < size; i++) {
+                int id = rn.nextInt(challengeIdList.size());
+                todayChallengeId.add(challengeIdList.get(id).getId());
+            }
+            return todayChallengeId;
+
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    //챌린지 수행/취소
+    public ChallengeCompleteRes patchChallengeComplete(Long userId, Long challengeId, Integer exp) throws Exception{
+        try{
+            User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_USER_ID));
+            RedisChallenge rc = redisChallengeRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_USER_ID));
+            List<RedisChallenge.Challenge> c = rc.getChallenge();
+
+            for (RedisChallenge.Challenge challenge : c) {
+                if(challenge.getId().equals(challengeId)) {
+                    if(challenge.getComplete()) {
+                        challenge.setComplete(false);
+                        user.setExp(user.getExp()+exp);
+                    }
+                    else {
+                        challenge.setComplete(true);
+                        user.setExp(user.getExp()-exp);
+                    }
+                }
+            }
+            checkLevel(user);
+            redisChallengeRepository.save(rc);
+            return new ChallengeCompleteRes(user.getLevel().getId());
+        }
+        catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    //레벨업&다운
+    private void checkLevel(User user) throws BaseException {
+        if(user.getExp() >= 100) {
+            Level levelup = levelRepository.findById(user.getLevel().getId() + 1).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));
+            user.setLevel(levelup);
+            user.setExp(user.getExp()-100);
+            createUC(user);
+
+        } else if(user.getExp() < 0){
+            if(user.getLevel().getId()!=1) {
+                Level levelDown = levelRepository.findById(user.getLevel().getId() - 1).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));;;
+                user.setLevel(levelDown);
+                user.setExp(user.getExp()+100);
+            } else {
+                user.setExp(0);
+            }
+        }
+        userRepository.save(user);
+    }
+
+    private void createUC(User user) {
+        List<Challenge> challenges = challengeRepository.findByLevel_Id(user.getLevel().getId());
+        if(userChallengeRepository.findByUser_IdAndChallenge_Id(user.getId(), challenges.get(0).getId())==null) {
+            for (Challenge challenge : challenges) {
+                userChallengeRepository.save(User_Challenge.builder()
+                        .user(user).challenge(challenge).build());
+            }
+        }
+    }
+
+    /*
     public List<ChallengeListRes> getTodayChallengeList(long userId, Integer size) throws BaseException{
         List<User_Challenge> todayChallenge = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
@@ -101,35 +214,5 @@ public class ChallengeService {
             throw new BaseException(DATABASE_ERROR);
         }
     }
-
-    //레벨업&다운
-    private void checkLevel(User user) throws BaseException {
-        if(user.getExp() >= 100) {
-            Level levelup = levelRepository.findById(user.getLevel().getId() + 1).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));
-            user.setLevel(levelup);
-            user.setExp(user.getExp()-100);
-            createUC(user);
-
-        } else if(user.getExp() < 0){
-            if(user.getLevel().getId()!=1) {
-                Level levelDown = levelRepository.findById(user.getLevel().getId() - 1).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));;;
-                user.setLevel(levelDown);
-                user.setExp(user.getExp()+100);
-            } else {
-                user.setExp(0);
-            }
-        }
-        userRepository.save(user);
-    }
-
-    private void createUC(User user) {
-        List<Challenge> challenges = challengeRepository.findByLevel_Id(user.getLevel().getId());
-        if(userChallengeRepository.findByUser_IdAndChallenge_Id(user.getId(), challenges.get(0).getId())==null) {
-            for (Challenge challenge : challenges) {
-                userChallengeRepository.save(User_Challenge.builder()
-                        .user(user).challenge(challenge).build());
-            }
-        }
-    }
-
+    */
 }
