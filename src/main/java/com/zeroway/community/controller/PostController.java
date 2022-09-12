@@ -40,7 +40,7 @@ public class PostController {
                                          @RequestParam(required = false) Boolean challenge,
                                          @RequestParam(required = false) Boolean review,
                                          @RequestParam(defaultValue = "1") long page,
-                                         @RequestParam(defaultValue = "30") long size) {
+                                         @RequestParam(defaultValue = "5") long size) {
         try {
             if (sortColumns.contains(sort)) {
                 Long userId = jwtService.getUserIdx();
