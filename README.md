@@ -74,6 +74,12 @@
 
 <br/>
 
+## 소프트웨어 아키텍처
+![소프트웨어-아키텍쳐-001](https://user-images.githubusercontent.com/75151848/189675913-d8e7ea75-636b-4461-919d-2ef5c354b7ea.png)
+
+
+<br/>
+
 ## API 명세서
 
 [노션 링크](https://florentine-hose-94d.notion.site/API-4902862807c74655aedb6af6430c55a2)
@@ -83,8 +89,6 @@
 ## ERD
 읽기 전용 URL : https://aquerytool.com/aquerymain/index/?rurl=0377515b-2a58-4123-8db1-0bfcf4181b1a& <br/>
 Password : g74dw3 <br/>
-
-![Zeroway_20220824_215149](https://user-images.githubusercontent.com/75151848/186423097-9cca921a-145a-4213-b335-735ccda5a303.png)
 
 <br/>
 
