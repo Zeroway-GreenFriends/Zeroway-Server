@@ -22,7 +22,7 @@ public class FaqService {
         try {
             List<FAQ> faqList = faqRepository.findAll();
             return faqList.stream()
-                    .map(faq -> new FaqListRes(faq.getQuestion(), faq.getAnswer()))
+                    .map(faq -> new FaqListRes(faq.getId(), faq.getQuestion()))
                     .collect(Collectors.toList());
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);

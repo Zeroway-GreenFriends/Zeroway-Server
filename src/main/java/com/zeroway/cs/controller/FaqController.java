@@ -23,7 +23,7 @@ public class FaqController {
 
     /**
      * 자주 묻는 질문 전체 조회 API
-     * @return FAQ(질문, 답변)
+     * @return FAQ(id, 질문)
      */
     @ResponseBody
     @GetMapping("")
