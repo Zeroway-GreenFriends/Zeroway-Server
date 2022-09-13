@@ -5,11 +5,11 @@ import lombok.Data;
 @Data
 public class FaqListRes {
 
+    private long id;
     private String question;
-    private String answer;
 
-    public FaqListRes(String question, String answer) {
+    public FaqListRes(long id, String question) {
+        this.id = id;
         this.question = question;
-        this.answer = answer;
     }
 }
