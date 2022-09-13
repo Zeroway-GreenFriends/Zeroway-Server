@@ -40,13 +40,13 @@ public class ChallengeController {
 
     /**
      * 오늘의 챌린지 API
-     * @return 챌린지(id, content, complete) 랜덤 5개 (유저 레벨별 + 수행 안 한 것)
+     * @return 챌린지(id, content, complete) 랜덤 5개
      */
     @ResponseBody
     @GetMapping("list/today")
     public ResponseEntity<?> getTodayChallengeList() {
         try{
-            List<ChallengeListRes> challengeListRes = challengeService.getChallenge(jwtService.getUserIdx(), 3);
+            List<ChallengeListRes> challengeListRes = challengeService.getChallenge(jwtService.getUserIdx(), 5);
             return ResponseEntity.ok().body(challengeListRes);
         } catch(BaseException exception){
             return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
