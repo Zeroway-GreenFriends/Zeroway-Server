@@ -37,14 +37,14 @@ public enum BaseResponseStatus {
 
     UNAUTHORIZED_REQUEST(false, 2300, "권한이 없습니다."),
 
+    // CS
     INVALID_QNA_ID(false, 2400, "잘못된 문의 내역 식별자입니다."),
-
-    INVALID_ANNOUNCE_ID(false, 2500, "잘못된 공지 사항 식별자입니다."),
+    INVALID_ANNOUNCE_ID(false, 2401, "잘못된 공지 사항 식별자입니다."),
+    INVALID_FAQ_ID(false, 2402, "잘못된 자주 묻는 질문 식별자입니다."),
+    INVALID_QUESION_TYPE(false, 2403, "잘못된 질문 유형입니다."),
+    INVALID_REPORT_TYPE(false, 2404, "잘못된 신고 유형입니다."),
 
     INVALID_LEVEL_ID(false, 2600, "존재하지 않는 레벨입니다."),
-
-    INVALID_QUESION_TYPE(false, 2700, "잘못된 질문 유형입니다."),
-    INVALID_REPORT_TYPE(false, 2701, "잘못된 신고 유형입니다."),
 
 
 
