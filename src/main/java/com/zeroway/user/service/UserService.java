@@ -34,8 +34,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final LevelRepository levelRepository;
-    private final ChallengeRepository challengeRepository;
-    private final UserChallengeRepository userChallengeRepository;
     private final JwtService jwtService;
     private final Mapper mapper;
     private final S3Uploader s3Uploader;
@@ -83,18 +81,6 @@ public class UserService {
         }
 
         user = userRepository.save(user);
-
-        // userChallengeRepo 데이터 삽입 : 레벨1 챌린지
-        List<Challenge> levelOneChallenge = challengeRepository.findByLevel_Id(levelOptional.get().getId());
-
-        for (int i = 0; i < levelOneChallenge.size(); i++) {
-            User_Challenge userChallenge = User_Challenge.builder()
-                    .user(user)
-                    .challenge(levelOneChallenge.get(i))
-                    .build();
-            userChallengeRepository.save(userChallenge);
-        }
-
         return postUser(user);
     }
 
@@ -161,7 +147,6 @@ public class UserService {
 
             user.signout("알 수 없음", "email@gmail.com", null, levelRepository.findById(1).get(), StatusType.INACTIVE);
             jwtService.deleteRefreshToken(userIdx);
-            userChallengeRepository.deleteByUser_Id(userIdx);
             return user;
         } catch (BaseException e) {
             e.printStackTrace();

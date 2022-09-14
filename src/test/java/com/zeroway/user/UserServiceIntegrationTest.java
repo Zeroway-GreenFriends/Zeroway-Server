@@ -18,6 +18,9 @@ import com.zeroway.user.repository.UserRepository;
 import com.zeroway.user.service.UserService;
 import com.zeroway.utils.JwtService;
 import com.zeroway.utils.RedisService;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
+import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -54,8 +57,6 @@ public class UserServiceIntegrationTest {
     JwtService jwtService;
     @Autowired
     ChallengeRepository challengeRepository;
-    @Autowired
-    UserChallengeRepository userChallengeRepository;
     @Autowired
     RedisService redisService;
     @Mock
@@ -125,35 +126,24 @@ public class UserServiceIntegrationTest {
         assertThat(user.getLevel()).isEqualTo(twoLevel);
     }
 
-    @DisplayName("유저 회원가입 성공: 유저챌린지 테이블 삽입 확인")
+    @DisplayName("유저 회원가입 성공")
     @Test
     void signInO() throws BaseException {
         SignInAuthReq sign = signInAuthReq();
         User user = mapper.map(sign, User.class);
         MultipartFile multipartFile = null;
 
-        Level levelOne = levelRepository.findById(1).get();
-        Challenge challenge1 = Challenge.builder()
-                .content("test")
-                .level(levelOne)
-                .build();
-        Challenge challenge2 = Challenge.builder()
-                .content("test2")
-                .level(levelOne)
-                .build();
+        PostUserRes postUserRes = userService.signIn(sign, multipartFile);
 
-        Challenge save1 = challengeRepository.save(challenge1);
-        Challenge save2 = challengeRepository.save(challenge2);
+        request = new MockHttpServletRequest();
+        request.addHeader("Bearer", postUserRes.getAccessToken());
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+        Long userId = jwtService.getUserIdx();
 
-        userService.signIn(sign, multipartFile);
-
-        assertThat(userChallengeRepository.findByChallenge_Id(save1.getId()).getUser().getNickname()).isEqualTo(user.getNickname());
-        assertThat(userChallengeRepository.findByChallenge_Id(save2.getId()).getUser().getNickname()).isEqualTo(user.getNickname());
-        assertThat(userChallengeRepository.findByChallenge_Id(save1.getId()).isComplete()).isFalse();
-        assertThat(userChallengeRepository.findByChallenge_Id(save1.getId()).getChallenge().getLevel().getId()).isEqualTo(1);
+        assertThat(postUserRes.getRefreshToken()).isEqualTo(redisService.getValues(String.valueOf(userId)));
     }
 
-    @DisplayName("회원 탈퇴 성공: 유저 테이블, 유저 챌린지 테이블, redis")
+    @DisplayName("회원 탈퇴 성공: 유저 테이블, redis")
     @Test
     void signoutO() throws BaseException {
         Long userId = this.createRequestJWT();
@@ -167,23 +157,11 @@ public class UserServiceIntegrationTest {
                 .level(levelRepository.findById(1).get())
                 .build());
 
-        // 유저챌린지 테이블 데이터 생성
-        userChallengeRepository.save(User_Challenge.builder()
-                .user(userRepository.findById(userId).get())
-                .challenge(chall1)
-                .build());
-        userChallengeRepository.save(User_Challenge.builder()
-                .user(userRepository.findById(userId).get())
-                .challenge(chall2)
-                .build());
-        assertThat(userChallengeRepository.findByUser_Id(userId).size()).isEqualTo(2);
-
         User signoutUser = userService.signout();
 
         assertThat(signoutUser.getId()).isEqualTo(userId);
         assertThat(signoutUser.getEmail()).isEqualTo("email@gmail.com");
         assertThat(redisService.getValues(String.valueOf(signoutUser.getId()))).isNull();
-        assertThat(userChallengeRepository.findByUser_Id(userId).size()).isEqualTo(0);
     }
 
     @DisplayName("회원 정보 수정 성공 : 프로필 & 닉네임")
