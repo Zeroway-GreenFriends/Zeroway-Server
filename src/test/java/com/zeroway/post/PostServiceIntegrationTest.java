@@ -326,6 +326,7 @@ public class PostServiceIntegrationTest {
         if (all.size() != 0) {
             // 좋아요 +1
             Post post1 = all.get(0);
+            post1.setStatus(StatusType.ACTIVE);
             postLikeRepository.save(PostLike.builder()
                     .postId(post1.getId())
                     .userId(userId)
@@ -367,6 +368,7 @@ public class PostServiceIntegrationTest {
         if (all.size() != 0) {
             // 스크랩 +1
             Post post1 = all.get(0);
+            post1.setStatus(StatusType.ACTIVE);
             bookmarkRepository.save(Bookmark.builder()
                     .postId(post1.getId())
                     .userId(userId)
