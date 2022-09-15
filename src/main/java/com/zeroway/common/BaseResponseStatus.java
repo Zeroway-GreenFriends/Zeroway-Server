@@ -35,7 +35,7 @@ public enum BaseResponseStatus {
 
     INVALID_USER_ID(false, 2300, "잘못된 회원 식별자입니다."),
 
-    UNAUTHORIZED_REQUEST(false, 2300, "권한이 없습니다."),
+    UNAUTHORIZED_REQUEST(false, 2301, "권한이 없습니다."),
 
     // CS
     INVALID_QNA_ID(false, 2400, "잘못된 문의 내역 식별자입니다."),
