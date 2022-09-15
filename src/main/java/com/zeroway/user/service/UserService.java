@@ -1,11 +1,7 @@
 package com.zeroway.user.service;
 
-import com.zeroway.challenge.entity.Challenge;
-import com.zeroway.challenge.entity.User_Challenge;
-import com.zeroway.challenge.repository.ChallengeRepository;
 import com.zeroway.challenge.repository.LevelRepository;
 import com.zeroway.challenge.entity.Level;
-import com.zeroway.challenge.repository.UserChallengeRepository;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
 import com.zeroway.s3.S3Uploader;
