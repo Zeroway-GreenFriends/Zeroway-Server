@@ -141,11 +141,9 @@ public class UserServiceIntegrationTest {
 
         Challenge chall1 = challengeRepository.save(Challenge.builder()
                 .content("1번 챌린지")
-                .level(levelRepository.findById(1).get())
                 .build());
         Challenge chall2 = challengeRepository.save(Challenge.builder()
                 .content("2번 챌린지")
-                .level(levelRepository.findById(1).get())
                 .build());
 
         User signoutUser = userService.signout();
