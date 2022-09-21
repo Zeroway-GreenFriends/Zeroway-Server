@@ -68,21 +68,4 @@ public class ChallengeController {
         }
     }
 
-
-    /**
-     * 레벨별 챌린지 API
-     * @return 챌린지(id, content, complete) (유저 레벨별)
-     */
-    /*
-    @ResponseBody
-    @GetMapping("list")
-    public ResponseEntity<?> getChallengeList() {
-        try{
-            List<ChallengeListRes> challengeListRes = challengeService.getChallengeList(jwtService.getUserIdx());
-            return ResponseEntity.ok().body(challengeListRes);
-        } catch(BaseException exception){
-            return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
-        }
-    }
-    */
 }
