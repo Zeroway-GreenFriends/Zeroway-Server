@@ -35,7 +35,7 @@ public class StoreService {
     public List<StoreListRes> searchStoreList(String keyword, int page, int size) throws BaseException {
         try{
             PageRequest pageRequest = PageRequest.of(page, size, Sort.by("name").ascending());
-            return storeRepository.findByAddressNewContains(keyword, pageRequest).getContent().stream()
+            return storeRepository.findByAddressNewContainingOrNameContaining(keyword, keyword, pageRequest).getContent().stream()
                     .map(store -> new StoreListRes(store.getId(), store.getImageUrl(), store.getName(), store.getItem(),
                             store.getAddressNew(), store.getOperatingTime(), store.getContact(), store.getSiteUrl(), store.getInstagram())).collect(Collectors.toList());
         } catch (Exception e) {
@@ -45,7 +45,7 @@ public class StoreService {
 
     public List<StoreListRes> getStoreList(int page, int size) throws BaseException {
         try{
-            PageRequest pageRequest = PageRequest.of(page, size);
+            PageRequest pageRequest = PageRequest.of(page, size, Sort.by("name").ascending());
             return storeRepository.findAll(pageRequest).getContent().stream()
                     .map(store -> new StoreListRes(store.getId(), store.getImageUrl(), store.getName(), store.getItem(),
                             store.getAddressNew(), store.getOperatingTime(), store.getContact(), store.getSiteUrl(), store.getInstagram())).collect(Collectors.toList());
