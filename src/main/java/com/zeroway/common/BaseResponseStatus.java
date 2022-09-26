@@ -48,6 +48,8 @@ public enum BaseResponseStatus {
 
     INVALID_LEVEL_ID(false, 2600, "존재하지 않는 레벨입니다."),
 
+    // 커뮤니티
+    TOO_MANY_IMAGES(false, 2700, "이미지는 최대 6장까지만 업로드 가능합니다."),
 
 
     /**

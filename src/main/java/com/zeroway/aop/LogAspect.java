@@ -39,7 +39,6 @@ public class LogAspect {
             log.info("{} args={}", joinPoint.getSignature(), joinPoint.getArgs());
             return joinPoint.proceed();
         } catch (BaseException e) {
-
             log.error("{} args={} error={}", joinPoint.getSignature(), joinPoint.getArgs(), e.toString());
             if (e.getStatus().equals(UNAUTHORIZED_REQUEST))
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new BaseResponse<>(e.getStatus()));

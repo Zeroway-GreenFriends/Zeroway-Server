@@ -2,6 +2,7 @@ package com.zeroway.community.controller;
 
 import com.zeroway.common.BaseException;
 import com.zeroway.common.BaseResponse;
+import com.zeroway.common.BaseResponseStatus;
 import com.zeroway.community.dto.*;
 import com.zeroway.community.service.CommentService;
 import com.zeroway.community.service.PostLikeService;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.zeroway.common.BaseResponseStatus.*;
 import static com.zeroway.common.BaseResponseStatus.INVALID_PARAMETER_VALUE;
 import static com.zeroway.common.BaseResponseStatus.UNAUTHORIZED_REQUEST;
 
@@ -74,6 +76,7 @@ public class PostController {
     public ResponseEntity<?> createPost(@RequestPart CreatePostReq post,
                                         @RequestPart(required = false) List<MultipartFile> images) throws Exception{
             Long userId = jwtService.getUserIdx();
+            if(images != null && images.size() > 6) throw new BaseException(TOO_MANY_IMAGES);
             postService.createPost(post, images, userId);
             return ResponseEntity.ok().build();
     }
