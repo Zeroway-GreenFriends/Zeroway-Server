@@ -1,11 +1,13 @@
 package com.zeroway.common;
 
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * 에러 코드 관리
  */
 @Getter
+@ToString
 public enum BaseResponseStatus {
     /**
      * 1000 : 요청 성공
