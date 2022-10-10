@@ -28,7 +28,6 @@ public class AnnounceController {
         try{
             List<AnnounceListRes> announceListRes = announceService.getAnnounceList();
             return ResponseEntity.ok().body(announceListRes);
-
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
@@ -45,7 +44,6 @@ public class AnnounceController {
         try{
             AnnounceRes announceRes = announceService.getAnnounce(announceId);
             return ResponseEntity.ok().body(announceRes);
-
         } catch (BaseException e) {
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }

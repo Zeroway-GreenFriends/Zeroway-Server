@@ -38,11 +38,9 @@ public class ChallengeService {
         try{
             User user = userRepository.findById(userId).orElseThrow(() -> new BaseException(INVALID_USER_ID));
             Level userLevel = levelRepository.findById(user.getLevel().getId()).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));
-
             return new ChallengeRes(user.getNickname(), user.getLevel().getId(), user.getExp(), userLevel.getImageUrl());
         }
         catch (Exception exception) {
-            log.error(exception.getMessage());
             throw new BaseException(DATABASE_ERROR);
         }
     }
@@ -99,7 +97,6 @@ public class ChallengeService {
                 todayChallengeId.add(challengeIdList.get(id).getId());
             }
             return todayChallengeId;
-
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
@@ -152,5 +149,4 @@ public class ChallengeService {
             }
         }
     }
-
 }
