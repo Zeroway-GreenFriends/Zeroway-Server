@@ -18,18 +18,16 @@ public class ReportService {
 
     private final ReportRepository reportRepository;
 
-    //신고
+    // 신고하기
     public void reportTarget(Long userId, CategoryOfReport category, ReportReq reportReq) throws BaseException{
         try {
             TypeOfReport type = TypeOfReport.enumOf(reportReq.getType());
             if(type == null) {throw new BaseException(INVALID_REPORT_TYPE);}
-
             reportRepository.save(Report.builder()
                     .userId(userId)
                     .category(category)
                     .targetId(reportReq.getTargetId())
                     .type(type).build());
-
         } catch (Exception e) {
             throw new BaseException(DATABASE_ERROR);
         }

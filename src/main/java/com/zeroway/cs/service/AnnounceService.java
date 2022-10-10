@@ -22,6 +22,7 @@ public class AnnounceService {
 
     private final AnnounceRepository announceRepository;
 
+    // 공지사항 전체 조회
     public List<AnnounceListRes> getAnnounceList() throws BaseException {
         try {
             List<Announce> announceList = announceRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -33,6 +34,7 @@ public class AnnounceService {
         }
     }
 
+    // 공지사항 상세 조회
     public AnnounceRes getAnnounce(Long announceId) throws BaseException{
         try {
             Optional<Announce> findAnnounce = announceRepository.findById(announceId);

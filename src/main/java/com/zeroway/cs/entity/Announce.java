@@ -21,4 +21,9 @@ public class Announce extends BaseEntity {
 
     @Column(nullable = false, length = 1000)
     private String content;
+
+    public Announce(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
 }
