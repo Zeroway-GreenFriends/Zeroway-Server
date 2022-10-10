@@ -40,7 +40,6 @@ public class UserController {
 
             return ResponseEntity.ok().body(new BaseResponse<>(postUserRes));
         } catch (BaseException e) {
-            e.printStackTrace();
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
     }
@@ -62,7 +61,6 @@ public class UserController {
 
             return ResponseEntity.ok().body(new BaseResponse<>(postUserRes));
         } catch (BaseException e) {
-            e.printStackTrace();
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
     }
@@ -77,7 +75,6 @@ public class UserController {
             String accessToken = userService.refreshToken(postRefreshReq.getEmail());
             return ResponseEntity.ok().body(new BaseResponse<>(accessToken));
         } catch (BaseException e) {
-            e.printStackTrace();
             if (e.getStatus().equals(EXPIRATION_JWT)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new BaseResponse<>(e.getStatus()));
             } else {
@@ -95,7 +92,6 @@ public class UserController {
             userService.logout();
             return ResponseEntity.ok().build();
         } catch (BaseException e) {
-            e.printStackTrace();
             if (e.getStatus().equals(EXPIRATION_JWT)) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new BaseResponse<>(e.getStatus()));
             }
@@ -112,7 +108,6 @@ public class UserController {
             userService.signout();
             return ResponseEntity.ok().build();
         } catch (BaseException e) {
-            e.printStackTrace();
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
     }
@@ -127,7 +122,6 @@ public class UserController {
             userService.patchUser(profileImg, patchUserInfo);
             return ResponseEntity.ok().build();
         } catch (BaseException e) {
-            e.printStackTrace();
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
     }

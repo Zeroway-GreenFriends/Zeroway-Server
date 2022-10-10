@@ -153,7 +153,6 @@ public class PostService {
             Long userId = jwtService.getUserIdx();
             return postRepository.getPostListByUser(userId, page, size);
         } catch (BaseException e) {
-            e.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }
     }
@@ -166,7 +165,6 @@ public class PostService {
             Long userId = jwtService.getUserIdx();
             return postRepository.getPostListByComment(userId, page, size);
         } catch (BaseException e) {
-            e.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }
     }
@@ -179,7 +177,6 @@ public class PostService {
             Long userId = jwtService.getUserIdx();
             return postRepository.getPostListByLike(userId, page, size);
         } catch (BaseException e) {
-            e.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }
     }
@@ -192,7 +189,6 @@ public class PostService {
             Long userId = jwtService.getUserIdx();
             return postRepository.getPostListByScrap(userId, page, size);
         } catch (BaseException e) {
-            e.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }
     }
