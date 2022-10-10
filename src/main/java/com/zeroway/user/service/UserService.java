@@ -145,7 +145,6 @@ public class UserService {
             jwtService.deleteRefreshToken(userIdx);
             return user;
         } catch (BaseException e) {
-            e.printStackTrace();
             throw new BaseException(DATABASE_ERROR);
         }
     }
@@ -171,10 +170,7 @@ public class UserService {
                 user.setProfileImgUrl(userProfile);
             }
         } catch (IOException e) {
-            e.printStackTrace();
             throw new BaseException(FILE_UPLOAD_ERROR);
-        } catch (BaseException e) {
-            e.printStackTrace();
         }
     }
 

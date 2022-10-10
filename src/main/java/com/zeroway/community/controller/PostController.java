@@ -163,7 +163,6 @@ public class PostController {
             List<GetPostListByMypageRes> postListByUser = postService.getPostListByUser(page, size);
             return ResponseEntity.ok().body(new BaseResponse<>(postListByUser));
         } catch (BaseException e) {
-            e.printStackTrace();
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
     }
@@ -177,7 +176,6 @@ public class PostController {
             List<GetPostListByMypageRes> postListByComment = postService.getPostListBycomment(page, size);
             return ResponseEntity.ok().body(new BaseResponse<>(postListByComment));
         } catch (BaseException e) {
-            e.printStackTrace();
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
     }
@@ -191,7 +189,6 @@ public class PostController {
             List<GetPostListByMypageRes> resultList = postService.getPostListByLike(page, size);
             return ResponseEntity.ok().body(new BaseResponse<>(resultList));
         } catch (BaseException e) {
-            e.printStackTrace();
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
 
@@ -206,7 +203,6 @@ public class PostController {
             List<GetPostListByMypageRes> resultList = postService.getPostListByScrap(page, size);
             return ResponseEntity.ok().body(new BaseResponse<>(resultList));
         } catch (BaseException e) {
-            e.printStackTrace();
             return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
         }
 
