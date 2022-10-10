@@ -70,12 +70,13 @@
 - Spring Data JPA, Querydsl
 - AWS RDS, EC2, S3, 53 Route
 - Intellij
+- Jenkins
 
 <br/>
 
 ## API 명세서
 
-[노션 링크](https://productive-garage-a90.notion.site/API-1703813db61a44f0b15bc802dd0778a4)
+[노션 링크](https://florentine-hose-94d.notion.site/API-4902862807c74655aedb6af6430c55a2)
 
 <br/>
 

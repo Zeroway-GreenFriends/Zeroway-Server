@@ -1,11 +1,13 @@
 package com.zeroway.common;
 
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * 에러 코드 관리
  */
 @Getter
+@ToString
 public enum BaseResponseStatus {
     /**
      * 1000 : 요청 성공
@@ -35,16 +37,19 @@ public enum BaseResponseStatus {
 
     INVALID_USER_ID(false, 2300, "잘못된 회원 식별자입니다."),
 
-    UNAUTHORIZED_REQUEST(false, 2300, "권한이 없습니다."),
+    UNAUTHORIZED_REQUEST(false, 2301, "권한이 없습니다."),
 
+    // CS
     INVALID_QNA_ID(false, 2400, "잘못된 문의 내역 식별자입니다."),
-
-    INVALID_ANNOUNCE_ID(false, 2500, "잘못된 공지 사항 식별자입니다."),
+    INVALID_ANNOUNCE_ID(false, 2401, "잘못된 공지 사항 식별자입니다."),
+    INVALID_FAQ_ID(false, 2402, "잘못된 자주 묻는 질문 식별자입니다."),
+    INVALID_QUESION_TYPE(false, 2403, "잘못된 질문 유형입니다."),
+    INVALID_REPORT_TYPE(false, 2404, "잘못된 신고 유형입니다."),
 
     INVALID_LEVEL_ID(false, 2600, "존재하지 않는 레벨입니다."),
 
-    INVALID_QUESION_TYPE(false, 2700, "잘못된 질문 유형입니다."),
-
+    // 커뮤니티
+    TOO_MANY_IMAGES(false, 2700, "이미지는 최대 6장까지만 업로드 가능합니다."),
 
 
     /**

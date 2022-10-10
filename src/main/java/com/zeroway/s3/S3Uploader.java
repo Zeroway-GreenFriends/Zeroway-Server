@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
@@ -35,10 +36,11 @@ public class S3Uploader {
 
     // s3에 파일을 업로드 후, 파일 url을 반환한다.
     public String uploadFile(MultipartFile multipartFile, String dirName) throws IOException {
-        String fileName = dirName + "/" + UUID.randomUUID() + "_" + multipartFile.getOriginalFilename();
+        String fileName = dirName + "/" + UUID.randomUUID().toString().substring(0,8) + "_" + multipartFile.getOriginalFilename();
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         objectMetadata.setContentType(multipartFile.getContentType());
+        objectMetadata.setContentLength(multipartFile.getSize());
 
         try (InputStream inputStream = multipartFile.getInputStream()) {
             amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, inputStream, objectMetadata));

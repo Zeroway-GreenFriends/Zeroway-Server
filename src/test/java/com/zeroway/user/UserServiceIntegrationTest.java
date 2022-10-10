@@ -3,10 +3,8 @@ package com.zeroway.user;
 import com.github.dozermapper.core.Mapper;
 import com.zeroway.challenge.entity.Challenge;
 import com.zeroway.challenge.entity.Level;
-import com.zeroway.challenge.entity.User_Challenge;
 import com.zeroway.challenge.repository.ChallengeRepository;
 import com.zeroway.challenge.repository.LevelRepository;
-import com.zeroway.challenge.repository.UserChallengeRepository;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
 import com.zeroway.user.dto.PatchUserInfo;
@@ -18,9 +16,6 @@ import com.zeroway.user.repository.UserRepository;
 import com.zeroway.user.service.UserService;
 import com.zeroway.utils.JwtService;
 import com.zeroway.utils.RedisService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -28,18 +23,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 
 @SpringBootTest
 @Transactional
@@ -150,11 +141,9 @@ public class UserServiceIntegrationTest {
 
         Challenge chall1 = challengeRepository.save(Challenge.builder()
                 .content("1번 챌린지")
-                .level(levelRepository.findById(1).get())
                 .build());
         Challenge chall2 = challengeRepository.save(Challenge.builder()
                 .content("2번 챌린지")
-                .level(levelRepository.findById(1).get())
                 .build());
 
         User signoutUser = userService.signout();
