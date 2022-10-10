@@ -1,7 +1,9 @@
 package com.zeroway.cs.entity;
 
 import com.zeroway.common.BaseEntity;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +12,7 @@ import javax.persistence.Id;
 
 @Entity
 @Getter
+@NoArgsConstructor
 public class Announce extends BaseEntity {
 
     @Id @GeneratedValue
@@ -26,4 +29,5 @@ public class Announce extends BaseEntity {
         this.title = title;
         this.content = content;
     }
+
 }
