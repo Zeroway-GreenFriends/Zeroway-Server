@@ -94,6 +94,9 @@ public class ChallengeService {
             Random rn = new Random(now.getDayOfYear());
             for (long i = 0; i < size; i++) {
                 int id = rn.nextInt(challengeIdList.size());
+                while(todayChallengeId.contains(challengeIdList.get(id).getId())){ // id 중복 체크
+                    id = rn.nextInt(challengeIdList.size());
+                }
                 todayChallengeId.add(challengeIdList.get(id).getId());
             }
             return todayChallengeId;
