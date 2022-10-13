@@ -25,7 +25,6 @@ public class TipService {
 
     @Transactional(readOnly = true)
     public List<TodayTipsRes> getRandomTips(long size) throws BaseException {
-        List<Long> idList = new ArrayList<>();
 
         // 전체 tip 개수
         long totalCount = tipRepository.count();
@@ -38,16 +37,13 @@ public class TipService {
             return tipRepository.findAll().stream()
                     .map(tip -> new TodayTipsRes("Tip "+ (index.getAndIncrement()+1), tip.getTitle(), tip.getContent()))
                     .collect(Collectors.toList());
-
-
         }
 
         // 랜덤 id 생성
-        for (long i=0; i<size; i++) {
+        List<Long> idList = new ArrayList<>();
+        while(idList.size() < size) {
             Long id = (long)(Math.random()*totalCount) + 1;
-            while (idList.contains(id)){
-                id = (long)(Math.random()*totalCount) + 1;
-            }
+            if (idList.contains(id)) continue; // 중복 방지
             idList.add(id);
         }
 
