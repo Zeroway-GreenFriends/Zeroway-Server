@@ -45,63 +45,47 @@ public class StoreController {
 
     /**
      * 제로웨이스트샵 상세 조회 API
-     * @param storeId
+     * @param storeId 제로웨이스트샵 id
      * @return 이미지 url, 이름, 품목, 주소, 운영시간, 전화번호, 사이트 url, 인스타그램, 설명(제로웨이스트 실천 내용 포함)
      */
     @GetMapping("/{storeId}")
-    public ResponseEntity<?> getStoreDetail(@PathVariable Long storeId) {
-        try{
-            return ResponseEntity.ok().body(storeService.getStoreDetail(storeId));
-        } catch(BaseException exception){
-            return ResponseEntity.badRequest().body(new BaseResponse<>(exception.getStatus()));
-        }
+    public ResponseEntity<?> getStoreDetail(@PathVariable Long storeId) throws BaseException {
+        return ResponseEntity.ok().body(storeService.getStoreDetail(storeId));
     }
 
     /**
      * 제로웨이스트샵 수정 요청 API
-     * @param storeId 상점 ID
+     * @param storeId 제로웨이스트샵 id
      */
     @PatchMapping("/{storeId}")
     public ResponseEntity<?> updateStore(@PathVariable Long storeId,
                                          @RequestPart StoreReq info,
-                                         @RequestPart(required = false) MultipartFile image) {
-        try {
-            storeService.updateStoreRequest(storeId, info, image);
-            return ResponseEntity.ok().build();
-        } catch (BaseException e) {
-            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
-        }
+                                         @RequestPart(required = false) MultipartFile image) throws BaseException {
+        storeService.updateStoreRequest(storeId, info, image);
+        return ResponseEntity.ok().build();
     }
 
     /**
      * 제로웨이스트샵 등록 요청 API
-     * @param storeId 상점 ID
+     * @param storeId 제로웨이스트샵 id
      */
     @PostMapping("/{storeId}")
     public ResponseEntity<?> addStore(@PathVariable Long storeId,
                                          @RequestPart StoreReq info,
-                                         @RequestPart MultipartFile image) {
-        try {
-            storeService.addStoreRequest(storeId, info, image);
-            return ResponseEntity.ok().build();
-        } catch (BaseException e) {
-            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
-        }
+                                         @RequestPart MultipartFile image) throws BaseException {
+        storeService.addStoreRequest(storeId, info, image);
+        return ResponseEntity.ok().build();
     }
 
     /**
      * 제로웨이스트샵 삭제 요청 API
-     * @param storeId 상점 ID
+     * @param storeId 제로웨이스트샵 id
      * @param image 폐업 이미지
      */
     @DeleteMapping("/{storeId}")
     public ResponseEntity<?> deleteStore(@PathVariable Long storeId,
-                                         @RequestPart MultipartFile image) {
-        try {
-            storeService.deleteStoreRequest(storeId, image);
-            return ResponseEntity.ok().build();
-        } catch (BaseException e) {
-            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
-        }
+                                         @RequestPart MultipartFile image) throws BaseException {
+        storeService.deleteStoreRequest(storeId, image);
+        return ResponseEntity.ok().build();
     }
 }

@@ -9,11 +9,9 @@ import com.zeroway.cs.entity.report.CategoryOfReport;
 import com.zeroway.cs.service.ReportService;
 import com.zeroway.utils.JwtService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.zeroway.common.BaseResponseStatus.UNAUTHORIZED_REQUEST;
 
 @RequestMapping("/comment")
 @RestController
@@ -29,14 +27,10 @@ public class CommentController {
      * @param commentId 댓글 id
      */
     @PostMapping("/{commentId}/like")
-    public ResponseEntity<?> like(@PathVariable Long commentId, @RequestBody LikeReq req) {
-        try {
-            Long userId = jwtService.getUserIdx();
-            commentService.like(userId, commentId, req.isLike());
-            return ResponseEntity.ok().build();
-        } catch (BaseException e) {
-            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
-        }
+    public ResponseEntity<?> like(@PathVariable Long commentId, @RequestBody LikeReq req) throws BaseException {
+        Long userId = jwtService.getUserIdx();
+        commentService.like(userId, commentId, req.isLike());
+        return ResponseEntity.ok().build();
     }
 
     /**
@@ -44,16 +38,10 @@ public class CommentController {
      * @param commentId 댓글 id
      */
     @PatchMapping("/{commentId}/delete")
-    public ResponseEntity<?> deleteComment(@PathVariable Long commentId) {
-        try {
-            Long userId = jwtService.getUserIdx();
-            commentService.deleteComment(commentId, userId);
-            return ResponseEntity.ok().build();
-        } catch (BaseException e) {
-            if(e.getStatus().equals(UNAUTHORIZED_REQUEST))
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new BaseResponse<>(e.getStatus()));
-            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
-        }
+    public ResponseEntity<?> deleteComment(@PathVariable Long commentId) throws BaseException {
+        Long userId = jwtService.getUserIdx();
+        commentService.deleteComment(commentId, userId);
+        return ResponseEntity.ok().build();
     }
 
     /**

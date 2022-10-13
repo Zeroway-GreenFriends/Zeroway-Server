@@ -23,22 +23,15 @@ public class TermController {
     @GetMapping()
     public ResponseEntity<?> getTerms(@RequestParam(required = false) String keyword,
                                       @RequestParam(defaultValue = "1") int page,
-                                      @RequestParam(defaultValue = "10") int size) {
+                                      @RequestParam(defaultValue = "10") int size) throws BaseException {
 
         if(page < 1 || size < 1) return ResponseEntity.badRequest().build();
 
-        try {
-            List<TermRes> termRes;
+        List<TermRes> termRes;
+        if (keyword == null || keyword.isEmpty()) // 검색어를 입력하지 않은 경우
+            termRes = termService.getTerm(page-1, size);
+        else termRes = termService.searchTerm(keyword, page - 1, size);
 
-            if (keyword == null || keyword.isEmpty()) // 검색어를 입력하지 않은 경우
-                termRes = termService.getTerm(page-1, size);
-            else termRes = termService.searchTerm(keyword, page - 1, size);
-
-            return ResponseEntity.ok().body(termRes);
-        } catch (BaseException e) {
-            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
-        }
-
-
+        return ResponseEntity.ok().body(termRes);
     }
 }
