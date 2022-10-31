@@ -1,11 +1,7 @@
 package com.zeroway.user.service;
 
-import com.zeroway.challenge.entity.Challenge;
-import com.zeroway.challenge.entity.User_Challenge;
-import com.zeroway.challenge.repository.ChallengeRepository;
 import com.zeroway.challenge.repository.LevelRepository;
 import com.zeroway.challenge.entity.Level;
-import com.zeroway.challenge.repository.UserChallengeRepository;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
 import com.zeroway.s3.S3Uploader;
@@ -22,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 import static com.zeroway.common.BaseResponseStatus.*;
@@ -69,12 +64,12 @@ public class UserService {
 
         // 레벨 1
         Optional<Level> levelOptional = levelRepository.findById(1);
-        user.setLevel(levelOptional.get());
+        user.changeLevel(levelOptional.get());
 
         try {
             if (profileImg != null && !profileImg.isEmpty()) {
                 String userProfileUrl = s3Uploader.uploadFile(profileImg, "userProfile");
-                user.setProfileImgUrl(userProfileUrl);
+                user.uploadProfileImg(userProfileUrl);
             }
         } catch (IOException e) {
             throw new BaseException(FILE_UPLOAD_ERROR);
@@ -157,21 +152,20 @@ public class UserService {
      * 회원정보 수정
      */
     public void patchUser(MultipartFile profileImg, PatchUserInfo patchUserInfo) throws BaseException {
-        User user = null;
         try {
             Long userIdx = jwtService.getUserIdx();
-            user = userRepository.findById(userIdx).get();
+            User user = userRepository.findById(userIdx).get();
 
             if (patchUserInfo != null) {
                 String nickname = patchUserInfo.getNickname();
-                user.setNickname(nickname);
+                user.changeNickname(nickname);
             }
 
             if (profileImg == null) {
-                user.setProfileImgUrl(null);
+                user.uploadProfileImg(null);
             } else if (!profileImg.isEmpty()) {
                 String userProfile = s3Uploader.uploadFile(profileImg, "userProfile");
-                user.setProfileImgUrl(userProfile);
+                user.uploadProfileImg(userProfile);
             }
         } catch (IOException e) {
             throw new BaseException(FILE_UPLOAD_ERROR);

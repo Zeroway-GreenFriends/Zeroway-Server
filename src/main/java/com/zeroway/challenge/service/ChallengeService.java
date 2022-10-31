@@ -15,12 +15,10 @@ import com.zeroway.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -88,10 +86,10 @@ public class ChallengeService {
             User_Challenge uc = userChallengeRepository.findByUser_IdAndChallenge_Id(userId, challengeId);
             if(!uc.isComplete()) {
                 uc.setComplete(true);
-                user.setExp(user.getExp()+exp);
+                user.changeExp(user.getExp()+exp);
             } else {
                 uc.setComplete(false);
-                user.setExp(user.getExp()-exp);
+                user.changeExp(user.getExp()-exp);
             }
             checkLevel(user);
             userChallengeRepository.save(uc);
@@ -106,17 +104,17 @@ public class ChallengeService {
     private void checkLevel(User user) throws BaseException {
         if(user.getExp() >= 100) {
             Level levelup = levelRepository.findById(user.getLevel().getId() + 1).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));
-            user.setLevel(levelup);
-            user.setExp(user.getExp()-100);
+            user.changeLevel(levelup);
+            user.changeExp(user.getExp()-100);
             createUC(user);
 
         } else if(user.getExp() < 0){
             if(user.getLevel().getId()!=1) {
                 Level levelDown = levelRepository.findById(user.getLevel().getId() - 1).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));;;
-                user.setLevel(levelDown);
-                user.setExp(user.getExp()+100);
+                user.changeLevel(levelDown);
+                user.changeExp(user.getExp()+100);
             } else {
-                user.setExp(0);
+                user.changeExp(0);
             }
         }
         userRepository.save(user);

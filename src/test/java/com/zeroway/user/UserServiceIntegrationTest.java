@@ -3,10 +3,8 @@ package com.zeroway.user;
 import com.github.dozermapper.core.Mapper;
 import com.zeroway.challenge.entity.Challenge;
 import com.zeroway.challenge.entity.Level;
-import com.zeroway.challenge.entity.User_Challenge;
 import com.zeroway.challenge.repository.ChallengeRepository;
 import com.zeroway.challenge.repository.LevelRepository;
-import com.zeroway.challenge.repository.UserChallengeRepository;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
 import com.zeroway.user.dto.PatchUserInfo;
@@ -18,9 +16,6 @@ import com.zeroway.user.repository.UserRepository;
 import com.zeroway.user.service.UserService;
 import com.zeroway.utils.JwtService;
 import com.zeroway.utils.RedisService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -28,13 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.mock.web.MockMultipartHttpServletRequest;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -43,7 +36,7 @@ import static org.mockito.Mockito.doReturn;
 
 @SpringBootTest
 @Transactional
-public class UserServiceIntegrationTest {
+class UserServiceIntegrationTest {
 
     @Autowired
     UserService userService;
@@ -100,7 +93,7 @@ public class UserServiceIntegrationTest {
     @Test
     void loginO() throws BaseException {
         Optional<User> user = createUser();
-        user.get().setLevel(levelRepository.findById(1).get());
+        user.get().changeLevel(levelRepository.findById(1).get());
         User user1 = userRepository.save(user.get());
 
         PostUserRes login = userService.login(user.get().getEmail());
@@ -117,7 +110,7 @@ public class UserServiceIntegrationTest {
         MultipartFile multipartFile = null;
 
         Level twoLevel = levelRepository.findById(2).get();
-        mapUser.setLevel(twoLevel);
+        mapUser.changeLevel(twoLevel);
         userRepository.save(mapUser);
 
         PostUserRes login = userService.login(sign.getEmail());
@@ -239,7 +232,7 @@ public class UserServiceIntegrationTest {
     @Test
     void nickname() throws BaseException {
         User user = createUser().get();
-        user.setLevel(levelRepository.findById(1).get());
+        user.changeLevel(levelRepository.findById(1).get());
         userRepository.save(user);
 
         boolean b = userService.existUser(user.getNickname());
@@ -251,7 +244,7 @@ public class UserServiceIntegrationTest {
     @Test
     void nickname1() throws BaseException {
         User user = createUser().get();
-        user.setLevel(levelRepository.findById(1).get());
+        user.changeLevel(levelRepository.findById(1).get());
         user = userRepository.save(user);
         user.setStatus(StatusType.INACTIVE);
 
