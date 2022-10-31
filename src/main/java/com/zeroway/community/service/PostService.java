@@ -39,45 +39,33 @@ public class PostService {
     private final JwtService jwtService;
 
     // 전체 글 조회
-    public List<PostListRes> getPostList(Long userId, String sort, Boolean challenge, Boolean review, long page, long size) throws BaseException {
+    public List<PostListRes> getPostList(Long userId, String sort, Boolean challenge, Boolean review, long page, long size) {
         List<PostListRes> result = new ArrayList<>();
-        try {
-            for (PostListRes post : postRepository.getPostList(userId, sort, challenge, review, page, size)) {
-                Long postId = post.getPostId();
-                // 게시글 이미지 조회
-                post.getImageList().addAll(postImageRepository.findUrlByPostId(postId));
-                result.add(post);
-            }
-            return result;
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new BaseException(DATABASE_ERROR);
+        for (PostListRes post : postRepository.getPostList(userId, sort, challenge, review, page, size)) {
+            Long postId = post.getPostId();
+            // 게시글 이미지 조회
+            post.getImageList().addAll(postImageRepository.findUrlByPostId(postId));
+            result.add(post);
         }
+        return result;
     }
 
     // 글 상세 조회
     public PostRes getPost(Long postId, Long userId) throws BaseException {
         PostRes post;
-        try {
-            post = postRepository.getPost(postId, userId);
+        post = postRepository.getPost(postId, userId);
 
-            //유효하지 않은 게시글 id
-            if(post == null)
-                throw new BaseException(INVALID_POST_ID);
+        //유효하지 않은 게시글 id
+        if(post == null)
+            throw new BaseException(INVALID_POST_ID);
 
-            // 게시글 이미지 조회
-            post.getImageList().addAll(postImageRepository.findUrlByPostId(postId));
+        // 게시글 이미지 조회
+        post.getImageList().addAll(postImageRepository.findUrlByPostId(postId));
 
-            // 댓글 조회
-            post.getCommentList().addAll(commentRepository.getCommentList(postId, userId));
+        // 댓글 조회
+        post.getCommentList().addAll(commentRepository.getCommentList(postId, userId));
 
-            return post;
-        } catch (BaseException e) {
-            throw e;
-        } catch (Exception e) {
-            log.info(e.getMessage());
-            throw new BaseException(DATABASE_ERROR);
-        }
+        return post;
     }
 
     // 글 저장
@@ -98,7 +86,6 @@ public class PostService {
                     postImageRepository.save(PostImage.builder().postId(savedPost.getId()).url(url).build());
 
         } catch (IOException e) {
-            e.printStackTrace();
             throw new BaseException(FILE_UPLOAD_ERROR);
         }
     }
@@ -107,42 +94,30 @@ public class PostService {
      * 북마크 및 북마크 취소 기능
      */
     @Transactional
-    public void bookmark(Long userId, Long postId, boolean isBookmark) throws BaseException {
-        try {
-            Optional<Bookmark> optional = bookmarkRepository.findByUserIdAndPostId(userId, postId);
-            if (optional.isPresent()) {
-                Bookmark bookmark = optional.get();
-                if (isBookmark) {
-                    bookmark.setStatus(StatusType.ACTIVE);
-                } else {
-                    bookmark.setStatus(StatusType.INACTIVE);
-                }
+    public void bookmark(Long userId, Long postId, boolean isBookmark) {
+        Optional<Bookmark> optional = bookmarkRepository.findByUserIdAndPostId(userId, postId);
+        if (optional.isPresent()) {
+            Bookmark bookmark = optional.get();
+            if (isBookmark) {
+                bookmark.setStatus(StatusType.ACTIVE);
+            } else {
+                bookmark.setStatus(StatusType.INACTIVE);
             }
-            else if(isBookmark) bookmarkRepository.save(Bookmark.builder().userId(userId).postId(postId).build());
-        } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
         }
+        else if(isBookmark) bookmarkRepository.save(Bookmark.builder().userId(userId).postId(postId).build());
     }
 
 
     // 글 삭제
     @Transactional
     public void deletePost(Long postId, Long userId) throws BaseException {
-        try {
-            Post post = postRepository.findById(postId).orElseThrow(() -> new BaseException(INVALID_POST_ID));
+        Post post = postRepository.findById(postId).orElseThrow(() -> new BaseException(INVALID_POST_ID));
 
-            // 작성자가 아닌 회원이 요청한 경우
-            if(!post.getUserId().equals(userId)) throw new BaseException(UNAUTHORIZED_REQUEST);
+        // 작성자가 아닌 회원이 요청한 경우
+        if(!post.getUserId().equals(userId)) throw new BaseException(UNAUTHORIZED_REQUEST);
 
-            // 상태를 INACTIVE로 수정
-            post.setStatus(StatusType.INACTIVE);
-
-        } catch (BaseException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new BaseException(DATABASE_ERROR);
-        }
-
+        // 상태를 INACTIVE로 수정
+        post.setStatus(StatusType.INACTIVE);
     }
 
     /**

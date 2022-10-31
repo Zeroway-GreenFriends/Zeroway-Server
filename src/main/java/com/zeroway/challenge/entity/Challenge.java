@@ -20,11 +20,4 @@ public class Challenge extends BaseEntity {
     private Long id;
 
     private String content;
-
-    // 챌린지 별 레벨
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "level_id")
-    private Level level;
-
-
 }

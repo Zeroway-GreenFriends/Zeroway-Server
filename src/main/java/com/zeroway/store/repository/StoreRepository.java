@@ -9,5 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StoreRepository extends JpaRepository<Store, Long> {
 
-    Page<Store> findByAddressNewContains(String keyword, Pageable pageable);
+    Page<Store> findByAddressNewContainingOrNameContaining(String addressNew, String name, Pageable pageable);
+
 }
