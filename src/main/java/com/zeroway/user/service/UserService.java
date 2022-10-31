@@ -82,7 +82,7 @@ public class UserService {
     /**
      * 토큰 두종류 발급
      */
-    private PostUserRes postUser(User user) throws BaseException {
+    private PostUserRes postUser(User user) {
         String refreshJwt = jwtService.createRefreshToken(user.getId());
         String accessJwt = jwtService.createAccessToken(user.getId());
 
