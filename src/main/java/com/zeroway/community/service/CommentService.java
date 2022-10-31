@@ -7,11 +7,11 @@ import com.zeroway.community.entity.Comment;
 import com.zeroway.community.entity.CommentLike;
 import com.zeroway.community.repository.comment.CommentLikeRepository;
 import com.zeroway.community.repository.comment.CommentRepository;
-import com.zeroway.cs.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.zeroway.common.BaseResponseStatus.*;
@@ -60,11 +60,16 @@ public class CommentService {
     @Transactional
     public void deleteComment(Long commentId, Long userId) throws BaseException {
         try {
-            Comment comment = commentRepository.findByIdAndUserId(commentId, userId)
-                    .orElseThrow(() -> new BaseException(REQUEST_ERROR));
+            Comment comment = commentRepository.findById(commentId)
+                    .orElseThrow(() -> new BaseException(INVALID_COMMENT_ID));
+
+            // 댓글 작성자가 아닌 경우
+            if(!Objects.equals(comment.getUserId(), userId))
+                throw new BaseException(UNAUTHORIZED_REQUEST);
 
             // 이미 삭제된 댓글
-            if(comment.getStatus().equals(StatusType.INACTIVE)) throw new BaseException(ALREADY_DELETED);
+            if(comment.getStatus().equals(StatusType.INACTIVE))
+                throw new BaseException(ALREADY_DELETED);
 
             // 상태를 INACTIVE 로 수정
             comment.setStatus(StatusType.INACTIVE);
