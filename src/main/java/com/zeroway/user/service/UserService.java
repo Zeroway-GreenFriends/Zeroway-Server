@@ -64,7 +64,9 @@ public class UserService {
 
         // 레벨 1
         Optional<Level> levelOptional = levelRepository.findById(1);
-        user.changeLevel(levelOptional.get());
+        if (levelOptional.isPresent()) {
+            user.changeLevel(levelOptional.get());
+        }
 
         try {
             if (profileImg != null && !profileImg.isEmpty()) {
@@ -124,7 +126,11 @@ public class UserService {
         try {
             // 토큰 만료 확인
             Long userIdx = jwtService.getUserIdx();
-            User user = userRepository.findById(userIdx).get();
+            User user = null;
+            Optional<User> optionalUser = userRepository.findById(userIdx);
+            if (optionalUser.isPresent()) {
+                user = optionalUser.get();
+            }
             user.setStatus(StatusType.LOGOUT);
             jwtService.deleteRefreshToken(userIdx);
         } catch (BaseException e) {
@@ -136,16 +142,23 @@ public class UserService {
      * 회원탈퇴
      */
     public User signout() throws BaseException {
+        User user = null;
+
         try {
             Long userIdx = jwtService.getUserIdx();
-            User user = userRepository.findById(userIdx).get();
+            Optional<User> optionalUser = userRepository.findById(userIdx);
+            Optional<Level> levelOptional = levelRepository.findById(1);
+            if (optionalUser.isPresent() && levelOptional.isPresent()) {
+                user = optionalUser.get();
 
-            user.signout("알 수 없음", "email@gmail.com", null, levelRepository.findById(1).get(), StatusType.INACTIVE);
-            jwtService.deleteRefreshToken(userIdx);
-            return user;
+                user.signout("알 수 없음", "email@gmail.com", null, levelOptional.get(), StatusType.INACTIVE);
+                jwtService.deleteRefreshToken(userIdx);
+            }
         } catch (BaseException e) {
             throw new BaseException(DATABASE_ERROR);
         }
+
+        return user;
     }
 
     /**
@@ -154,7 +167,11 @@ public class UserService {
     public void patchUser(MultipartFile profileImg, PatchUserInfo patchUserInfo) throws BaseException {
         try {
             Long userIdx = jwtService.getUserIdx();
-            User user = userRepository.findById(userIdx).get();
+            User user = null;
+            Optional<User> optionalUser = userRepository.findById(userIdx);
+            if (optionalUser.isPresent()) {
+                user = optionalUser.get();
+            }
 
             if (patchUserInfo != null) {
                 String nickname = patchUserInfo.getNickname();
