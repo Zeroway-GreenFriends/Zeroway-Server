@@ -117,11 +117,11 @@ public class ChallengeService {
                 if(challenge.getId().equals(challengeId)) {
                     if(challenge.getComplete()) { // 수행 취소
                         challenge.setComplete(false);
-                        user.setExp(user.getExp()-exp);
+                        user.changeExp(user.getExp()-exp);
                     }
                     else { // 수행
                         challenge.setComplete(true);
-                        user.setExp(user.getExp()+exp);
+                        user.changeExp(user.getExp()+exp);
                     }
                 }
             }
@@ -139,16 +139,16 @@ public class ChallengeService {
     void checkLevel(User user) throws BaseException {
         if(user.getExp() >= 100) {
             Level levelup = levelRepository.findById(user.getLevel().getId() + 1).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));
-            user.setLevel(levelup);
-            user.setExp(user.getExp()-100);
+            user.changeLevel(levelup);
+            user.changeExp(user.getExp()-100);
 
         } else if(user.getExp() < 0){
             if(user.getLevel().getId()!=1) {
                 Level levelDown = levelRepository.findById(user.getLevel().getId() - 1).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));;;
-                user.setLevel(levelDown);
-                user.setExp(user.getExp()+100);
+                user.changeLevel(levelDown);
+                user.changeExp(user.getExp()+100);
             } else {
-                user.setExp(0);
+                user.changeExp(0);
             }
         }
     }

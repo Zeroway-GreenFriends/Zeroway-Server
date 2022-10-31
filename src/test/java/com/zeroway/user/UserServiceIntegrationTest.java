@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
-public class UserServiceIntegrationTest {
+class UserServiceIntegrationTest {
 
     @Autowired
     UserService userService;
@@ -91,7 +91,7 @@ public class UserServiceIntegrationTest {
     @Test
     void loginO() throws BaseException {
         Optional<User> user = createUser();
-        user.get().setLevel(levelRepository.findById(1).get());
+        user.get().changeLevel(levelRepository.findById(1).get());
         User user1 = userRepository.save(user.get());
 
         PostUserRes login = userService.login(user.get().getEmail());
@@ -108,7 +108,7 @@ public class UserServiceIntegrationTest {
         MultipartFile multipartFile = null;
 
         Level twoLevel = levelRepository.findById(2).get();
-        mapUser.setLevel(twoLevel);
+        mapUser.changeLevel(twoLevel);
         userRepository.save(mapUser);
 
         PostUserRes login = userService.login(sign.getEmail());
@@ -228,7 +228,7 @@ public class UserServiceIntegrationTest {
     @Test
     void nickname() throws BaseException {
         User user = createUser().get();
-        user.setLevel(levelRepository.findById(1).get());
+        user.changeLevel(levelRepository.findById(1).get());
         userRepository.save(user);
 
         boolean b = userService.existUser(user.getNickname());
@@ -240,7 +240,7 @@ public class UserServiceIntegrationTest {
     @Test
     void nickname1() throws BaseException {
         User user = createUser().get();
-        user.setLevel(levelRepository.findById(1).get());
+        user.changeLevel(levelRepository.findById(1).get());
         user = userRepository.save(user);
         user.setStatus(StatusType.INACTIVE);
 

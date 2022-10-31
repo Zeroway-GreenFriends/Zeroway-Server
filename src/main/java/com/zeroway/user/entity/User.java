@@ -1,6 +1,5 @@
 package com.zeroway.user.entity;
 
-import com.github.dozermapper.core.Mapping;
 import com.zeroway.challenge.entity.Level;
 import com.zeroway.common.BaseEntity;
 import com.zeroway.common.StatusType;
@@ -11,7 +10,6 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Setter
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -49,5 +47,21 @@ public class User extends BaseEntity {
         this.profileImgUrl = profileImgUrl;
         this.level = level;
         this.setStatus(statusType);
+    }
+
+    public void uploadProfileImg(String newProfileImgUrl) {
+        this.profileImgUrl = newProfileImgUrl;
+    }
+
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void changeLevel(Level one) {
+        this.level = one;
+    }
+
+    public void changeExp(Integer newExp) {
+        this.exp = newExp;
     }
 }
