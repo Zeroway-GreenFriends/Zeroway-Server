@@ -36,7 +36,7 @@ public class UserService {
     /**
      * 소셜 로그인
      */
-    public PostUserRes login(String email) throws BaseException {
+    public PostUserRes login(String email) {
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isEmpty()) {
             throw new BaseException(LOGIN_FAILED);
@@ -54,7 +54,7 @@ public class UserService {
     /**
      * 신규 회원가입
      */
-    public PostUserRes signIn(SignInAuthReq signInAuthReq, MultipartFile profileImg) throws BaseException {
+    public PostUserRes signIn(SignInAuthReq signInAuthReq, MultipartFile profileImg) {
         Optional<User> optionalUser = userRepository.findByEmail(signInAuthReq.getEmail());
         if (optionalUser.isPresent()) {
             throw new BaseException(POST_USERS_EXISTS_EMAIL);
@@ -100,7 +100,7 @@ public class UserService {
     /**
     액세스토큰 재발급
      */
-    public String refreshToken(String email) throws BaseException {
+    public String refreshToken(String email) {
         // refresh 만료 확인
         jwtService.expireToken();
         String refreshToken = jwtService.getToken();
@@ -122,7 +122,7 @@ public class UserService {
     /**
      * 로그아웃
      */
-    public void logout() throws BaseException {
+    public void logout() {
         try {
             // 토큰 만료 확인
             Long userIdx = jwtService.getUserIdx();
@@ -141,7 +141,7 @@ public class UserService {
     /**
      * 회원탈퇴
      */
-    public User signout() throws BaseException {
+    public User signout() {
         User user = null;
 
         try {
@@ -151,7 +151,7 @@ public class UserService {
             if (optionalUser.isPresent() && levelOptional.isPresent()) {
                 user = optionalUser.get();
 
-                user.signout("알 수 없음", "email@gmail.com", null, levelOptional.get(), StatusType.INACTIVE);
+                user.signout(levelOptional.get());
                 jwtService.deleteRefreshToken(userIdx);
             }
         } catch (BaseException e) {
@@ -164,25 +164,24 @@ public class UserService {
     /**
      * 회원정보 수정
      */
-    public void patchUser(MultipartFile profileImg, PatchUserInfo patchUserInfo) throws BaseException {
+    public void patchUser(MultipartFile profileImg, PatchUserInfo patchUserInfo) {
         try {
             Long userIdx = jwtService.getUserIdx();
-            User user = null;
             Optional<User> optionalUser = userRepository.findById(userIdx);
             if (optionalUser.isPresent()) {
-                user = optionalUser.get();
-            }
+                User user = optionalUser.get();
 
-            if (patchUserInfo != null) {
-                String nickname = patchUserInfo.getNickname();
-                user.changeNickname(nickname);
-            }
+                if (patchUserInfo != null) {
+                    String nickname = patchUserInfo.getNickname();
+                    user.changeNickname(nickname);
+                }
 
-            if (profileImg == null) {
-                user.uploadProfileImg(null);
-            } else if (!profileImg.isEmpty()) {
-                String userProfile = s3Uploader.uploadFile(profileImg, "userProfile");
-                user.uploadProfileImg(userProfile);
+                if (profileImg == null) {
+                    user.uploadProfileImg(null);
+                } else if (!profileImg.isEmpty()) {
+                    String userProfile = s3Uploader.uploadFile(profileImg, "userProfile");
+                    user.uploadProfileImg(userProfile);
+                }
             }
         } catch (IOException e) {
             throw new BaseException(FILE_UPLOAD_ERROR);

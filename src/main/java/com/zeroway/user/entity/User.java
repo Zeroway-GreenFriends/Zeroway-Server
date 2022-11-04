@@ -41,12 +41,12 @@ public class User extends BaseEntity {
     @Builder.Default
     private Integer exp = 0;
 
-    public void signout(String nickname, String email, String profileImgUrl, Level level, StatusType statusType) {
-        this.nickname = nickname;
-        this.email = email;
-        this.profileImgUrl = profileImgUrl;
+    public void signout(Level level) {
+        this.nickname = "알 수 없음";
+        this.email = "email@gmail.com";
+        this.profileImgUrl = null;
         this.level = level;
-        this.setStatus(statusType);
+        this.setStatus(StatusType.INACTIVE);
     }
 
     public void uploadProfileImg(String newProfileImgUrl) {

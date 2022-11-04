@@ -3,18 +3,17 @@ package com.zeroway.user;
 
 import com.github.dozermapper.core.DozerBeanMapperBuilder;
 import com.github.dozermapper.core.Mapper;
-import com.zeroway.challenge.entity.Level;
 import com.zeroway.challenge.repository.LevelRepository;
 import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
-import com.zeroway.user.dto.PostUserRes;
 import com.zeroway.user.dto.SignInAuthReq;
 import com.zeroway.user.entity.ProviderType;
 import com.zeroway.user.entity.User;
 import com.zeroway.user.repository.UserRepository;
 import com.zeroway.user.service.UserService;
 import com.zeroway.utils.JwtService;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -25,8 +24,8 @@ import java.util.Optional;
 
 import static com.zeroway.common.BaseResponseStatus.*;
 import static com.zeroway.common.StatusType.INACTIVE;
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -80,7 +79,7 @@ public class UserServiceMockTest {
 
     @DisplayName("회원가입 실패: 이미 존재 하는 유저")
     @Test
-    void signUpX() throws BaseException {
+    void signUpX() {
         SignInAuthReq sign = signInAuthReq();
         MultipartFile multipartFile = null;
         Optional<User> optionalUser = createUser();
@@ -94,7 +93,7 @@ public class UserServiceMockTest {
 
     @DisplayName("로그인 실패: 존재하지 않는 유저")
     @Test
-    void loginX() throws BaseException {
+    void loginX() {
         SignInAuthReq sign = signInAuthReq();
         Optional<User> user = Optional.empty();
         doReturn(user).when(userRepository).findByEmail(any());
@@ -106,7 +105,7 @@ public class UserServiceMockTest {
 
     @DisplayName("로그인 실패: 탈퇴한 유저")
     @Test
-    void loginX1() throws BaseException {
+    void loginX1() {
         Optional<User> optionalUser = createUser();
         optionalUser.get().setStatus(INACTIVE);
         doReturn(optionalUser).when(userRepository).findByEmail(any());
@@ -118,7 +117,7 @@ public class UserServiceMockTest {
 
     @DisplayName("토큰 재발급 성공")
     @Test
-    void tokenO() throws BaseException {
+    void tokenO() {
         Optional<User> user = createUser();
 
         // given : 리프레시토큰
