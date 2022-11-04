@@ -5,7 +5,6 @@ import com.zeroway.challenge.entity.Challenge;
 import com.zeroway.challenge.entity.Level;
 import com.zeroway.challenge.repository.ChallengeRepository;
 import com.zeroway.challenge.repository.LevelRepository;
-import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
 import com.zeroway.user.dto.PatchUserInfo;
 import com.zeroway.user.dto.PostUserRes;
@@ -30,7 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
@@ -89,7 +88,7 @@ class UserServiceIntegrationTest {
 
     @DisplayName("로그인 성공")
     @Test
-    void loginO() throws BaseException {
+    void loginO() {
         Optional<User> user = createUser();
         user.get().changeLevel(levelRepository.findById(1).get());
         User user1 = userRepository.save(user.get());
@@ -102,7 +101,7 @@ class UserServiceIntegrationTest {
 
     @DisplayName("기존 회원 재로그인 시 : 기존 레벨 유지")
     @Test
-    void reLoginLevelCheck() throws BaseException {
+    void reLoginLevelCheck() {
         SignInAuthReq sign = signInAuthReq();
         User mapUser = mapper.map(sign, User.class);
         MultipartFile multipartFile = null;
@@ -119,7 +118,7 @@ class UserServiceIntegrationTest {
 
     @DisplayName("유저 회원가입 성공")
     @Test
-    void signInO() throws BaseException {
+    void signInO() {
         SignInAuthReq sign = signInAuthReq();
         User user = mapper.map(sign, User.class);
         MultipartFile multipartFile = null;
@@ -136,7 +135,7 @@ class UserServiceIntegrationTest {
 
     @DisplayName("회원 탈퇴 성공: 유저 테이블, redis")
     @Test
-    void signoutO() throws BaseException {
+    void signoutO() {
         Long userId = this.createRequestJWT();
 
         Challenge chall1 = challengeRepository.save(Challenge.builder()
@@ -155,7 +154,7 @@ class UserServiceIntegrationTest {
 
     @DisplayName("회원 정보 수정 성공 : 프로필 & 닉네임")
     @Test
-    void patchInfo() throws BaseException {
+    void patchInfo() {
         Long userId = this.createRequestJWT();
         User existedUser = userRepository.findById(userId).get();
         String existedImg = existedUser.getProfileImgUrl();
@@ -175,7 +174,7 @@ class UserServiceIntegrationTest {
 
     @DisplayName("회원 정보 수정 성공 : 닉네임만 변경")
     @Test
-    void patchInfo1() throws BaseException {
+    void patchInfo1() {
         Long userId = this.createRequestJWT();
         User existedUser = userRepository.findById(userId).get();
         String existedImg = existedUser.getProfileImgUrl();
@@ -192,7 +191,7 @@ class UserServiceIntegrationTest {
 
     @DisplayName("회원 정보 수정 성공 : 프로필 삭제 & 닉네임 변경")
     @Test
-    void patchInfo2() throws BaseException {
+    void patchInfo2() {
         Long userId = this.createRequestJWT();
         User existedUser = userRepository.findById(userId).get();
         String existedImg = existedUser.getProfileImgUrl();
@@ -209,7 +208,7 @@ class UserServiceIntegrationTest {
 
     @DisplayName("회원 정보 수정 성공 : 프로필만 변경")
     @Test
-    void patchInfo3() throws BaseException {
+    void patchInfo3() {
         Long userId = this.createRequestJWT();
         User existedUser = userRepository.findById(userId).get();
         String existedNickname = existedUser.getNickname();
@@ -226,7 +225,7 @@ class UserServiceIntegrationTest {
 
     @DisplayName("닉네임 중복 여부 확인 성공: T")
     @Test
-    void nickname() throws BaseException {
+    void nickname() {
         User user = createUser().get();
         user.changeLevel(levelRepository.findById(1).get());
         userRepository.save(user);
@@ -238,7 +237,7 @@ class UserServiceIntegrationTest {
 
     @DisplayName("닉네임 중복 여부 확인 성공: T & INACTIVE 유저 제외")
     @Test
-    void nickname1() throws BaseException {
+    void nickname1() {
         User user = createUser().get();
         user.changeLevel(levelRepository.findById(1).get());
         user = userRepository.save(user);
@@ -251,7 +250,7 @@ class UserServiceIntegrationTest {
 
     @DisplayName("닉네임 중복 여부 확인 성공: F")
     @Test
-    void nickname2() throws BaseException {
+    void nickname2() {
         boolean b = userService.existUser("새로운 닉네임");
 
         assertThat(b).isFalse();
@@ -259,7 +258,7 @@ class UserServiceIntegrationTest {
 
     @DisplayName("로그아웃 성공")
     @Test
-    void logout() throws BaseException {
+    void logout() {
         Long userId = createRequestJWT();
 
         userService.logout();

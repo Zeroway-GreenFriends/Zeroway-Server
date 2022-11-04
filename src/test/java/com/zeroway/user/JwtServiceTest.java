@@ -5,10 +5,6 @@ import com.zeroway.user.entity.ProviderType;
 import com.zeroway.user.entity.User;
 import com.zeroway.utils.JwtService;
 import com.zeroway.utils.RedisService;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,15 +17,11 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.security.Key;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Optional;
 
 import static com.zeroway.common.BaseResponseStatus.EXPIRATION_JWT;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,7 +38,7 @@ public class JwtServiceTest {
 
     @Test
     @DisplayName("만료된 토큰 검증")
-    void tokenX() throws BaseException, InterruptedException {
+    void tokenX() throws InterruptedException {
         // given
         String refreshToken = jwtService.createExpiredTokenTest();
 

@@ -2,7 +2,10 @@ package com.zeroway.community.service;
 
 import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
-import com.zeroway.community.dto.*;
+import com.zeroway.community.dto.CreatePostReq;
+import com.zeroway.community.dto.GetPostListByMypageRes;
+import com.zeroway.community.dto.PostListRes;
+import com.zeroway.community.dto.PostRes;
 import com.zeroway.community.entity.Bookmark;
 import com.zeroway.community.entity.Post;
 import com.zeroway.community.entity.PostImage;

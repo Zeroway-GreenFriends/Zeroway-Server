@@ -3,12 +3,12 @@ package com.zeroway.utils;
 import com.zeroway.common.BaseException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import javax.servlet.http.HttpServletRequest;
 
+import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.time.Duration;
 import java.util.Date;
@@ -16,20 +16,16 @@ import java.util.Date;
 import static com.zeroway.common.BaseResponseStatus.*;
 
 @Service
+@RequiredArgsConstructor
 public class JwtService {
 
-    private RedisService redisService;
-
-    @Autowired
-    public JwtService(RedisService redisService) {
-        this.redisService = redisService;
-    }
+    private final RedisService redisService;
 
     private final int accessTokenMs = 1000 * 60 * 60;   // 1시간
     private final int refreshTokenMs = 1000 * 60 * 60 * 24 * 7;    // 1주
 
-    private final static SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS512;
-    private final static Key key = Keys.secretKeyFor(signatureAlgorithm);
+    private static final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS512;
+    private static final Key key = Keys.secretKeyFor(signatureAlgorithm);
 
     /**
      * JWT 생성
@@ -87,7 +83,7 @@ public class JwtService {
     /**
      * 토큰 만료 확인
      */
-    public Jws<Claims> expireToken() throws BaseException {
+    public Jws<Claims> expireToken() {
         // 1. JWT 추출
         String token = getToken();
         if (token == null || token.length() == 0) {
@@ -101,11 +97,9 @@ public class JwtService {
                     .setSigningKey(key.getEncoded())
                     .build()
                     .parseClaimsJws(token);
-        } catch (ExpiredJwtException e) {
-            e.printStackTrace();
+        } catch (ExpiredJwtException expiredJwtException) {
             throw new BaseException(EXPIRATION_JWT);
-        } catch (Exception ignored) {
-            ignored.printStackTrace();
+        } catch (Exception exception) {
             throw new BaseException(INVALID_JWT);
         }
 
@@ -115,7 +109,7 @@ public class JwtService {
     /**
      * redis 내에 토큰값 일치 여부 확인
      */
-    public void checkRefreshTokenByRedis(Long userId, String refreshReq) throws BaseException {
+    public void checkRefreshTokenByRedis(Long userId, String refreshReq) {
         String redisRefresh = redisService.getValues(String.valueOf(userId));
         if (!redisRefresh.equals(refreshReq)) {
             throw new BaseException(INVALID_JWT);
@@ -125,7 +119,7 @@ public class JwtService {
     /**
      * refreshToken 삭제
      */
-    public void deleteRefreshToken(Long userId) throws BaseException {
+    public void deleteRefreshToken(Long userId) {
         redisService.deleteValues(String.valueOf(userId));
     }
 }
