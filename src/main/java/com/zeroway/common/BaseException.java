@@ -9,6 +9,6 @@ import lombok.ToString;
 @Setter
 @AllArgsConstructor
 @ToString
-public class BaseException extends Exception {
-    private BaseResponseStatus status;
+public class BaseException extends RuntimeException {
+    private final BaseResponseStatus status;
 }
