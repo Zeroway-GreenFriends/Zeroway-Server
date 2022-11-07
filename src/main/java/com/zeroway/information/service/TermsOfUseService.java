@@ -15,8 +15,14 @@ public class TermsOfUseService {
     private final TermsOfUseRepository repository;
 
     // 가장 최신 서비스 이용약관 조회
-    public InfoRes getLatestTermsOfUse() {
-        return new InfoRes(repository.findFirstByOrderByPublishedAtDesc());
+    public InfoRes getLatestTermsOfUse(boolean url) {
+        InfoRes infoRes = new InfoRes(repository.findFirstByOrderByPublishedAtDesc());
+        if (url) {
+            infoRes.setContent(null);
+        } else {
+            infoRes.setUrl(null);
+        }
+        return infoRes;
     }
 
     // 특정 버전의 서비스 이용약관 조회
