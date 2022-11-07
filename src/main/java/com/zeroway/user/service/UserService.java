@@ -141,15 +141,13 @@ public class UserService {
     /**
      * 회원탈퇴
      */
-    public User signout() {
-        User user = null;
-
+    public void signout() {
         try {
             Long userIdx = jwtService.getUserIdx();
             Optional<User> optionalUser = userRepository.findById(userIdx);
             Optional<Level> levelOptional = levelRepository.findById(1);
             if (optionalUser.isPresent() && levelOptional.isPresent()) {
-                user = optionalUser.get();
+                User user = optionalUser.get();
 
                 user.signout(levelOptional.get());
                 jwtService.deleteRefreshToken(userIdx);
@@ -157,8 +155,6 @@ public class UserService {
         } catch (BaseException e) {
             throw new BaseException(DATABASE_ERROR);
         }
-
-        return user;
     }
 
     /**
