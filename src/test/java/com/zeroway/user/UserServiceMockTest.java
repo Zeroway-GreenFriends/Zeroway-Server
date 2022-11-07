@@ -58,7 +58,7 @@ public class UserServiceMockTest {
 
     @DisplayName("소셜로그인 맵핑")
     @Test
-    void signUpMapping() throws BaseException {
+    void signUpMapping() {
         mapper = DozerBeanMapperBuilder.buildDefault();
 
         // given
@@ -134,7 +134,7 @@ public class UserServiceMockTest {
 
     @DisplayName("로그아웃 성공")
     @Test
-    void logoutO() throws BaseException {
+    void logoutO() {
         Optional<User> user = createUser();
         assertThat(user.get().getStatus()).isEqualTo(StatusType.ACTIVE);
 

@@ -17,6 +17,9 @@ import com.zeroway.utils.JwtService;
 import com.zeroway.utils.RedisService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,6 +31,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -73,8 +77,8 @@ class UserServiceIntegrationTest {
                 .build());
     }
 
-    private Long createRequestJWT() {
-        User user = createUser().get();
+    private Long createRequestJWT(Optional<User> optionalUser) {
+        User user = optionalUser.get();
         userRepository.save(user);
         Long userId = userRepository.findByEmail(user.getEmail()).get().getId();
         String accessToken = jwtService.createAccessToken(userId);
@@ -136,7 +140,7 @@ class UserServiceIntegrationTest {
     @DisplayName("회원 탈퇴 성공: 유저 테이블, redis")
     @Test
     void signoutO() {
-        Long userId = this.createRequestJWT();
+        Long userId = this.createRequestJWT(createUser());
 
         Challenge chall1 = challengeRepository.save(Challenge.builder()
                 .content("1번 챌린지")
@@ -145,17 +149,55 @@ class UserServiceIntegrationTest {
                 .content("2번 챌린지")
                 .build());
 
-        User signoutUser = userService.signout();
+        userService.signout();
+        User signoutUser = userRepository.findById(userId).get();
 
         assertThat(signoutUser.getId()).isEqualTo(userId);
         assertThat(signoutUser.getEmail()).isEqualTo("email@gmail.com");
         assertThat(redisService.getValues(String.valueOf(signoutUser.getId()))).isNull();
     }
 
+    static Stream<Arguments> streamUsers() {
+        return Stream.of(
+                Arguments.arguments(
+                        Optional.of(User.builder()
+                                .id(1L)
+                                .email("test@test")
+                                .nickname("예지테스트")
+                                .provider(ProviderType.valueOf("KAKAO"))
+                                .build())
+                ),
+                Arguments.arguments(
+                        Optional.of(User.builder()
+                                .id(2L)
+                                .email("e2")
+                                .nickname("n2")
+                                .provider(ProviderType.valueOf("KAKAO"))
+                                .build())
+                )
+        );
+    }
+
+    @DisplayName("회원탈퇴 성공: 2명 이상 처리")
+    @ParameterizedTest
+    @MethodSource("streamUsers")
+    void signOut(Optional<User> optionalUser) {
+        User user = optionalUser.get();
+        user.changeLevel(levelRepository.findById(1).get());
+
+        Long userId = createRequestJWT(optionalUser);
+
+        userService.signout();
+        User signoutUser = userRepository.findById(userId).get();
+
+        assertThat(signoutUser.getEmail()).isEqualTo("email@gmail.com");
+        assertThat(signoutUser.getNickname()).isEqualTo("알 수 없음");
+    }
+
     @DisplayName("회원 정보 수정 성공 : 프로필 & 닉네임")
     @Test
     void patchInfo() {
-        Long userId = this.createRequestJWT();
+        Long userId = this.createRequestJWT(createUser());
         User existedUser = userRepository.findById(userId).get();
         String existedImg = existedUser.getProfileImgUrl();
         String existedNickname = existedUser.getNickname();
@@ -175,7 +217,7 @@ class UserServiceIntegrationTest {
     @DisplayName("회원 정보 수정 성공 : 닉네임만 변경")
     @Test
     void patchInfo1() {
-        Long userId = this.createRequestJWT();
+        Long userId = this.createRequestJWT(createUser());
         User existedUser = userRepository.findById(userId).get();
         String existedImg = existedUser.getProfileImgUrl();
 
@@ -192,7 +234,7 @@ class UserServiceIntegrationTest {
     @DisplayName("회원 정보 수정 성공 : 프로필 삭제 & 닉네임 변경")
     @Test
     void patchInfo2() {
-        Long userId = this.createRequestJWT();
+        Long userId = this.createRequestJWT(createUser());
         User existedUser = userRepository.findById(userId).get();
         String existedImg = existedUser.getProfileImgUrl();
 
@@ -209,7 +251,7 @@ class UserServiceIntegrationTest {
     @DisplayName("회원 정보 수정 성공 : 프로필만 변경")
     @Test
     void patchInfo3() {
-        Long userId = this.createRequestJWT();
+        Long userId = this.createRequestJWT(createUser());
         User existedUser = userRepository.findById(userId).get();
         String existedNickname = existedUser.getNickname();
 
@@ -259,7 +301,7 @@ class UserServiceIntegrationTest {
     @DisplayName("로그아웃 성공")
     @Test
     void logout() {
-        Long userId = createRequestJWT();
+        Long userId = createRequestJWT(createUser());
 
         userService.logout();
         User user = userRepository.findById(userId).get();
