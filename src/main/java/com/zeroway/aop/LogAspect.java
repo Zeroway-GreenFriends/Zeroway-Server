@@ -8,8 +8,7 @@ import org.aspectj.lang.annotation.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static com.zeroway.common.BaseResponseStatus.REQUEST_ERROR;
-import static com.zeroway.common.BaseResponseStatus.UNAUTHORIZED_REQUEST;
+import static com.zeroway.common.BaseResponseStatus.*;
 
 @Slf4j
 @Aspect
@@ -40,7 +39,7 @@ public class LogAspect {
             return joinPoint.proceed();
         } catch (BaseException e) {
             log.error("{} args={} error={}", joinPoint.getSignature(), joinPoint.getArgs(), e.toString());
-            if (e.getStatus().equals(UNAUTHORIZED_REQUEST))
+            if (e.getStatus().equals(UNAUTHORIZED_REQUEST) || e.getStatus().equals(EXPIRATION_JWT))
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new BaseResponse<>(e.getStatus()));
             else
                 return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));

@@ -25,27 +25,9 @@ public class TipController {
      * @return 랜덤 3개 팁
      */
     @GetMapping()
-    public ResponseEntity<?> getTodayTips() {
-
-        try {
-            List<TodayTipsRes> randomTips = tipService.getRandomTips(3);
-            return ResponseEntity.ok().body(randomTips);
-        } catch (BaseException e) {
-            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
-        }
+    public ResponseEntity<?> getTodayTips() throws BaseException {
+        List<TodayTipsRes> randomTips = tipService.getRandomTips(3);
+        return ResponseEntity.ok().body(randomTips);
     }
-
-    /**
-     * 오늘의 팁, 환경 용어 전체 조회 API
-     */
-//    @GetMapping("/all")
-//    public ResponseEntity<?> getAllTips() {
-//        try {
-//            AllTipRes allTips = tipService.getAllTips();
-//            return ResponseEntity.ok().body(new BaseResponse<>(allTips));
-//        } catch (BaseException e) {
-//            return ResponseEntity.badRequest().body(new BaseResponse<>(e.getStatus()));
-//        }
-//    }
 
 }

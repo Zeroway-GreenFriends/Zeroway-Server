@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -21,8 +22,8 @@ public class InfoController {
      * 최신 버전의 개인정보 처리방침 조회 API
      */
     @GetMapping("/privacy-policy/latest")
-    public ResponseEntity<InfoRes> getLatestPrivacyPolicy() {
-        return ResponseEntity.ok().body(privacyPolicyService.getLatestPrivacyPolicy());
+    public ResponseEntity<InfoRes> getLatestPrivacyPolicy(@RequestParam(defaultValue = "false") boolean url) {
+        return ResponseEntity.ok().body(privacyPolicyService.getLatestPrivacyPolicy(url));
     }
 
     /**
@@ -39,8 +40,8 @@ public class InfoController {
      * 최신 버전의 서비스 이용약관 조회 API
      */
     @GetMapping("/terms-of-use/latest")
-    public ResponseEntity<InfoRes> getLatestTermsOfUse() {
-        return ResponseEntity.ok().body(termsOfUseService.getLatestTermsOfUse());
+    public ResponseEntity<InfoRes> getLatestTermsOfUse(@RequestParam(defaultValue = "false") boolean url) {
+        return ResponseEntity.ok().body(termsOfUseService.getLatestTermsOfUse(url));
     }
 
     /**

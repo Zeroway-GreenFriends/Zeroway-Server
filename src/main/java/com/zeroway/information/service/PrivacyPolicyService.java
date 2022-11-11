@@ -15,8 +15,14 @@ public class PrivacyPolicyService {
     private final PrivacyPolicyRepository repository;
 
     // 가장 최신 개인정보 처리방침 조회
-    public InfoRes getLatestPrivacyPolicy() {
-        return new InfoRes(repository.findFirstByOrderByPublishedAtDesc());
+    public InfoRes getLatestPrivacyPolicy(boolean url) {
+        InfoRes infoRes = new InfoRes(repository.findFirstByOrderByPublishedAtDesc());
+        if (url) {
+            infoRes.setContent(null);
+        } else {
+          infoRes.setUrl(null);
+        }
+        return infoRes;
     }
 
     // 특정 버전의 개인정보 처리방침 조회

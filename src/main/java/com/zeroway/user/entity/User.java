@@ -1,6 +1,5 @@
 package com.zeroway.user.entity;
 
-import com.github.dozermapper.core.Mapping;
 import com.zeroway.challenge.entity.Level;
 import com.zeroway.common.BaseEntity;
 import com.zeroway.common.StatusType;
@@ -11,7 +10,6 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@Setter
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,7 +19,7 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false, length = 15)
@@ -43,11 +41,27 @@ public class User extends BaseEntity {
     @Builder.Default
     private Integer exp = 0;
 
-    public void signout(String nickname, String email, String profileImgUrl, Level level, StatusType statusType) {
-        this.nickname = nickname;
-        this.email = email;
-        this.profileImgUrl = profileImgUrl;
+    public void signout(Level level) {
+        this.nickname = "알 수 없음";
+        this.email = "email@gmail.com";
+        this.profileImgUrl = null;
         this.level = level;
-        this.setStatus(statusType);
+        this.setStatus(StatusType.INACTIVE);
+    }
+
+    public void uploadProfileImg(String newProfileImgUrl) {
+        this.profileImgUrl = newProfileImgUrl;
+    }
+
+    public void changeNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    public void changeLevel(Level one) {
+        this.level = one;
+    }
+
+    public void changeExp(Integer newExp) {
+        this.exp = newExp;
     }
 }

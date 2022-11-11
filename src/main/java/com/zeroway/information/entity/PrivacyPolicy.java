@@ -16,6 +16,8 @@ public class PrivacyPolicy {
 
     private String content;
 
+    private String Url;
+
     // 공고 날짜
     private LocalDate publishedAt;
 

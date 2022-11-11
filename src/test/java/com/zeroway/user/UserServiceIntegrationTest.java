@@ -5,7 +5,6 @@ import com.zeroway.challenge.entity.Challenge;
 import com.zeroway.challenge.entity.Level;
 import com.zeroway.challenge.repository.ChallengeRepository;
 import com.zeroway.challenge.repository.LevelRepository;
-import com.zeroway.common.BaseException;
 import com.zeroway.common.StatusType;
 import com.zeroway.user.dto.PatchUserInfo;
 import com.zeroway.user.dto.PostUserRes;
@@ -18,6 +17,9 @@ import com.zeroway.utils.JwtService;
 import com.zeroway.utils.RedisService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,12 +31,13 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-public class UserServiceIntegrationTest {
+class UserServiceIntegrationTest {
 
     @Autowired
     UserService userService;
@@ -74,8 +77,8 @@ public class UserServiceIntegrationTest {
                 .build());
     }
 
-    private Long createRequestJWT() {
-        User user = createUser().get();
+    private Long createRequestJWT(Optional<User> optionalUser) {
+        User user = optionalUser.get();
         userRepository.save(user);
         Long userId = userRepository.findByEmail(user.getEmail()).get().getId();
         String accessToken = jwtService.createAccessToken(userId);
@@ -89,9 +92,9 @@ public class UserServiceIntegrationTest {
 
     @DisplayName("로그인 성공")
     @Test
-    void loginO() throws BaseException {
+    void loginO() {
         Optional<User> user = createUser();
-        user.get().setLevel(levelRepository.findById(1).get());
+        user.get().changeLevel(levelRepository.findById(1).get());
         User user1 = userRepository.save(user.get());
 
         PostUserRes login = userService.login(user.get().getEmail());
@@ -102,13 +105,13 @@ public class UserServiceIntegrationTest {
 
     @DisplayName("기존 회원 재로그인 시 : 기존 레벨 유지")
     @Test
-    void reLoginLevelCheck() throws BaseException {
+    void reLoginLevelCheck() {
         SignInAuthReq sign = signInAuthReq();
         User mapUser = mapper.map(sign, User.class);
         MultipartFile multipartFile = null;
 
         Level twoLevel = levelRepository.findById(2).get();
-        mapUser.setLevel(twoLevel);
+        mapUser.changeLevel(twoLevel);
         userRepository.save(mapUser);
 
         PostUserRes login = userService.login(sign.getEmail());
@@ -119,7 +122,7 @@ public class UserServiceIntegrationTest {
 
     @DisplayName("유저 회원가입 성공")
     @Test
-    void signInO() throws BaseException {
+    void signInO() {
         SignInAuthReq sign = signInAuthReq();
         User user = mapper.map(sign, User.class);
         MultipartFile multipartFile = null;
@@ -136,8 +139,8 @@ public class UserServiceIntegrationTest {
 
     @DisplayName("회원 탈퇴 성공: 유저 테이블, redis")
     @Test
-    void signoutO() throws BaseException {
-        Long userId = this.createRequestJWT();
+    void signoutO() {
+        Long userId = this.createRequestJWT(createUser());
 
         Challenge chall1 = challengeRepository.save(Challenge.builder()
                 .content("1번 챌린지")
@@ -146,17 +149,55 @@ public class UserServiceIntegrationTest {
                 .content("2번 챌린지")
                 .build());
 
-        User signoutUser = userService.signout();
+        userService.signout();
+        User signoutUser = userRepository.findById(userId).get();
 
         assertThat(signoutUser.getId()).isEqualTo(userId);
         assertThat(signoutUser.getEmail()).isEqualTo("email@gmail.com");
         assertThat(redisService.getValues(String.valueOf(signoutUser.getId()))).isNull();
     }
 
+    static Stream<Arguments> streamUsers() {
+        return Stream.of(
+                Arguments.arguments(
+                        Optional.of(User.builder()
+                                .id(1L)
+                                .email("test@test")
+                                .nickname("예지테스트")
+                                .provider(ProviderType.valueOf("KAKAO"))
+                                .build())
+                ),
+                Arguments.arguments(
+                        Optional.of(User.builder()
+                                .id(2L)
+                                .email("e2")
+                                .nickname("n2")
+                                .provider(ProviderType.valueOf("KAKAO"))
+                                .build())
+                )
+        );
+    }
+
+    @DisplayName("회원탈퇴 성공: 2명 이상 처리")
+    @ParameterizedTest
+    @MethodSource("streamUsers")
+    void signOut(Optional<User> optionalUser) {
+        User user = optionalUser.get();
+        user.changeLevel(levelRepository.findById(1).get());
+
+        Long userId = createRequestJWT(optionalUser);
+
+        userService.signout();
+        User signoutUser = userRepository.findById(userId).get();
+
+        assertThat(signoutUser.getEmail()).isEqualTo("email@gmail.com");
+        assertThat(signoutUser.getNickname()).isEqualTo("알 수 없음");
+    }
+
     @DisplayName("회원 정보 수정 성공 : 프로필 & 닉네임")
     @Test
-    void patchInfo() throws BaseException {
-        Long userId = this.createRequestJWT();
+    void patchInfo() {
+        Long userId = this.createRequestJWT(createUser());
         User existedUser = userRepository.findById(userId).get();
         String existedImg = existedUser.getProfileImgUrl();
         String existedNickname = existedUser.getNickname();
@@ -175,8 +216,8 @@ public class UserServiceIntegrationTest {
 
     @DisplayName("회원 정보 수정 성공 : 닉네임만 변경")
     @Test
-    void patchInfo1() throws BaseException {
-        Long userId = this.createRequestJWT();
+    void patchInfo1() {
+        Long userId = this.createRequestJWT(createUser());
         User existedUser = userRepository.findById(userId).get();
         String existedImg = existedUser.getProfileImgUrl();
 
@@ -192,8 +233,8 @@ public class UserServiceIntegrationTest {
 
     @DisplayName("회원 정보 수정 성공 : 프로필 삭제 & 닉네임 변경")
     @Test
-    void patchInfo2() throws BaseException {
-        Long userId = this.createRequestJWT();
+    void patchInfo2() {
+        Long userId = this.createRequestJWT(createUser());
         User existedUser = userRepository.findById(userId).get();
         String existedImg = existedUser.getProfileImgUrl();
 
@@ -209,8 +250,8 @@ public class UserServiceIntegrationTest {
 
     @DisplayName("회원 정보 수정 성공 : 프로필만 변경")
     @Test
-    void patchInfo3() throws BaseException {
-        Long userId = this.createRequestJWT();
+    void patchInfo3() {
+        Long userId = this.createRequestJWT(createUser());
         User existedUser = userRepository.findById(userId).get();
         String existedNickname = existedUser.getNickname();
 
@@ -226,9 +267,9 @@ public class UserServiceIntegrationTest {
 
     @DisplayName("닉네임 중복 여부 확인 성공: T")
     @Test
-    void nickname() throws BaseException {
+    void nickname() {
         User user = createUser().get();
-        user.setLevel(levelRepository.findById(1).get());
+        user.changeLevel(levelRepository.findById(1).get());
         userRepository.save(user);
 
         boolean b = userService.existUser(user.getNickname());
@@ -238,9 +279,9 @@ public class UserServiceIntegrationTest {
 
     @DisplayName("닉네임 중복 여부 확인 성공: T & INACTIVE 유저 제외")
     @Test
-    void nickname1() throws BaseException {
+    void nickname1() {
         User user = createUser().get();
-        user.setLevel(levelRepository.findById(1).get());
+        user.changeLevel(levelRepository.findById(1).get());
         user = userRepository.save(user);
         user.setStatus(StatusType.INACTIVE);
 
@@ -251,7 +292,7 @@ public class UserServiceIntegrationTest {
 
     @DisplayName("닉네임 중복 여부 확인 성공: F")
     @Test
-    void nickname2() throws BaseException {
+    void nickname2() {
         boolean b = userService.existUser("새로운 닉네임");
 
         assertThat(b).isFalse();
@@ -259,8 +300,8 @@ public class UserServiceIntegrationTest {
 
     @DisplayName("로그아웃 성공")
     @Test
-    void logout() throws BaseException {
-        Long userId = createRequestJWT();
+    void logout() {
+        Long userId = createRequestJWT(createUser());
 
         userService.logout();
         User user = userRepository.findById(userId).get();

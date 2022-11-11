@@ -117,11 +117,11 @@ public class ChallengeService {
                 if(challenge.getId().equals(challengeId)) {
                     if(challenge.getComplete()) { // 수행 취소
                         challenge.setComplete(false);
-                        user.setExp(user.getExp()-exp);
+                        user.changeExp(user.getExp()-exp);
                     }
                     else { // 수행
                         challenge.setComplete(true);
-                        user.setExp(user.getExp()+exp);
+                        user.changeExp(user.getExp()+exp);
                     }
                 }
             }
@@ -140,19 +140,19 @@ public class ChallengeService {
         long maxLevel = levelRepository.maxLevel(); // 최대 레벨
         if(user.getExp() >= 100) {
             if(user.getLevel().getId()==maxLevel || user.getLevel().getId()==maxLevel-1) {
-                user.setLevel(levelRepository.findById(Math.toIntExact(maxLevel)).get());
-                user.setExp(100);
+                user.changeLevel(levelRepository.findById(Math.toIntExact(maxLevel)).get());
+                user.changeExp(100);
             } else {
                 Level levelup = levelRepository.findById(user.getLevel().getId() + 1).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));
-                user.setLevel(levelup);
-                user.setExp(user.getExp()-100);
+                user.changeLevel(levelup);
+                user.changeExp(user.getExp()-100);
             }
         } else if(user.getExp() < 0){
             if(user.getLevel().getId()!=1) {
                 Level levelDown = levelRepository.findById(user.getLevel().getId() - 1).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));
-                user.setLevel(levelDown);
-                user.setExp(user.getExp()+100);
-            } else user.setExp(0);
+                user.changeLevel(levelDown);
+                user.changeExp(user.getExp()+100);
+            } else {user.changeExp(0);}
         }
     }
 }

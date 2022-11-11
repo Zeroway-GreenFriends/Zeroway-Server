@@ -15,6 +15,7 @@ public class TermsOfUse {
     private Integer id;
 
     private String content;
+    private String url;
 
     // 공고 날짜
     private LocalDate publishedAt;
