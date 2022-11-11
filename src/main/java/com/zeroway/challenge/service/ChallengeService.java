@@ -137,19 +137,22 @@ public class ChallengeService {
     //레벨업&다운
     @Transactional
     void checkLevel(User user) throws BaseException {
+        long maxLevel = levelRepository.maxLevel(); // 최대 레벨
         if(user.getExp() >= 100) {
-            Level levelup = levelRepository.findById(user.getLevel().getId() + 1).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));
-            user.changeLevel(levelup);
-            user.changeExp(user.getExp()-100);
-
+            if(user.getLevel().getId()==maxLevel || user.getLevel().getId()==maxLevel-1) {
+                user.changeLevel(levelRepository.findById(Math.toIntExact(maxLevel)).get());
+                user.changeExp(100);
+            } else {
+                Level levelup = levelRepository.findById(user.getLevel().getId() + 1).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));
+                user.changeLevel(levelup);
+                user.changeExp(user.getExp()-100);
+            }
         } else if(user.getExp() < 0){
             if(user.getLevel().getId()!=1) {
-                Level levelDown = levelRepository.findById(user.getLevel().getId() - 1).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));;;
+                Level levelDown = levelRepository.findById(user.getLevel().getId() - 1).orElseThrow(() -> new BaseException(INVALID_LEVEL_ID));
                 user.changeLevel(levelDown);
                 user.changeExp(user.getExp()+100);
-            } else {
-                user.changeExp(0);
-            }
+            } else {user.changeExp(0);}
         }
     }
 }
