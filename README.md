@@ -90,6 +90,6 @@ Password : g74dw3 <br/>
 
 ## 👩‍💻 Server 팀원
 - 박소정 [sojungpp](https://github.com/sojungpp) 
-- 장예지 [yeezze](https://github.com/yeezze)
+- 장예지 [yeeeze](https://github.com/yeeeze)
 - 한지혜 [jihyehann](https://github.com/jihyehann)
 
