@@ -81,9 +81,6 @@
 <br/>
 
 ## ERD
-읽기 전용 URL : https://aquerytool.com/aquerymain/index/?rurl=0377515b-2a58-4123-8db1-0bfcf4181b1a& <br/>
-Password : g74dw3 <br/>
-
 ![Zeroway_20220824_215149](https://user-images.githubusercontent.com/75151848/186423097-9cca921a-145a-4213-b335-735ccda5a303.png)
 
 <br/>
